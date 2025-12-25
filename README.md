@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # motorcycle-management-backend
 
 
@@ -91,3 +92,19 @@ For open source projects, say how it is licensed.
 
 ## Project status
 If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+=======
+# Backend - Aplikasi Manajemen Perawatan Motor
+
+Struktur ini adalah kerangka backend yang rapi dan mudah diadaptasi — disusun agar sesuai praktik umum Laravel/Express tetapi ringan untuk dikembangkan.
+
+Folder penting:
+
+-   `app/` : kode aplikasi (Models, Http Controllers, Requests, Middleware, Console)
+-   `routes/` : definisi routing API
+-   `database/migrations` : file migrasi
+-   `database/seeders` : seeder awal
+-   `config/` : konfigurasi environment-agnostic
+-   `docs/` : dokumentasi arsitektur dan ERD
+
+Gunakan README ini sebagai titik awal. Sesuaikan dengan stack pilihan (Laravel atau Node.js + Express).
+>>>>>>> f9ffe58 (Initial commit - project structure)
