@@ -2,11 +2,6 @@
 
 namespace App\Models;
 
-<<<<<<< HEAD
-class ServiceHistory
-{
-    // Model stub - properties: id, vehicle_id, service_type, km, cost, receipt_url, performed_at
-=======
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -66,5 +61,5 @@ class ServiceHistory extends Model
     {
         $this->attributes['cost_cents'] = $value * 100;
     }
->>>>>>> a141ab55b3ee831814b4651bcc3ab00e6ae62169
+
 }

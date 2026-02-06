@@ -2,11 +2,6 @@
 
 namespace App\Models;
 
-<<<<<<< HEAD
-class Trip
-{
-    // Model stub - properties: id, vehicle_id, start_at, end_at, distance_meters
-=======
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -85,5 +80,4 @@ class Trip extends Model
         }
         return round($this->distance_meters / 1000, 2);
     }
->>>>>>> a141ab55b3ee831814b4651bcc3ab00e6ae62169
 }

@@ -2,17 +2,6 @@
 
 namespace App\Http\Controllers;
 
-<<<<<<< HEAD
-use Illuminate\Http\Request;
-
-class ServiceHistoryController extends Controller
-{
-    public function index() {}
-    public function store(Request $request) {}
-    public function show($id) {}
-    public function update(Request $request, $id) {}
-    public function destroy($id) {}
-=======
 use App\Http\Requests\StoreServiceHistoryRequest;
 use App\Http\Requests\UpdateServiceHistoryRequest;
 use App\Models\ServiceHistory;
@@ -409,5 +398,4 @@ class ServiceHistoryController extends Controller
             return $this->errorResponse('Gagal mengambil ringkasan biaya: ' . $e->getMessage(), 500);
         }
     }
->>>>>>> a141ab55b3ee831814b4651bcc3ab00e6ae62169
 }

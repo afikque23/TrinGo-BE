@@ -2,11 +2,6 @@
 
 namespace App\Models;
 
-<<<<<<< HEAD
-class Vehicle
-{
-    // Model stub - properties: id, user_id, make, model, year, odometer, photo_url
-=======
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -105,5 +100,4 @@ class Vehicle extends Model
     {
         return $this->hasMany(ServiceInterval::class);
     }
->>>>>>> a141ab55b3ee831814b4651bcc3ab00e6ae62169
 }

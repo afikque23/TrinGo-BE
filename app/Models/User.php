@@ -2,11 +2,6 @@
 
 namespace App\Models;
 
-<<<<<<< HEAD
-class User
-{
-    // Model stub - properties: id, name, email, password, avatar, created_at, updated_at
-=======
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -152,5 +147,4 @@ class User extends Authenticatable
             ->withPivot('role', 'granted_at', 'expires_at', 'is_active')
             ->withTimestamps();
     }
->>>>>>> a141ab55b3ee831814b4651bcc3ab00e6ae62169
 }

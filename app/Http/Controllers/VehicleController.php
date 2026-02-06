@@ -2,17 +2,6 @@
 
 namespace App\Http\Controllers;
 
-<<<<<<< HEAD
-use Illuminate\Http\Request;
-
-class VehicleController extends Controller
-{
-    public function index() {}
-    public function store(Request $request) {}
-    public function show($id) {}
-    public function update(Request $request, $id) {}
-    public function destroy($id) {}
-=======
 use App\Models\Vehicle;
 use App\Models\ServiceInterval;
 use App\Http\Requests\StoreVehicleRequest;
@@ -411,5 +400,5 @@ class VehicleController extends Controller
             );
         }
     }
->>>>>>> a141ab55b3ee831814b4651bcc3ab00e6ae62169
+
 }
