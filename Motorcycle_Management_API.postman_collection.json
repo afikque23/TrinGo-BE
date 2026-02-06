@@ -1,0 +1,674 @@
+{
+    "info": {
+        "_postman_id": "motorcycle-management-api-v2",
+        "name": "Motorcycle Management API v2.0",
+        "description": "Complete API collection with Refresh Token & Primary Vehicle System",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{access_token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "1. Register",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.otp) {",
+                                    "        pm.environment.set('otp', response.data.otp);",
+                                    "        pm.environment.set('test_email', pm.request.body.raw ? JSON.parse(pm.request.body.raw).email : '');",
+                                    "        console.log('✅ OTP saved:', response.data.otp);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"test@example.com\",\n    \"phone\": \"081234567890\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/register",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "register"]
+                        },
+                        "description": "Register user baru. OTP akan dikirim ke email dan disimpan otomatis ke environment variable."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Verify Email",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data) {",
+                                    "        pm.environment.set('access_token', response.data.access_token);",
+                                    "        pm.environment.set('refresh_token', response.data.refresh_token);",
+                                    "        console.log('✅ Access Token saved');",
+                                    "        console.log('✅ Refresh Token saved');",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"{{test_email}}\",\n    \"otp\": \"{{otp}}\",\n    \"type\": \"email_verification\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/verify-email",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "verify-email"]
+                        },
+                        "description": "Verifikasi email dengan OTP. Akan mendapat access_token & refresh_token."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data) {",
+                                    "        pm.environment.set('access_token', response.data.access_token);",
+                                    "        pm.environment.set('refresh_token', response.data.refresh_token);",
+                                    "        console.log('✅ Login successful');",
+                                    "        console.log('✅ Access Token saved');",
+                                    "        console.log('✅ Refresh Token saved');",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\",\n    \"device_id\": \"device-uuid-123\",\n    \"device_name\": \"Postman Test\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "login"]
+                        },
+                        "description": "Login dan mendapat access_token (30 menit) + refresh_token (30 hari)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Refresh Token ⭐",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data) {",
+                                    "        pm.environment.set('access_token', response.data.access_token);",
+                                    "        pm.environment.set('refresh_token', response.data.refresh_token);",
+                                    "        console.log('✅ Token refreshed successfully');",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"refresh_token\": \"{{refresh_token}}\",\n    \"email\": \"test@example.com\",\n    \"device_id\": \"device-uuid-123\",\n    \"device_name\": \"Postman Test\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/refresh-token",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "refresh-token"]
+                        },
+                        "description": "Refresh access token menggunakan refresh token. Dapat access_token & refresh_token baru."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Get Current User",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/auth/me",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "me"]
+                        },
+                        "description": "Get data user yang sedang login."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Resend OTP",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.otp) {",
+                                    "        pm.environment.set('otp', response.data.otp);",
+                                    "        console.log('✅ OTP resent:', response.data.otp);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"test@example.com\",\n    \"type\": \"email_verification\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/resend-otp",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "resend-otp"]
+                        },
+                        "description": "Kirim ulang OTP ke email."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Forgot Password",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.otp) {",
+                                    "        pm.environment.set('reset_otp', response.data.otp);",
+                                    "        console.log('✅ Reset OTP saved:', response.data.otp);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"test@example.com\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/forgot-password",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "forgot-password"]
+                        },
+                        "description": "Request reset password. OTP akan dikirim ke email."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Reset Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"test@example.com\",\n    \"otp\": \"{{reset_otp}}\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/reset-password",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "reset-password"]
+                        },
+                        "description": "Reset password dengan OTP."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "9. Change Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"current_password\": \"password123\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/change-password",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "change-password"]
+                        },
+                        "description": "Change password untuk user yang sudah login."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "10. Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/auth/logout",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "logout"]
+                        },
+                        "description": "Logout dan revoke semua token (access + refresh)."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Endpoint untuk autentikasi dengan sistem refresh token"
+        },
+        {
+            "name": "Vehicles - Primary System",
+            "item": [
+                {
+                    "name": "1. Add Vehicle (Auto Primary)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.id) {",
+                                    "        pm.environment.set('vehicle_id', response.data.id);",
+                                    "        console.log('✅ Vehicle created, ID:', response.data.id);",
+                                    "        console.log('Is Primary:', response.data.is_primary);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Honda PCX Saya\",\n    \"make\": \"Honda\",\n    \"model\": \"PCX 160\",\n    \"year\": 2023,\n    \"tipe_motor\": \"matic\",\n    \"odometer\": 5000,\n    \"license_plate\": \"B 1234 XYZ\",\n    \"color\": \"Hitam\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/vehicles",
+                            "host": ["{{base_url}}"],
+                            "path": ["vehicles"]
+                        },
+                        "description": "Tambah motor baru. Motor pertama otomatis jadi primary."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Get Primary Vehicle ⭐",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    console.log('✅ Primary Vehicle:', response.data.title);",
+                                    "    console.log('Motor ID:', response.data.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/vehicles/primary",
+                            "host": ["{{base_url}}"],
+                            "path": ["vehicles", "primary"]
+                        },
+                        "description": "Get motor utama user. Endpoint ini yang akan digunakan dashboard & fitur lainnya."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. List All Vehicles",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/vehicles",
+                            "host": ["{{base_url}}"],
+                            "path": ["vehicles"]
+                        },
+                        "description": "List semua motor milik user."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get Vehicle by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/vehicles/{{vehicle_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["vehicles", "{{vehicle_id}}"]
+                        },
+                        "description": "Get detail motor by ID."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Add Second Vehicle",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.id) {",
+                                    "        pm.environment.set('vehicle_id_2', response.data.id);",
+                                    "        console.log('✅ Second vehicle created, ID:', response.data.id);",
+                                    "        console.log('Is Primary:', response.data.is_primary);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Yamaha NMAX Saya\",\n    \"make\": \"Yamaha\",\n    \"model\": \"NMAX 155\",\n    \"year\": 2024,\n    \"tipe_motor\": \"matic\",\n    \"odometer\": 1000,\n    \"license_plate\": \"B 5678 ABC\",\n    \"color\": \"Merah\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/vehicles",
+                            "host": ["{{base_url}}"],
+                            "path": ["vehicles"]
+                        },
+                        "description": "Tambah motor kedua. Tidak otomatis jadi primary karena sudah ada primary."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Set as Primary Vehicle ⭐",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/vehicles/{{vehicle_id_2}}/set-primary",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "vehicles",
+                                "{{vehicle_id_2}}",
+                                "set-primary"
+                            ]
+                        },
+                        "description": "Set motor sebagai primary. Motor lain otomatis jadi non-primary."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Update Vehicle",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Honda PCX Updated\",\n    \"odometer\": 6000,\n    \"color\": \"Putih\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/vehicles/{{vehicle_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["vehicles", "{{vehicle_id}}"]
+                        },
+                        "description": "Update data motor."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Delete Vehicle",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/vehicles/{{vehicle_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["vehicles", "{{vehicle_id}}"]
+                        },
+                        "description": "Hapus motor (soft delete)."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Endpoint untuk manajemen kendaraan dengan sistem primary vehicle"
+        },
+        {
+            "name": "Health Check",
+            "item": [
+                {
+                    "name": "API Health Check",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/health",
+                            "host": ["{{base_url}}"],
+                            "path": ["health"]
+                        },
+                        "description": "Cek status API."
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000/api",
+            "type": "string"
+        }
+    ]
+}

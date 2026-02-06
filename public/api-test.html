@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>API Test - Motorcycle Management</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                padding: 20px;
+                min-height: 100vh;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 10px;
+                padding: 30px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            }
+            h1 {
+                color: #333;
+                margin-bottom: 20px;
+            }
+            .endpoint {
+                background: #f5f5f5;
+                padding: 20px;
+                margin: 20px 0;
+                border-radius: 8px;
+                border-left: 4px solid #667eea;
+            }
+            .endpoint h3 {
+                color: #667eea;
+                margin-bottom: 10px;
+            }
+            .method {
+                display: inline-block;
+                padding: 5px 10px;
+                border-radius: 4px;
+                font-weight: bold;
+                margin-right: 10px;
+            }
+            .post {
+                background: #28a745;
+                color: white;
+            }
+            .get {
+                background: #17a2b8;
+                color: white;
+            }
+            input,
+            textarea,
+            button {
+                width: 100%;
+                padding: 10px;
+                margin: 5px 0;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+            button {
+                background: #667eea;
+                color: white;
+                border: none;
+                cursor: pointer;
+                font-weight: bold;
+            }
+            button:hover {
+                background: #5568d3;
+            }
+            .response {
+                background: #1e1e1e;
+                color: #d4d4d4;
+                padding: 15px;
+                border-radius: 4px;
+                margin-top: 10px;
+                font-family: "Courier New", monospace;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                max-height: 400px;
+                overflow-y: auto;
+            }
+            .success {
+                border-left: 4px solid #28a745;
+            }
+            .error {
+                border-left: 4px solid #dc3545;
+            }
+            label {
+                display: block;
+                margin-top: 10px;
+                font-weight: bold;
+                color: #555;
+            }
+            .token-box {
+                background: #fff3cd;
+                padding: 10px;
+                border-radius: 4px;
+                margin: 10px 0;
+                border-left: 4px solid #ffc107;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🏍️ Motorcycle Management API Tester</h1>
+            <p style="color: #666; margin-bottom: 20px">
+                Test all authentication endpoints
+            </p>
+
+            <div class="token-box">
+                <strong>Saved Token:</strong>
+                <div
+                    id="savedToken"
+                    style="word-break: break-all; margin-top: 5px"
+                >
+                    None
+                </div>
+            </div>
+
+            <!-- Register -->
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span> /api/auth/register
+                </h3>
+                <label>Name:</label>
+                <input
+                    type="text"
+                    id="reg_name"
+                    placeholder="John Doe"
+                    value="Test User"
+                />
+                <label>Email:</label>
+                <input
+                    type="email"
+                    id="reg_email"
+                    placeholder="john@example.com"
+                    value="test@example.com"
+                />
+                <label>Phone (optional):</label>
+                <input type="text" id="reg_phone" placeholder="081234567890" />
+                <label>Password:</label>
+                <input
+                    type="password"
+                    id="reg_password"
+                    placeholder="password"
+                    value="password123"
+                />
+                <label>Confirm Password:</label>
+                <input
+                    type="password"
+                    id="reg_password_confirmation"
+                    placeholder="password"
+                    value="password123"
+                />
+                <button onclick="register()">Register</button>
+                <div
+                    id="reg_response"
+                    class="response"
+                    style="display: none"
+                ></div>
+            </div>
+
+            <!-- Verify Email -->
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span> /api/auth/verify-email
+                </h3>
+                <label>Email:</label>
+                <input
+                    type="email"
+                    id="verify_email"
+                    placeholder="john@example.com"
+                />
+                <label>OTP Code:</label>
+                <input type="text" id="verify_otp" placeholder="123456" />
+                <button onclick="verifyEmail()">Verify Email</button>
+                <div
+                    id="verify_response"
+                    class="response"
+                    style="display: none"
+                ></div>
+            </div>
+
+            <!-- Login -->
+            <div class="endpoint">
+                <h3><span class="method post">POST</span> /api/auth/login</h3>
+                <label>Email:</label>
+                <input
+                    type="email"
+                    id="login_email"
+                    placeholder="john@example.com"
+                />
+                <label>Password:</label>
+                <input
+                    type="password"
+                    id="login_password"
+                    placeholder="password"
+                />
+                <button onclick="login()">Login</button>
+                <div
+                    id="login_response"
+                    class="response"
+                    style="display: none"
+                ></div>
+            </div>
+
+            <!-- Get Profile -->
+            <div class="endpoint">
+                <h3><span class="method get">GET</span> /api/auth/me</h3>
+                <p style="color: #666">Requires authentication token</p>
+                <button onclick="getProfile()">Get My Profile</button>
+                <div
+                    id="profile_response"
+                    class="response"
+                    style="display: none"
+                ></div>
+            </div>
+
+            <!-- Forgot Password -->
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    /api/auth/forgot-password
+                </h3>
+                <label>Email:</label>
+                <input
+                    type="email"
+                    id="forgot_email"
+                    placeholder="john@example.com"
+                />
+                <button onclick="forgotPassword()">Send OTP</button>
+                <div
+                    id="forgot_response"
+                    class="response"
+                    style="display: none"
+                ></div>
+            </div>
+
+            <!-- Reset Password -->
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    /api/auth/reset-password
+                </h3>
+                <label>Email:</label>
+                <input
+                    type="email"
+                    id="reset_email"
+                    placeholder="john@example.com"
+                />
+                <label>OTP Code:</label>
+                <input type="text" id="reset_otp" placeholder="123456" />
+                <label>New Password:</label>
+                <input
+                    type="password"
+                    id="reset_password"
+                    placeholder="newpassword"
+                />
+                <label>Confirm Password:</label>
+                <input
+                    type="password"
+                    id="reset_password_confirmation"
+                    placeholder="newpassword"
+                />
+                <button onclick="resetPassword()">Reset Password</button>
+                <div
+                    id="reset_response"
+                    class="response"
+                    style="display: none"
+                ></div>
+            </div>
+
+            <!-- Logout -->
+            <div class="endpoint">
+                <h3><span class="method post">POST</span> /api/auth/logout</h3>
+                <p style="color: #666">Requires authentication token</p>
+                <button onclick="logout()">Logout</button>
+                <div
+                    id="logout_response"
+                    class="response"
+                    style="display: none"
+                ></div>
+            </div>
+        </div>
+
+        <script>
+            const BASE_URL = "/api";
+            let authToken = localStorage.getItem("auth_token") || "";
+
+            if (authToken) {
+                document.getElementById("savedToken").textContent =
+                    authToken.substring(0, 50) + "...";
+            }
+
+            function showResponse(elementId, data, isError = false) {
+                const el = document.getElementById(elementId);
+                el.style.display = "block";
+                el.className = "response " + (isError ? "error" : "success");
+                el.textContent = JSON.stringify(data, null, 2);
+            }
+
+            function saveToken(token) {
+                authToken = token;
+                localStorage.setItem("auth_token", token);
+                document.getElementById("savedToken").textContent =
+                    token.substring(0, 50) + "...";
+            }
+
+            async function register() {
+                const data = {
+                    name: document.getElementById("reg_name").value,
+                    email: document.getElementById("reg_email").value,
+                    phone: document.getElementById("reg_phone").value,
+                    password: document.getElementById("reg_password").value,
+                    password_confirmation: document.getElementById(
+                        "reg_password_confirmation"
+                    ).value,
+                };
+
+                try {
+                    const response = await fetch(BASE_URL + "/auth/register", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    });
+                    const result = await response.json();
+                    showResponse("reg_response", result, !response.ok);
+
+                    if (result.success && result.data.otp) {
+                        document.getElementById("verify_email").value =
+                            data.email;
+                        document.getElementById("verify_otp").value =
+                            result.data.otp;
+                    }
+                } catch (error) {
+                    showResponse(
+                        "reg_response",
+                        { error: error.message },
+                        true
+                    );
+                }
+            }
+
+            async function verifyEmail() {
+                const data = {
+                    email: document.getElementById("verify_email").value,
+                    otp: document.getElementById("verify_otp").value,
+                    type: "email_verification",
+                };
+
+                try {
+                    const response = await fetch(
+                        BASE_URL + "/auth/verify-email",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Accept: "application/json",
+                            },
+                            body: JSON.stringify(data),
+                        }
+                    );
+                    const result = await response.json();
+                    showResponse("verify_response", result, !response.ok);
+
+                    if (result.success && result.data.token) {
+                        saveToken(result.data.token);
+                    }
+                } catch (error) {
+                    showResponse(
+                        "verify_response",
+                        { error: error.message },
+                        true
+                    );
+                }
+            }
+
+            async function login() {
+                const data = {
+                    email: document.getElementById("login_email").value,
+                    password: document.getElementById("login_password").value,
+                };
+
+                try {
+                    const response = await fetch(BASE_URL + "/auth/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    });
+                    const result = await response.json();
+                    showResponse("login_response", result, !response.ok);
+
+                    if (result.success && result.data.token) {
+                        saveToken(result.data.token);
+                    }
+                } catch (error) {
+                    showResponse(
+                        "login_response",
+                        { error: error.message },
+                        true
+                    );
+                }
+            }
+
+            async function getProfile() {
+                if (!authToken) {
+                    showResponse(
+                        "profile_response",
+                        { error: "No token. Please login first." },
+                        true
+                    );
+                    return;
+                }
+
+                try {
+                    const response = await fetch(BASE_URL + "/auth/me", {
+                        method: "GET",
+                        headers: {
+                            Accept: "application/json",
+                            Authorization: "Bearer " + authToken,
+                        },
+                    });
+                    const result = await response.json();
+                    showResponse("profile_response", result, !response.ok);
+                } catch (error) {
+                    showResponse(
+                        "profile_response",
+                        { error: error.message },
+                        true
+                    );
+                }
+            }
+
+            async function forgotPassword() {
+                const data = {
+                    email: document.getElementById("forgot_email").value,
+                };
+
+                try {
+                    const response = await fetch(
+                        BASE_URL + "/auth/forgot-password",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Accept: "application/json",
+                            },
+                            body: JSON.stringify(data),
+                        }
+                    );
+                    const result = await response.json();
+                    showResponse("forgot_response", result, !response.ok);
+
+                    if (result.success && result.data.otp) {
+                        document.getElementById("reset_email").value =
+                            data.email;
+                        document.getElementById("reset_otp").value =
+                            result.data.otp;
+                    }
+                } catch (error) {
+                    showResponse(
+                        "forgot_response",
+                        { error: error.message },
+                        true
+                    );
+                }
+            }
+
+            async function resetPassword() {
+                const data = {
+                    email: document.getElementById("reset_email").value,
+                    otp: document.getElementById("reset_otp").value,
+                    password: document.getElementById("reset_password").value,
+                    password_confirmation: document.getElementById(
+                        "reset_password_confirmation"
+                    ).value,
+                };
+
+                try {
+                    const response = await fetch(
+                        BASE_URL + "/auth/reset-password",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Accept: "application/json",
+                            },
+                            body: JSON.stringify(data),
+                        }
+                    );
+                    const result = await response.json();
+                    showResponse("reset_response", result, !response.ok);
+                } catch (error) {
+                    showResponse(
+                        "reset_response",
+                        { error: error.message },
+                        true
+                    );
+                }
+            }
+
+            async function logout() {
+                if (!authToken) {
+                    showResponse(
+                        "logout_response",
+                        { error: "No token. Please login first." },
+                        true
+                    );
+                    return;
+                }
+
+                try {
+                    const response = await fetch(BASE_URL + "/auth/logout", {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json",
+                            Authorization: "Bearer " + authToken,
+                        },
+                    });
+                    const result = await response.json();
+                    showResponse("logout_response", result, !response.ok);
+
+                    if (result.success) {
+                        authToken = "";
+                        localStorage.removeItem("auth_token");
+                        document.getElementById("savedToken").textContent =
+                            "None";
+                    }
+                } catch (error) {
+                    showResponse(
+                        "logout_response",
+                        { error: error.message },
+                        true
+                    );
+                }
+            }
+        </script>
+    </body>
+</html>
