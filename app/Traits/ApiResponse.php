@@ -80,4 +80,20 @@ trait ApiResponse
             'data' => $data,
         ], 201);
     }
+
+    // Alias methods for shorter syntax
+    protected function success($data = null, string $message = 'Success', int $code = 200): JsonResponse
+    {
+        return $this->successResponse($data, $message, $code);
+    }
+
+    protected function error(string $message = 'Error occurred', int $code = 400, $errors = null): JsonResponse
+    {
+        return $this->errorResponse($message, $code, $errors);
+    }
+
+    protected function created($data = null, string $message = 'Resource created successfully'): JsonResponse
+    {
+        return $this->createdResponse($data, $message);
+    }
 }

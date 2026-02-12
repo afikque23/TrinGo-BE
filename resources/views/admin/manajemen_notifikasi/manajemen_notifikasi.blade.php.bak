@@ -1,0 +1,213 @@
+@extends('layouts.sidebar')
+
+@section('title', 'Manajemen Notifikasi - MotoTracker')
+@section('page-title', 'Manajemen Notifikasi')
+
+@section('content')
+<div x-data="{
+    showEditModal: false,
+    showDeleteModal: false,
+    selectedNotification: null,
+    testingNotification: null,
+    notifications: [
+        { id: 1, name: 'Pengingat Servis Rutin', trigger: '200 km sebelum interval', priority: 'High', priorityColor: '#FDC700', channels: 'Push + In-App', message: '🔧 Servis {service_type} dalam {km_remaining} km lagi! Estimasi biaya: {predicted_cost}', threshold: 200, active: true },
+        { id: 2, name: 'Peringatan Servis Kritikal', trigger: 'Melewati interval 10%', priority: 'Critical', priorityColor: '#FF6467', channels: 'Push + Email', message: '⚠️ URGENT: Motor Anda sudah melewati jadwal {service_type} sebanyak {km_overdue} km!', threshold: 10, active: true },
+        { id: 3, name: 'Rekomendasi Bengkel Terdekat', trigger: 'Servis mendekati interval', priority: 'Normal', priorityColor: '#6A7282', channels: 'In-App', message: '📍 {workshop_name} ({rating} ⭐) berjarak {distance} km. Booking sekarang!', threshold: 150, active: true },
+        { id: 4, name: 'Insight Pola Berkendara', trigger: 'Analisis bulanan', priority: 'Low', priorityColor: '#6A7282', channels: 'In-App', message: '📊 Pola berkendara Anda: {riding_pattern}, rata-rata {avg_distance} km/hari 🏍️', threshold: 0, active: true }
+    ],
+    openEdit(notif) {
+        this.selectedNotification = JSON.parse(JSON.stringify(notif));
+        this.showEditModal = true;
+    },
+    openDelete(notif) {
+        this.selectedNotification = notif;
+        this.showDeleteModal = true;
+    },
+    async testPush(notifId) {
+        this.testingNotification = notifId;
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        this.testingNotification = null;
+        alert('Push notification \"' + this.notifications.find(n => n.id === notifId).name + '\" berhasil dikirim ke test device!');
+    },
+    toggleActive(notifId) {
+        const notif = this.notifications.find(n => n.id === notifId);
+        if (notif) notif.active = !notif.active;
+    }
+}" class="relative">
+
+<div class="flex justify-between items-start mb-6">
+    <p class="text-[#99A1AF] text-sm" style="font-family: Arial, sans-serif;">Konfigurasi jenis dan parameter notifikasi ke pengguna aplikasi</p>
+    <button class="h-11 px-4 bg-[#6B7C4F] text-white text-base rounded-[10px] hover:bg-[#5A6A40] transition-colors flex items-center gap-2" style="font-family: Arial, sans-serif;">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Tambah Notifikasi
+    </button>
+</div>
+
+<div class="space-y-4">
+    <!-- Notification Card 1: Pengingat Servis Rutin -->
+    <div class="bg-[#111111] border border-[#1E2939] rounded-[14px] p-[21px]">
+        <div class="flex items-start justify-between mb-4">
+            <div class="flex-1">
+                <h3 class="text-base font-bold text-white mb-1" style="font-family: Arial, sans-serif;">Pengingat Servis Rutin</h3>
+                <div class="flex items-center gap-3 text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">
+                    <span>Trigger: 200 km sebelum interval</span>
+                    <span>•</span>
+                    <span class="text-[#FDC700]">High</span>
+                    <span>•</span>
+                    <span>Push + In-App</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button class="h-[38px] px-4 bg-[#1A1A1A] border border-[#364153] text-white text-sm rounded-[10px] hover:bg-[#2A2A2A] transition-colors flex items-center gap-2" style="font-family: Arial, sans-serif;">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                    </svg>
+                    Test Push
+                </button>
+                <button class="w-12 h-6 bg-[#6B7C4F] rounded-full relative flex items-center transition-colors">
+                    <div class="absolute right-1 w-4 h-4 bg-white rounded-full"></div>
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-[13px] mb-4">
+            <p class="text-xs text-[#6A7282] uppercase tracking-wider mb-1" style="font-family: Arial, sans-serif; letter-spacing: 0.3px;">Preview Pesan</p>
+            <p class="text-sm text-white" style="font-family: Arial, sans-serif;">🔧 Servis {service_type} dalam {km_remaining} km lagi. Jaga performa motor Anda!</p>
+        </div>
+
+        <div class="flex">
+            <button class="h-[38px] px-4 bg-[#1A1A1A] border border-[#364153] text-white text-sm rounded-[10px] hover:bg-[#2A2A2A] transition-colors flex items-center gap-2" style="font-family: Arial, sans-serif;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                Edit
+            </button>
+        </div>
+    </div>
+
+    <!-- Notification Card 2: Peringatan Servis Kritikal -->
+    <div class="bg-[#111111] border border-[#1E2939] rounded-[14px] p-[21px]">
+        <div class="flex items-start justify-between mb-4">
+            <div class="flex-1">
+                <h3 class="text-base font-bold text-white mb-1" style="font-family: Arial, sans-serif;">Peringatan Servis Kritikal</h3>
+                <div class="flex items-center gap-3 text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">
+                    <span>Trigger: Melewati interval 10%</span>
+                    <span>•</span>
+                    <span class="text-[#FF6467]">Critical</span>
+                    <span>•</span>
+                    <span>Push + Email</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button class="h-[38px] px-4 bg-[#1A1A1A] border border-[#364153] text-white text-sm rounded-[10px] hover:bg-[#2A2A2A] transition-colors flex items-center gap-2" style="font-family: Arial, sans-serif;">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                    </svg>
+                    Test Push
+                </button>
+                <button class="w-12 h-6 bg-[#6B7C4F] rounded-full relative flex items-center transition-colors">
+                    <div class="absolute right-1 w-4 h-4 bg-white rounded-full"></div>
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-[13px] mb-4">
+            <p class="text-xs text-[#6A7282] uppercase tracking-wider mb-1" style="font-family: Arial, sans-serif; letter-spacing: 0.3px;">Preview Pesan</p>
+            <p class="text-sm text-white" style="font-family: Arial, sans-serif;">⚠️ URGENT: Motor Anda sudah melewati jadwal {service_type} sebanyak {km_overdue} km!</p>
+        </div>
+
+        <div class="flex">
+            <button class="h-[38px] px-4 bg-[#1A1A1A] border border-[#364153] text-white text-sm rounded-[10px] hover:bg-[#2A2A2A] transition-colors flex items-center gap-2" style="font-family: Arial, sans-serif;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                Edit
+            </button>
+        </div>
+    </div>
+
+    <!-- Notification Card 3: Rekomendasi Bengkel Terdekat -->
+    <div class="bg-[#111111] border border-[#1E2939] rounded-[14px] p-[21px]">
+        <div class="flex items-start justify-between mb-4">
+            <div class="flex-1">
+                <h3 class="text-base font-bold text-white mb-1" style="font-family: Arial, sans-serif;">Rekomendasi Bengkel Terdekat</h3>
+                <div class="flex items-center gap-3 text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">
+                    <span>Trigger: Servis mendekati interval</span>
+                    <span>•</span>
+                    <span>Normal</span>
+                    <span>•</span>
+                    <span>In-App</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button class="h-[38px] px-4 bg-[#1A1A1A] border border-[#364153] text-white text-sm rounded-[10px] hover:bg-[#2A2A2A] transition-colors flex items-center gap-2" style="font-family: Arial, sans-serif;">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                    </svg>
+                    Test Push
+                </button>
+                <button class="w-12 h-6 bg-[#6B7C4F] rounded-full relative flex items-center transition-colors">
+                    <div class="absolute right-1 w-4 h-4 bg-white rounded-full"></div>
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-[13px] mb-4">
+            <p class="text-xs text-[#6A7282] uppercase tracking-wider mb-1" style="font-family: Arial, sans-serif; letter-spacing: 0.3px;">Preview Pesan</p>
+            <p class="text-sm text-white" style="font-family: Arial, sans-serif;">📍 {workshop_name} ({rating} ⭐) berjarak {distance} km. Booking sekarang!</p>
+        </div>
+
+        <div class="flex">
+            <button class="h-[38px] px-4 bg-[#1A1A1A] border border-[#364153] text-white text-sm rounded-[10px] hover:bg-[#2A2A2A] transition-colors flex items-center gap-2" style="font-family: Arial, sans-serif;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                Edit
+            </button>
+        </div>
+    </div>
+
+    <!-- Notification Card 4: Insight Pola Berkendara -->
+    <div class="bg-[#111111] border border-[#1E2939] rounded-[14px] p-[21px]">
+        <div class="flex items-start justify-between mb-4">
+            <div class="flex-1">
+                <h3 class="text-base font-bold text-white mb-1" style="font-family: Arial, sans-serif;">Insight Pola Berkendara</h3>
+                <div class="flex items-center gap-3 text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">
+                    <span>Trigger: Analisis bulanan</span>
+                    <span>•</span>
+                    <span>Low</span>
+                    <span>•</span>
+                    <span>In-App</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button class="h-[38px] px-4 bg-[#1A1A1A] border border-[#364153] text-white text-sm rounded-[10px] hover:bg-[#2A2A2A] transition-colors flex items-center gap-2" style="font-family: Arial, sans-serif;">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                    </svg>
+                    Test Push
+                </button>
+                <button class="w-12 h-6 bg-[#6B7C4F] rounded-full relative flex items-center transition-colors">
+                    <div class="absolute right-1 w-4 h-4 bg-white rounded-full"></div>
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-[13px] mb-4">
+            <p class="text-xs text-[#6A7282] uppercase tracking-wider mb-1" style="font-family: Arial, sans-serif; letter-spacing: 0.3px;">Preview Pesan</p>
+            <p class="text-sm text-white" style="font-family: Arial, sans-serif;">📊 Pola berkendara Anda: {riding_pattern}, rata-rata {avg_distance} km/hari 🏍️</p>
+        </div>
+
+        <div class="flex">
+            <button class="h-[38px] px-4 bg-[#1A1A1A] border border-[#364153] text-white text-sm rounded-[10px] hover:bg-[#2A2A2A] transition-colors flex items-center gap-2" style="font-family: Arial, sans-serif;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                Edit
+            </button>
+        </div>
+    </div>
+</div>
+@endsection

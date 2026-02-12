@@ -14,6 +14,7 @@ class ServiceHistory extends Model
 
     protected $fillable = [
         'vehicle_id',
+        'service_type_id',
         'service_type',
         'performed_at',
         'odometer',
@@ -36,6 +37,14 @@ class ServiceHistory extends Model
     public function vehicle(): BelongsTo
     {
         return $this->belongsTo(Vehicle::class);
+    }
+
+    /**
+     * Get the service type that owns the service history.
+     */
+    public function serviceType(): BelongsTo
+    {
+        return $this->belongsTo(ServiceType::class, 'service_type_id');
     }
 
     /**

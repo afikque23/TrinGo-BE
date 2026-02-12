@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -6,7 +6,33 @@
 @source "../**/*.js";
 @source "../**/*.vue";
 
+/* Alpine.js x-cloak - hide until Alpine is ready */
+[x-cloak] {
+    display: none !important;
+}
+
+/* Custom select dropdown arrow positioning */
+select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2399A1AF' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
 @theme {
-    --font-sans: Figtree, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-        'Noto Color Emoji';
+    --font-sans:
+        Figtree, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+        "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+    /* Custom Admin Colors */
+    --color-admin-bg: #111111;
+    --color-admin-border: #1e2939;
+    --color-admin-active: #6b7c4f;
+    --color-admin-text: #99a1af;
+    --color-admin-text-muted: #6a7282;
+    --color-admin-status-bg: #0a0a0a;
 }

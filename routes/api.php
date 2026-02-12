@@ -1,8 +1,16 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ContentController;
+use App\Http\Controllers\Api\NotificationCategoryController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\NotificationPreferenceController;
+use App\Http\Controllers\Api\ReminderOptionController;
+use App\Http\Controllers\Api\ServiceTypeController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\ServiceHistoryController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\TripController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -11,25 +19,30 @@ use Illuminate\Support\Facades\Route;
 | API Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
+| These routes are for mobile app and external API access
+| Prefix: /api/v1/motorcycle
+| All responses return JSON
 |
 */
 
 // Public routes (no authentication required)
-Route::prefix('auth')->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
-    Route::post('/resend-otp', [AuthController::class, 'resendOtp']);
-    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-    Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
+Route::prefix('auth')->name('api.auth.')->group(function () {
+    Route::post('/register', [AuthController::class, 'register'])->name('register');
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/verify-email', [AuthController::class, 'verifyEmail'])->name('verify-email');
+    Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->name('resend-otp');
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot-password');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('reset-password');
+    Route::post('/refresh-token', [AuthController::class, 'refreshToken'])->name('refresh-token');
+});
+
+// Public Content Routes (for Mobile App) - No authentication required
+Route::prefix('public')->group(function () {
+    Route::get('/contents/{type}', [ContentController::class, 'getByType']);
 });
 
 // Protected routes (authentication required)
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum,web')->group(function () {
     // Auth routes
     Route::prefix('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -50,9 +63,56 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::apiResource('service-histories', ServiceHistoryController::class);
 
+    // Service Management Routes (New Feature)
+    // IMPORTANT: Specific routes MUST come before apiResource
+    Route::get('/services/summary/{vehicle_id}', [ServiceController::class, 'summary']);
+    Route::get('/services/cost-breakdown/{vehicle_id}', [ServiceController::class, 'costBreakdown']);
+    
+    Route::apiResource('services', ServiceController::class);
+
+    // Service Type Master Data (for Web Admin & Mobile Dropdown)
+    // IMPORTANT: Specific routes MUST come before apiResource
+    Route::patch('/service-types/{service_type}/toggle-status', [ServiceTypeController::class, 'toggleStatus']);
+    
+    Route::apiResource('service-types', ServiceTypeController::class);
+
+    // Reminder Option Master Data (for Web Admin & Mobile Dropdown)
+    // IMPORTANT: Specific routes MUST come before apiResource
+    Route::patch('/reminder-options/{reminder_option}/toggle-status', [ReminderOptionController::class, 'toggleStatus']);
+    
+    Route::apiResource('reminder-options', ReminderOptionController::class);
+
+    // Service Schedule Routes (Sprint 6)
+    // IMPORTANT: Specific routes MUST come before apiResource
+    Route::get('/service-schedules/status/{vehicle_id}', [App\Http\Controllers\Api\ServiceScheduleController::class, 'evaluateStatus']);
+    
+    Route::apiResource('service-schedules', App\Http\Controllers\Api\ServiceScheduleController::class);
+
+    // Trip Management Routes
+    Route::apiResource('trips', TripController::class);
+
+    // Notification Routes (Mobile App)
+    // IMPORTANT: Specific routes MUST come before apiResource
+    Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+    
+    Route::apiResource('notifications', NotificationController::class)->only(['index', 'show', 'destroy']);
+
+    // Notification Categories (for Tab Navigation)
+    Route::get('/notification-categories', [NotificationCategoryController::class, 'index']);
+
+    // Notification Preferences (User Settings for Push Notifications)
+    Route::get('/notification-preferences', [NotificationPreferenceController::class, 'index']);
+    Route::patch('/notification-preferences', [NotificationPreferenceController::class, 'update']);
+    Route::delete('/notification-preferences', [NotificationPreferenceController::class, 'destroy']);
+
+    // Admin Content Management Routes (Web Admin Only)
+    Route::prefix('admin')->middleware('admin')->group(function () {
+        Route::apiResource('contents', ContentController::class);
+    });
+
     // Other protected routes will go here
-    // Example:
-    // Route::apiResource('trips', TripController::class);
+    // Future: FuelLog, Document, Reminder, etc.
 });
 
 // Health check route

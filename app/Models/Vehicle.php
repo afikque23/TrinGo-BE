@@ -70,6 +70,14 @@ class Vehicle extends Model
     }
 
     /**
+     * Get the services for the vehicle.
+     */
+    public function services(): HasMany
+    {
+        return $this->hasMany(Service::class);
+    }
+
+    /**
      * Get the fuel logs for the vehicle.
      */
     public function fuelLogs(): HasMany
@@ -83,6 +91,14 @@ class Vehicle extends Model
     public function reminders(): HasMany
     {
         return $this->hasMany(Reminder::class);
+    }
+
+    /**
+     * Get the service schedules for the vehicle.
+     */
+    public function serviceSchedules(): HasMany
+    {
+        return $this->hasMany(ServiceSchedule::class);
     }
 
     /**

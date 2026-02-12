@@ -637,6 +637,663 @@
             "description": "Endpoint untuk manajemen kendaraan dengan sistem primary vehicle"
         },
         {
+            "name": "Services",
+            "item": [
+                {
+                    "name": "1. Create Service",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.id) {",
+                                    "        pm.environment.set('service_id', response.data.id);",
+                                    "        console.log('✅ Service created, ID:', response.data.id);",
+                                    "        console.log('Total Cost:', response.data.cost);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"vehicle_id\": {{vehicle_id}},\n    \"service_type_id\": 1,\n    \"service_date\": \"2024-01-15\",\n    \"odometer_km\": 5000,\n    \"cost\": 150000,\n    \"workshop_name\": \"Bengkel Jaya Motor\",\n    \"notes\": \"Ganti oli mesin dan filter oli\",\n    \"receipt_image\": null\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/services",
+                            "host": ["{{base_url}}"],
+                            "path": ["services"]
+                        },
+                        "description": "Tambah service baru untuk kendaraan. Service type: 1=Ganti Oli, 2=Tune Up, 3=Ganti Ban, 4=Ganti Kampas Rem, 5=Service Berkala, 6=Perbaikan Mesin, 7=Ganti Aki, 8=Lainnya"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Get All Services",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/services",
+                            "host": ["{{base_url}}"],
+                            "path": ["services"]
+                        },
+                        "description": "List semua service. Dapat difilter dengan parameter vehicle_id."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Get Services by Vehicle",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/services?vehicle_id={{vehicle_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["services"],
+                            "query": [
+                                {
+                                    "key": "vehicle_id",
+                                    "value": "{{vehicle_id}}"
+                                }
+                            ]
+                        },
+                        "description": "List service untuk kendaraan tertentu."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get Service Detail",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/services/{{service_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["services", "{{service_id}}"]
+                        },
+                        "description": "Get detail service by ID."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Update Service",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"service_type_id\": 2,\n    \"service_date\": \"2024-01-20\",\n    \"odometer_km\": 5200,\n    \"cost\": 250000,\n    \"workshop_name\": \"Bengkel Makmur\",\n    \"notes\": \"Tune up dan ganti busi\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/services/{{service_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["services", "{{service_id}}"]
+                        },
+                        "description": "Update data service."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Delete Service",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/services/{{service_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["services", "{{service_id}}"]
+                        },
+                        "description": "Hapus service."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Get Service Summary ⭐",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    console.log('✅ Total Services:', response.data.total_services);",
+                                    "    console.log('Total Cost:', response.data.total_cost);",
+                                    "    console.log('Last Service:', response.data.last_service_date);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/services/summary/{{vehicle_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["services", "summary", "{{vehicle_id}}"]
+                        },
+                        "description": "Get ringkasan service untuk kendaraan: total service, total biaya, service terakhir."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Get Cost Breakdown",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    console.log('✅ Cost breakdown by service type');",
+                                    "    response.data.breakdown.forEach(item => {",
+                                    "        console.log(`${item.service_type}: Rp ${item.total_cost} (${item.count}x)`);",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/services/cost-breakdown/{{vehicle_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "services",
+                                "cost-breakdown",
+                                "{{vehicle_id}}"
+                            ]
+                        },
+                        "description": "Get breakdown biaya per jenis service untuk analisis."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Endpoint untuk manajemen service kendaraan dengan perhitungan biaya otomatis"
+        },
+        {
+            "name": "Service Types - Master Data",
+            "item": [
+                {
+                    "name": "1. Get Active Service Types (Mobile) ⭐",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    console.log('✅ Active Service Types:');",
+                                    "    response.data.forEach(type => {",
+                                    "        console.log(`${type.id}. ${type.name}`);",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-types?active=1",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-types"],
+                            "query": [
+                                {
+                                    "key": "active",
+                                    "value": "1",
+                                    "description": "Filter hanya service type yang aktif"
+                                }
+                            ]
+                        },
+                        "description": "Endpoint untuk mobile app - dapatkan daftar jenis service aktif untuk dropdown. Response simple: hanya id dan name."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Get All Service Types (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-types",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-types"]
+                        },
+                        "description": "List semua service types untuk admin panel (termasuk yang non-aktif). Response lengkap dengan semua field."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Create Service Type",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.id) {",
+                                    "        pm.environment.set('service_type_id', response.data.id);",
+                                    "        console.log('✅ Service Type created, ID:', response.data.id);",
+                                    "        console.log('Name:', response.data.name);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Ganti CVT\",\n    \"description\": \"Penggantian CVT dan komponennya\",\n    \"is_active\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/service-types",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-types"]
+                        },
+                        "description": "Tambah jenis service baru dari admin panel."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get Service Type Detail",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-types/{{service_type_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-types", "{{service_type_id}}"]
+                        },
+                        "description": "Get detail service type by ID."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Update Service Type",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Ganti CVT Lengkap\",\n    \"description\": \"Penggantian CVT dan komponen terkait\",\n    \"is_active\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/service-types/{{service_type_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-types", "{{service_type_id}}"]
+                        },
+                        "description": "Update data service type."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Toggle Status",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-types/{{service_type_id}}/toggle-status",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "service-types",
+                                "{{service_type_id}}",
+                                "toggle-status"
+                            ]
+                        },
+                        "description": "Toggle status aktif/non-aktif service type. Digunakan untuk menonaktifkan jenis service tanpa menghapus data."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Delete Service Type",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-types/{{service_type_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-types", "{{service_type_id}}"]
+                        },
+                        "description": "Hapus service type. Tidak bisa dihapus jika masih digunakan oleh data service."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Master data jenis service untuk Web Admin dan Mobile App dropdown"
+        },
+        {
+            "name": "Reminder Options - Master Data",
+            "item": [
+                {
+                    "name": "1. Get Active Reminder Options (Mobile) ⭐",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    console.log('✅ Active Reminder Options:');",
+                                    "    response.data.forEach(option => {",
+                                    "        console.log(`${option.id}. ${option.display_text} (${option.value} ${option.unit})`);",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/reminder-options?active=1&unit=km",
+                            "host": ["{{base_url}}"],
+                            "path": ["reminder-options"],
+                            "query": [
+                                {
+                                    "key": "active",
+                                    "value": "1",
+                                    "description": "Filter hanya reminder option yang aktif"
+                                },
+                                {
+                                    "key": "unit",
+                                    "value": "km",
+                                    "description": "Filter by unit: km, days, weeks, months, years"
+                                }
+                            ]
+                        },
+                        "description": "Endpoint untuk mobile app - dapatkan daftar opsi pengingat aktif untuk dropdown. Response dengan display_text siap pakai."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Get All Reminder Options (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/reminder-options",
+                            "host": ["{{base_url}}"],
+                            "path": ["reminder-options"]
+                        },
+                        "description": "List semua reminder options untuk admin panel (termasuk yang non-aktif)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Create Reminder Option",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.id) {",
+                                    "        pm.environment.set('reminder_option_id', response.data.id);",
+                                    "        console.log('✅ Reminder Option created, ID:', response.data.id);",
+                                    "        console.log('Label:', response.data.label);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"label\": \"3 bulan sebelum\",\n    \"value\": 3,\n    \"unit\": \"months\",\n    \"is_active\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/reminder-options",
+                            "host": ["{{base_url}}"],
+                            "path": ["reminder-options"]
+                        },
+                        "description": "Tambah opsi pengingat baru dari admin panel. Unit harus salah satu dari: 'km', 'days', 'weeks', 'months', 'years'. Value + Unit harus unik."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get Reminder Option Detail",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/reminder-options/{{reminder_option_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "reminder-options",
+                                "{{reminder_option_id}}"
+                            ]
+                        },
+                        "description": "Get detail reminder option by ID."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Update Reminder Option",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"label\": \"6 bulan sebelum\",\n    \"value\": 6,\n    \"unit\": \"months\",\n    \"is_active\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/reminder-options/{{reminder_option_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "reminder-options",
+                                "{{reminder_option_id}}"
+                            ]
+                        },
+                        "description": "Update data reminder option. Unit must be one of: 'km', 'days', 'weeks', 'months', 'years'."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Toggle Status",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/reminder-options/{{reminder_option_id}}/toggle-status",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "reminder-options",
+                                "{{reminder_option_id}}",
+                                "toggle-status"
+                            ]
+                        },
+                        "description": "Toggle status aktif/non-aktif reminder option."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Delete Reminder Option",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/reminder-options/{{reminder_option_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "reminder-options",
+                                "{{reminder_option_id}}"
+                            ]
+                        },
+                        "description": "Hapus reminder option."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Master data opsi pengingat untuk Web Admin dan Mobile App dropdown"
+        },
+        {
             "name": "Health Check",
             "item": [
                 {
@@ -662,6 +1319,795 @@
                     "response": []
                 }
             ]
+        },
+        {
+            "name": "Content Management - Admin",
+            "item": [
+                {
+                    "name": "Get All Contents",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/contents",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "contents"]
+                        },
+                        "description": "Get all content records for admin panel"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Content",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Syarat dan Ketentuan\",\n    \"type\": \"terms\",\n    \"body\": \"[{\\\"section\\\":\\\"Penerimaan Syarat\\\",\\\"content\\\":\\\"Dengan menggunakan aplikasi ini, Anda menyetujui syarat dan ketentuan yang berlaku.\\\"}]\",\n    \"status\": \"published\",\n    \"order\": 1\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/contents",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "contents"]
+                        },
+                        "description": "Create new content (admin only)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Single Content",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/contents/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "contents", "1"]
+                        },
+                        "description": "Get single content by ID"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Content",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Updated Title\",\n    \"status\": \"draft\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/contents/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "contents", "1"]
+                        },
+                        "description": "Update content (partial or full update)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Content",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/contents/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "contents", "1"]
+                        },
+                        "description": "Delete content by ID"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Content Management endpoints for admin panel - CRUD operations"
+        },
+        {
+            "name": "Content Management - Public",
+            "item": [
+                {
+                    "name": "Get Terms & Conditions",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/public/contents/terms",
+                            "host": ["{{base_url}}"],
+                            "path": ["public", "contents", "terms"]
+                        },
+                        "description": "Get published Terms & Conditions for mobile app"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Privacy Policy",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/public/contents/privacy",
+                            "host": ["{{base_url}}"],
+                            "path": ["public", "contents", "privacy"]
+                        },
+                        "description": "Get published Privacy Policy for mobile app"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get User Guide",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/public/contents/guide",
+                            "host": ["{{base_url}}"],
+                            "path": ["public", "contents", "guide"]
+                        },
+                        "description": "Get published User Guide for mobile app"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get About",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/public/contents/about",
+                            "host": ["{{base_url}}"],
+                            "path": ["public", "contents", "about"]
+                        },
+                        "description": "Get published About info for mobile app"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get FAQ",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/public/contents/faq",
+                            "host": ["{{base_url}}"],
+                            "path": ["public", "contents", "faq"]
+                        },
+                        "description": "Get published FAQ for mobile app"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get System Info",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/public/contents/system_info",
+                            "host": ["{{base_url}}"],
+                            "path": ["public", "contents", "system_info"]
+                        },
+                        "description": "Get published System Info (algorithm transparency) for mobile app"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Public content endpoints for mobile app - no authentication required"
+        },
+        {
+            "name": "Service Schedules",
+            "item": [
+                {
+                    "name": "1. Create Service Schedule (KM)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.id) {",
+                                    "        pm.environment.set('service_schedule_id', response.data.id);",
+                                    "        console.log('✅ Service schedule created, ID:', response.data.id);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"vehicle_id\": 1,\n  \"service_type_id\": 2,\n  \"schedule_type\": \"km\",\n  \"target_km\": 15000,\n  \"reminder_option_id\": 1,\n  \"notes\": \"Ganti oli setiap 5000 km\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-schedules"]
+                        },
+                        "description": "Create a KM-based service schedule. Requires auth"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Create Service Schedule (Time)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"vehicle_id\": 1,\n  \"service_type_id\": 3,\n  \"schedule_type\": \"time\",\n  \"target_date\": \"2026-06-30\",\n  \"reminder_option_id\": 11,\n  \"notes\": \"Service berkala 6 bulan\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-schedules"]
+                        },
+                        "description": "Create a time-based service schedule. Requires auth"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. List Service Schedules (Admin/User)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules?vehicle_id=1",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-schedules"],
+                            "query": [{ "key": "vehicle_id", "value": "1" }]
+                        },
+                        "description": "List schedules, filter by vehicle_id, is_active, schedule_type"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get Service Schedule Detail",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules/{{service_schedule_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "service-schedules",
+                                "{{service_schedule_id}}"
+                            ]
+                        },
+                        "description": "Get schedule detail by id"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Update Service Schedule",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"notes\": \"Perbarui catatan\",\n  \"is_active\": false\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules/{{service_schedule_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "service-schedules",
+                                "{{service_schedule_id}}"
+                            ]
+                        },
+                        "description": "Update schedule (partial/sometimes fields accepted)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Delete Service Schedule",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules/{{service_schedule_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "service-schedules",
+                                "{{service_schedule_id}}"
+                            ]
+                        },
+                        "description": "Delete schedule by id"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Evaluate Schedule Status (Vehicle)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules/status/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-schedules", "status", "1"]
+                        },
+                        "description": "Evaluate all active schedules for a vehicle and return status (critical/warning/normal)"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Service Schedule master data & evaluation endpoints"
+        },
+        {
+            "name": "Notifications",
+            "item": [
+                {
+                    "name": "1. Get Notification Categories",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notification-categories",
+                            "host": ["{{base_url}}"],
+                            "path": ["notification-categories"]
+                        },
+                        "description": "Get all active notification categories for tab navigation"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Get All Notifications",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications?per_page=10",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications"],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "10",
+                                    "description": "Items per page"
+                                },
+                                {
+                                    "key": "category",
+                                    "value": "service",
+                                    "disabled": true,
+                                    "description": "Filter by category (service, trip, alert, insight)"
+                                },
+                                {
+                                    "key": "unread",
+                                    "value": "true",
+                                    "disabled": true,
+                                    "description": "Filter unread only"
+                                }
+                            ]
+                        },
+                        "description": "Get paginated user notifications with filters"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Get Notification by Category",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications?category=service&per_page=10",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications"],
+                            "query": [
+                                { "key": "category", "value": "service" },
+                                { "key": "per_page", "value": "10" }
+                            ]
+                        },
+                        "description": "Get notifications filtered by category"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get Unread Notifications",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications?unread=true",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications"],
+                            "query": [{ "key": "unread", "value": "true" }]
+                        },
+                        "description": "Get only unread notifications"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Get Single Notification",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications/{{notification_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications", "{{notification_id}}"]
+                        },
+                        "description": "Get single notification detail"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Mark Notification as Read",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications/{{notification_id}}/read",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "notifications",
+                                "{{notification_id}}",
+                                "read"
+                            ]
+                        },
+                        "description": "Mark a specific notification as read"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Mark All as Read",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications/read-all",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications", "read-all"]
+                        },
+                        "description": "Mark all user notifications as read"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Delete Notification",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications/{{notification_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications", "{{notification_id}}"]
+                        },
+                        "description": "Delete a notification"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "9. Get Notification Preferences",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notification-preferences",
+                            "host": ["{{base_url}}"],
+                            "path": ["notification-preferences"]
+                        },
+                        "description": "Get all notification templates grouped by category with user's preference status (enabled/disabled). Returns both category-level and template-specific preferences."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "10. Toggle Template Preference",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"template_id\": 1,\n    \"is_enabled\": false\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/notification-preferences",
+                            "host": ["{{base_url}}"],
+                            "path": ["notification-preferences"]
+                        },
+                        "description": "Toggle notification preference for a specific template. Set is_enabled to true to enable, false to disable. Provide either template_id or category_key, not both."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "11. Toggle Category Preference",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"category_key\": \"service\",\n    \"is_enabled\": false\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/notification-preferences",
+                            "host": ["{{base_url}}"],
+                            "path": ["notification-preferences"]
+                        },
+                        "description": "Toggle notification preference for an entire category. This will affect all templates in the category unless they have specific template-level preferences."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "12. Reset Preference (Delete)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"template_id\": 1\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/notification-preferences",
+                            "host": ["{{base_url}}"],
+                            "path": ["notification-preferences"]
+                        },
+                        "description": "Reset notification preference to default (enabled). Provide either template_id or category_key to reset. Alternative body example: {\"category_key\": \"service\"}"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "User notification management endpoints for mobile app"
         }
     ],
     "variable": [

@@ -13,7 +13,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\IsAdmin::class,
+        ]);
+        
+        // Enable session and CSRF for API routes (needed for web admin panel)
+        $middleware->statefulApi();
+        
+        // Encrypt cookies for API
+        $middleware->encryptCookies(except: []);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

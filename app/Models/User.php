@@ -19,6 +19,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'role',
         'phone',
         'password',
         'avatar',
@@ -114,6 +115,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if user is admin
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
      * Relationships
      */
     public function vehicles()
@@ -146,5 +155,15 @@ class User extends Authenticatable
         return $this->belongsToMany(Vehicle::class, 'vehicle_user')
             ->withPivot('role', 'granted_at', 'expires_at', 'is_active')
             ->withTimestamps();
+    }
+
+    public function notificationPreferences()
+    {
+        return $this->hasMany(NotificationPreference::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
     }
 }
