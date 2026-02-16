@@ -7,6 +7,7 @@ use App\Models\ServiceInterval;
 use App\Http\Requests\StoreVehicleRequest;
 use App\Http\Requests\UpdateVehicleRequest;
 use App\Traits\ApiResponse;
+use App\Traits\HasOwnerIdentification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -15,18 +16,19 @@ use Illuminate\Support\Facades\Log;
 
 class VehicleController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, HasOwnerIdentification;
 
     /**
      * Display a listing of the user's vehicles.
+     * Supports both authenticated users and guest mode (device_id)
      */
     public function index(Request $request): JsonResponse
     {
         try {
-            $user = $request->user();
+            $query = Vehicle::query();
+            $this->applyOwnerFilter($query, $request);
             
-            $vehicles = Vehicle::where('user_id', $user->id)
-                ->with(['serviceIntervals' => function ($query) {
+            $vehicles = $query->with(['serviceIntervals' => function ($query) {
                     $query->where('is_active', true)->orderBy('next_due_km');
                 }])
                 ->orderBy('created_at', 'desc')
@@ -49,13 +51,13 @@ class VehicleController extends Controller
 
     /**
      * Store a newly created vehicle in storage.
+     * Supports both authenticated users and guest mode (device_id)
      */
     public function store(StoreVehicleRequest $request): JsonResponse
     {
         DB::beginTransaction();
         
         try {
-            $user = $request->user();
             $validated = $request->validated();
             
             // Handle photo upload
@@ -66,11 +68,14 @@ class VehicleController extends Controller
                 $validated['photo_url'] = $path;
             }
             
-            // Set user_id
-            $validated['user_id'] = $user->id;
+            // Set owner (user_id atau device_id)
+            $ownerData = $this->getOwnerData($request);
+            $validated = array_merge($validated, $ownerData);
             
-            // Auto-set as primary if this is user's first vehicle
-            $existingVehicleCount = Vehicle::where('user_id', $user->id)->count();
+            // Auto-set as primary if this is owner's first vehicle
+            $query = Vehicle::query();
+            $this->applyOwnerFilter($query, $request);
+            $existingVehicleCount = $query->count();
             if ($existingVehicleCount === 0) {
                 $validated['is_primary'] = true;
             }
@@ -114,14 +119,15 @@ class VehicleController extends Controller
 
     /**
      * Display the specified vehicle.
+     * Supports both authenticated users and guest mode (device_id)
      */
     public function show(Request $request, $id): JsonResponse
     {
         try {
-            $user = $request->user();
+            $query = Vehicle::query();
+            $this->applyOwnerFilter($query, $request);
             
-            $vehicle = Vehicle::where('user_id', $user->id)
-                ->with([
+            $vehicle = $query->with([
                     'serviceIntervals' => function ($query) {
                         $query->where('is_active', true)->orderBy('next_due_km');
                     },
@@ -159,14 +165,16 @@ class VehicleController extends Controller
 
     /**
      * Update the specified vehicle in storage.
+     * Supports both authenticated users and guest mode (device_id)
      */
     public function update(UpdateVehicleRequest $request, $id): JsonResponse
     {
         DB::beginTransaction();
         
         try {
-            $user = $request->user();
-            $vehicle = Vehicle::where('user_id', $user->id)->findOrFail($id);
+            $query = Vehicle::query();
+            $this->applyOwnerFilter($query, $request);
+            $vehicle = $query->findOrFail($id);
             
             $validated = $request->validated();
             $oldPhotoUrl = $vehicle->photo_url;
@@ -235,14 +243,16 @@ class VehicleController extends Controller
 
     /**
      * Remove the specified vehicle from storage.
+     * Supports both authenticated users and guest mode (device_id)
      */
     public function destroy(Request $request, $id): JsonResponse
     {
         DB::beginTransaction();
         
         try {
-            $user = $request->user();
-            $vehicle = Vehicle::where('user_id', $user->id)->findOrFail($id);
+            $query = Vehicle::query();
+            $this->applyOwnerFilter($query, $request);
+            $vehicle = $query->findOrFail($id);
             
             $photoUrl = $vehicle->photo_url;
             
@@ -300,21 +310,22 @@ class VehicleController extends Controller
     }
 
     /**
-     * Set primary vehicle for current user.
+     * Set primary vehicle for current owner.
+     * Supports both authenticated users and guest mode (device_id)
      */
     public function setPrimary(Request $request, $id): JsonResponse
     {
         DB::beginTransaction();
         
         try {
-            $user = $request->user();
+            // Verify vehicle exists and belongs to owner
+            $query = Vehicle::query();
+            $this->applyOwnerFilter($query, $request);
+            $vehicle = $query->findOrFail($id);
             
-            // Verify vehicle exists and belongs to user
-            $vehicle = Vehicle::where('user_id', $user->id)
-                ->findOrFail($id);
-            
-            // Unset all other vehicles as primary for this user
-            Vehicle::where('user_id', $user->id)
+            // Unset all other vehicles as primary for this owner
+            $ownerFilter = $this->getOwnerFilter($request);
+            Vehicle::where($ownerFilter['column'], $ownerFilter['id'])
                 ->where('id', '!=', $vehicle->id)
                 ->update(['is_primary' => false]);
             
@@ -352,16 +363,16 @@ class VehicleController extends Controller
     }
 
     /**
-     * Get primary vehicle for current user.
+     * Get primary vehicle for current owner.
+     * Supports both authenticated users and guest mode (device_id)
      */
     public function getPrimary(Request $request): JsonResponse
     {
         try {
-            $user = $request->user();
-            
             // Get primary vehicle with relationships
-            $vehicle = Vehicle::where('user_id', $user->id)
-                ->where('is_primary', true)
+            $query = Vehicle::query();
+            $this->applyOwnerFilter($query, $request);
+            $vehicle = $query->where('is_primary', true)
                 ->with([
                     'serviceIntervals' => function ($query) {
                         $query->where('is_active', true)->orderBy('next_due_km');

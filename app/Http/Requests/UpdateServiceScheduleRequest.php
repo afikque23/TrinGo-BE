@@ -68,7 +68,6 @@ class UpdateServiceScheduleRequest extends FormRequest
             'target_km.min' => 'Target kilometers must be at least 1.',
             'target_date.required' => 'Target date is required for time-based schedule.',
             'target_date.after' => 'Target date must be in the future.',
-            'reminder_option_id.required' => 'Reminder option is required.',
             'reminder_option_id.exists' => 'Selected reminder option not found or inactive.',
         ];
     }

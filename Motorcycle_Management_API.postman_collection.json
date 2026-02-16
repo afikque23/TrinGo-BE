@@ -15,6 +15,32 @@
             }
         ]
     },
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Auto-inject X-Device-ID header for guest mode (if not authenticated)",
+                    "const accessToken = pm.collectionVariables.get('access_token') || pm.environment.get('access_token');",
+                    "const deviceId = pm.collectionVariables.get('device_id') || pm.environment.get('device_id');",
+                    "",
+                    "// If no access token and device_id exists, add X-Device-ID header",
+                    "if (!accessToken && deviceId) {",
+                    "    pm.request.headers.upsert({",
+                    "        key: 'X-Device-ID',",
+                    "        value: deviceId",
+                    "    });",
+                    "    console.log('✅ X-Device-ID header auto-injected:', deviceId);",
+                    "} else if (accessToken) {",
+                    "    console.log('✅ Using authenticated mode with Bearer token');",
+                    "} else {",
+                    "    console.log('⚠️ No access_token or device_id found. Guest requests will fail.');",
+                    "}"
+                ]
+            }
+        }
+    ],
     "item": [
         {
             "name": "Authentication",
@@ -92,6 +118,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -217,6 +249,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -253,6 +291,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -354,6 +398,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -382,6 +432,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -425,6 +481,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -468,6 +530,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -487,6 +555,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -506,6 +580,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -543,6 +623,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -571,6 +657,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -594,6 +686,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -622,6 +720,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -665,6 +769,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -693,6 +803,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -712,6 +828,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -737,6 +859,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -756,6 +884,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -784,6 +918,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -819,6 +959,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -855,6 +1001,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -901,6 +1053,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -927,6 +1085,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -964,6 +1128,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -992,6 +1162,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1011,6 +1187,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -1039,6 +1221,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1062,6 +1250,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1104,6 +1298,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1135,6 +1335,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1172,6 +1378,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -1200,6 +1412,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1222,6 +1440,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -1253,6 +1477,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1276,6 +1506,12 @@
                             {
                                 "key": "Accept",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1336,6 +1572,12 @@
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1365,6 +1607,12 @@
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -1393,6 +1641,12 @@
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1422,6 +1676,12 @@
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -1450,6 +1710,12 @@
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1482,9 +1748,9 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/public/contents/terms",
+                            "raw": "{{base_url}}/contents/terms",
                             "host": ["{{base_url}}"],
-                            "path": ["public", "contents", "terms"]
+                            "path": ["contents", "terms"]
                         },
                         "description": "Get published Terms & Conditions for mobile app"
                     },
@@ -1505,9 +1771,9 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/public/contents/privacy",
+                            "raw": "{{base_url}}/contents/privacy",
                             "host": ["{{base_url}}"],
-                            "path": ["public", "contents", "privacy"]
+                            "path": ["contents", "privacy"]
                         },
                         "description": "Get published Privacy Policy for mobile app"
                     },
@@ -1528,9 +1794,9 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/public/contents/guide",
+                            "raw": "{{base_url}}/contents/guide",
                             "host": ["{{base_url}}"],
-                            "path": ["public", "contents", "guide"]
+                            "path": ["contents", "guide"]
                         },
                         "description": "Get published User Guide for mobile app"
                     },
@@ -1551,9 +1817,9 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/public/contents/about",
+                            "raw": "{{base_url}}/contents/about",
                             "host": ["{{base_url}}"],
-                            "path": ["public", "contents", "about"]
+                            "path": ["contents", "about"]
                         },
                         "description": "Get published About info for mobile app"
                     },
@@ -1574,9 +1840,9 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/public/contents/faq",
+                            "raw": "{{base_url}}/contents/faq",
                             "host": ["{{base_url}}"],
-                            "path": ["public", "contents", "faq"]
+                            "path": ["contents", "faq"]
                         },
                         "description": "Get published FAQ for mobile app"
                     },
@@ -1597,9 +1863,9 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/public/contents/system_info",
+                            "raw": "{{base_url}}/contents/system_info",
                             "host": ["{{base_url}}"],
-                            "path": ["public", "contents", "system_info"]
+                            "path": ["contents", "system_info"]
                         },
                         "description": "Get published System Info (algorithm transparency) for mobile app"
                     },
@@ -1633,23 +1899,36 @@
                     "request": {
                         "method": "POST",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
                             "mode": "raw",
                             "raw": "{\n  \"vehicle_id\": 1,\n  \"service_type_id\": 2,\n  \"schedule_type\": \"km\",\n  \"target_km\": 15000,\n  \"reminder_option_id\": 1,\n  \"notes\": \"Ganti oli setiap 5000 km\"\n}",
-                            "options": { "raw": { "language": "json" } }
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
                         },
                         "url": {
                             "raw": "{{base_url}}/service-schedules",
                             "host": ["{{base_url}}"],
                             "path": ["service-schedules"]
                         },
-                        "description": "Create a KM-based service schedule. Requires auth"
+                        "description": "Create a KM-based service schedule. reminder_option_id is optional - you can create schedules without setting a reminder."
                     },
                     "response": []
                 },
@@ -1658,23 +1937,36 @@
                     "request": {
                         "method": "POST",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"vehicle_id\": 1,\n  \"service_type_id\": 3,\n  \"schedule_type\": \"time\",\n  \"target_date\": \"2026-06-30\",\n  \"reminder_option_id\": 11,\n  \"notes\": \"Service berkala 6 bulan\"\n}",
-                            "options": { "raw": { "language": "json" } }
+                            "raw": "{\n  \"vehicle_id\": 1,\n  \"service_type_id\": 3,\n  \"schedule_type\": \"time\",\n  \"target_date\": \"2026-06-30\",\n  \"notes\": \"Service berkala 6 bulan (no reminder)\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
                         },
                         "url": {
                             "raw": "{{base_url}}/service-schedules",
                             "host": ["{{base_url}}"],
                             "path": ["service-schedules"]
                         },
-                        "description": "Create a time-based service schedule. Requires auth"
+                        "description": "Create a time-based service schedule. reminder_option_id is optional - this example shows creating without a reminder."
                     },
                     "response": []
                 },
@@ -1683,17 +1975,31 @@
                     "request": {
                         "method": "GET",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
                             "raw": "{{base_url}}/service-schedules?vehicle_id=1",
                             "host": ["{{base_url}}"],
                             "path": ["service-schedules"],
-                            "query": [{ "key": "vehicle_id", "value": "1" }]
+                            "query": [
+                                {
+                                    "key": "vehicle_id",
+                                    "value": "1"
+                                }
+                            ]
                         },
                         "description": "List schedules, filter by vehicle_id, is_active, schedule_type"
                     },
@@ -1704,10 +2010,19 @@
                     "request": {
                         "method": "GET",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1727,16 +2042,29 @@
                     "request": {
                         "method": "PUT",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
                             "mode": "raw",
                             "raw": "{\n  \"notes\": \"Perbarui catatan\",\n  \"is_active\": false\n}",
-                            "options": { "raw": { "language": "json" } }
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
                         },
                         "url": {
                             "raw": "{{base_url}}/service-schedules/{{service_schedule_id}}",
@@ -1755,10 +2083,19 @@
                     "request": {
                         "method": "DELETE",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1774,14 +2111,52 @@
                     "response": []
                 },
                 {
-                    "name": "7. Evaluate Schedule Status (Vehicle)",
+                    "name": "7. Get Primary Vehicle Schedules ⭐ NEW",
                     "request": {
                         "method": "GET",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules/primary",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-schedules", "primary"]
+                        },
+                        "description": "Get all service schedules for primary vehicle with live status evaluation based on current odometer. Status dinamis: Darurat (critical), Segera (warning), Aman (normal). Otomatis switch ketika ganti primary vehicle."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Evaluate Schedule Status (Vehicle)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1789,7 +2164,7 @@
                             "host": ["{{base_url}}"],
                             "path": ["service-schedules", "status", "1"]
                         },
-                        "description": "Evaluate all active schedules for a vehicle and return status (critical/warning/normal)"
+                        "description": "Evaluate all active schedules for a specific vehicle and return status (critical/warning/normal)"
                     },
                     "response": []
                 }
@@ -1804,10 +2179,19 @@
                     "request": {
                         "method": "GET",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1824,10 +2208,19 @@
                     "request": {
                         "method": "GET",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1863,10 +2256,19 @@
                     "request": {
                         "method": "GET",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1874,8 +2276,14 @@
                             "host": ["{{base_url}}"],
                             "path": ["notifications"],
                             "query": [
-                                { "key": "category", "value": "service" },
-                                { "key": "per_page", "value": "10" }
+                                {
+                                    "key": "category",
+                                    "value": "service"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "10"
+                                }
                             ]
                         },
                         "description": "Get notifications filtered by category"
@@ -1887,17 +2295,31 @@
                     "request": {
                         "method": "GET",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
                             "raw": "{{base_url}}/notifications?unread=true",
                             "host": ["{{base_url}}"],
                             "path": ["notifications"],
-                            "query": [{ "key": "unread", "value": "true" }]
+                            "query": [
+                                {
+                                    "key": "unread",
+                                    "value": "true"
+                                }
+                            ]
                         },
                         "description": "Get only unread notifications"
                     },
@@ -1908,10 +2330,19 @@
                     "request": {
                         "method": "GET",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1928,10 +2359,19 @@
                     "request": {
                         "method": "PATCH",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1952,10 +2392,19 @@
                     "request": {
                         "method": "PATCH",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1972,10 +2421,19 @@
                     "request": {
                         "method": "DELETE",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -1992,10 +2450,19 @@
                     "request": {
                         "method": "GET",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "url": {
@@ -2012,7 +2479,10 @@
                     "request": {
                         "method": "PATCH",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
@@ -2020,6 +2490,12 @@
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -2045,7 +2521,10 @@
                     "request": {
                         "method": "PATCH",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
@@ -2053,6 +2532,12 @@
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -2078,7 +2563,10 @@
                     "request": {
                         "method": "DELETE",
                         "header": [
-                            { "key": "Accept", "value": "application/json" },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
@@ -2086,6 +2574,12 @@
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
                             }
                         ],
                         "body": {
@@ -2108,13 +2602,688 @@
                 }
             ],
             "description": "User notification management endpoints for mobile app"
+        },
+        {
+            "name": "🔥 Public Endpoints (Guest Mode)",
+            "description": "Endpoint yang bisa diakses tanpa login menggunakan device_id. Gunakan header X-Device-ID untuk identifikasi perangkat.",
+            "item": [
+                {
+                    "name": "Vehicles",
+                    "item": [
+                        {
+                            "name": "Get All Vehicles (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}",
+                                        "description": "Device ID untuk identifikasi perangkat"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/vehicles",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["vehicles"]
+                                },
+                                "description": "Mendapatkan semua kendaraan milik device ini (tanpa login)"
+                            }
+                        },
+                        {
+                            "name": "Create Vehicle (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"title\": \"Honda Beat 2020\",\n    \"make\": \"Honda\",\n    \"model\": \"Beat\",\n    \"year\": 2020,\n    \"tipe_motor\": \"matic\",\n    \"odometer\": 5000,\n    \"license_plate\": \"B 1234 XYZ\",\n    \"color\": \"Merah\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/vehicles",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["vehicles"]
+                                },
+                                "description": "Membuat kendaraan baru sebagai guest (tanpa login)"
+                            }
+                        },
+                        {
+                            "name": "Get Primary Vehicle (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/vehicles/primary",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["vehicles", "primary"]
+                                },
+                                "description": "Mendapatkan kendaraan utama sebagai guest"
+                            }
+                        },
+                        {
+                            "name": "Update Vehicle (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "PUT",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"title\": \"Honda Beat 2020 Updated\",\n    \"odometer\": 6000\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/vehicles/1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["vehicles", "1"]
+                                },
+                                "description": "Update data kendaraan sebagai guest"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Services",
+                    "item": [
+                        {
+                            "name": "Get All Services (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/services?vehicle_id=1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["services"],
+                                    "query": [
+                                        {
+                                            "key": "vehicle_id",
+                                            "value": "1"
+                                        }
+                                    ]
+                                },
+                                "description": "Mendapatkan semua service untuk kendaraan sebagai guest"
+                            }
+                        },
+                        {
+                            "name": "Create Service (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"vehicle_id\": 1,\n    \"service_type_id\": 1,\n    \"service_date\": \"2024-02-13\",\n    \"odometer_km\": 5000,\n    \"cost\": 150000,\n    \"workshop_name\": \"Bengkel Motor Jaya\",\n    \"notes\": \"Ganti oli dan filter\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/services",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["services"]
+                                },
+                                "description": "Membuat service baru sebagai guest"
+                            }
+                        },
+                        {
+                            "name": "Get Service Summary (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/public/services/summary/1",
+                                    "host": ["{{base_url}}"],
+                                    "path": [
+                                        "public",
+                                        "services",
+                                        "summary",
+                                        "1"
+                                    ]
+                                },
+                                "description": "Mendapatkan ringkasan service untuk kendaraan"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Service Schedules",
+                    "item": [
+                        {
+                            "name": "Get All Schedules (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/service-schedules?vehicle_id=1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["service-schedules"],
+                                    "query": [
+                                        {
+                                            "key": "vehicle_id",
+                                            "value": "1"
+                                        }
+                                    ]
+                                },
+                                "description": "Mendapatkan semua jadwal service sebagai guest"
+                            }
+                        },
+                        {
+                            "name": "Create Schedule (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}"
+                                    },
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"vehicle_id\": 1,\n    \"service_type_id\": 1,\n    \"schedule_type\": \"km\",\n    \"target_km\": 10000,\n    \"reminder_option_id\": 1,\n    \"notes\": \"Service rutin 10.000 km\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/service-schedules",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["service-schedules"]
+                                },
+                                "description": "Membuat jadwal service baru sebagai guest"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Notifications",
+                    "item": [
+                        {
+                            "name": "Get All Notifications (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/notifications",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["notifications"]
+                                },
+                                "description": "Mendapatkan semua notifikasi sebagai guest"
+                            }
+                        },
+                        {
+                            "name": "Mark Notification as Read (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/public/notifications/1/read",
+                                    "host": ["{{base_url}}"],
+                                    "path": [
+                                        "public",
+                                        "notifications",
+                                        "1",
+                                        "read"
+                                    ]
+                                },
+                                "description": "Tandai notifikasi sebagai sudah dibaca"
+                            }
+                        },
+                        {
+                            "name": "Mark All as Read (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/public/notifications/read-all",
+                                    "host": ["{{base_url}}"],
+                                    "path": [
+                                        "public",
+                                        "notifications",
+                                        "read-all"
+                                    ]
+                                },
+                                "description": "Tandai semua notifikasi sebagai sudah dibaca"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Service History",
+                    "item": [
+                        {
+                            "name": "Get Service Histories (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/service-histories",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["service-histories"]
+                                },
+                                "description": "Mendapatkan riwayat service kendaraan primary sebagai guest"
+                            }
+                        },
+                        {
+                            "name": "Create Service History (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "service_type",
+                                            "value": "Ganti Oli",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "performed_at",
+                                            "value": "2024-02-13",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "odometer",
+                                            "value": "5000",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "cost",
+                                            "value": "150000",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "service_provider",
+                                            "value": "Bengkel Motor Jaya",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "notes",
+                                            "value": "Service rutin bulanan",
+                                            "type": "text"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/service-histories",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["service-histories"]
+                                },
+                                "description": "Membuat riwayat service baru sebagai guest"
+                            }
+                        },
+                        {
+                            "name": "Get Cost Summary (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/public/service-histories/cost-summary",
+                                    "host": ["{{base_url}}"],
+                                    "path": [
+                                        "public",
+                                        "service-histories",
+                                        "cost-summary"
+                                    ]
+                                },
+                                "description": "Mendapatkan ringkasan biaya service sebagai guest"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Trips",
+                    "item": [
+                        {
+                            "name": "Get All Trips (Guest)",
+                            "request": {
+                                "auth": {
+                                    "type": "noauth"
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "X-Device-ID",
+                                        "value": "{{device_id}}"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/trips",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["trips"]
+                                },
+                                "description": "Mendapatkan semua trip sebagai guest"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "🔐 Authentication dengan Device Sync",
+            "description": "Alur autentikasi yang akan mensinkronisasi data device_id ke user_id saat login",
+            "item": [
+                {
+                    "name": "Login with Device Sync ⭐",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data) {",
+                                    "        pm.environment.set('access_token', response.data.access_token);",
+                                    "        pm.environment.set('refresh_token', response.data.refresh_token);",
+                                    "        console.log('✅ Access Token saved');",
+                                    "        console.log('✅ Refresh Token saved');",
+                                    "        ",
+                                    "        // Log sync info",
+                                    "        if (response.data.sync_info) {",
+                                    "            console.log('📊 Data Sync Info:', response.data.sync_info);",
+                                    "            console.log('Total synced:', response.data.sync_info.total_synced);",
+                                    "        }",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\",\n    \"device_id\": \"{{device_id}}\",\n    \"device_name\": \"My Android Phone\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "login"]
+                        },
+                        "description": "Login dengan device_id akan otomatis sinkronisasi semua data device ke user account. Check response sync_info untuk detail data yang ter-sync."
+                    }
+                },
+                {
+                    "name": "Verify Email with Device Sync",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data) {",
+                                    "        pm.environment.set('access_token', response.data.access_token);",
+                                    "        pm.environment.set('refresh_token', response.data.refresh_token);",
+                                    "        console.log('✅ Access Token saved');",
+                                    "        console.log('✅ Refresh Token saved');",
+                                    "        ",
+                                    "        // Log sync info",
+                                    "        if (response.data.sync_info) {",
+                                    "            console.log('📊 Data Sync Info:', response.data.sync_info);",
+                                    "        }",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"{{test_email}}\",\n    \"otp\": \"{{otp}}\",\n    \"type\": \"email_verification\",\n    \"device_id\": \"{{device_id}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/verify-email",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "verify-email"]
+                        },
+                        "description": "Verifikasi email dengan device_id akan otomatis sinkronisasi data guest ke user account"
+                    }
+                }
+            ]
         }
     ],
     "variable": [
         {
             "key": "base_url",
-            "value": "http://localhost:8000/api",
+            "value": "http://localhost:8000/api/v1/motorcycle",
             "type": "string"
+        },
+        {
+            "key": "device_id",
+            "value": "guest-device-12345678-abcd-1234-abcd-123456789012",
+            "type": "string",
+            "description": "Device ID untuk Guest Mode - Generate UUID di app"
         }
     ]
 }

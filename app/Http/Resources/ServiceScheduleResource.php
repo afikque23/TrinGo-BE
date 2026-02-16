@@ -32,12 +32,12 @@ class ServiceScheduleResource extends JsonResource
             'schedule_type' => $this->schedule_type,
             'target_km' => $this->target_km,
             'target_date' => $this->target_date?->format('Y-m-d'),
-            'reminder_option' => [
+            'reminder_option' => $this->reminderOption ? [
                 'id' => $this->reminderOption->id,
                 'label' => $this->reminderOption->label,
                 'value' => $this->reminderOption->value,
                 'unit' => $this->reminderOption->unit,
-            ],
+            ] : null,
             'is_active' => $this->is_active,
             'notes' => $this->notes,
             'created_at' => $this->created_at->toISOString(),

@@ -20,8 +20,8 @@ class ReminderOptionController extends Controller
      * Display a listing of reminder options.
      * 
      * Query params:
-     * - active: 1 (only active) | 0 (only inactive) | null (all)
-     * - unit: km | days | null (all)
+     * - active: 1 (only active) | 0 (only inactive) | null (all - admin only)
+     * - unit: km | days | weeks | months | years | null (all)
      * - per_page: jumlah data per halaman (default: 15)
      */
     public function index(Request $request): AnonymousResourceCollection
@@ -29,13 +29,17 @@ class ReminderOptionController extends Controller
         $query = ReminderOption::query();
 
         // Filter berdasarkan status aktif
+        // Default to active only for non-admin users
         if ($request->has('active')) {
             $isActive = filter_var($request->active, FILTER_VALIDATE_BOOLEAN);
             $query->byStatus($isActive);
+        } else {
+            // Default to active only
+            $query->active();
         }
 
         // Filter berdasarkan unit
-        if ($request->has('unit') && in_array($request->unit, ['km', 'days'])) {
+        if ($request->has('unit')) {
             $query->byUnit($request->unit);
         }
 

@@ -1,0 +1,283 @@
+{
+    "info": {
+        "name": "Content Management API",
+        "description": "API endpoints untuk Content Management System MotoTracker",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000/api",
+            "type": "string"
+        },
+        {
+            "key": "admin_token",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Admin Endpoints",
+            "item": [
+                {
+                    "name": "Get All Contents",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/contents",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "contents"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Content",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Test Content\",\n    \"type\": \"guide\",\n    \"body\": \"[{\\\"section\\\":\\\"Introduction\\\",\\\"content\\\":\\\"This is a test content\\\"}]\",\n    \"status\": \"published\",\n    \"order\": 1\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/contents",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "contents"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Single Content",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/contents/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "contents", "1"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Content",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Updated Title\",\n    \"status\": \"draft\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/contents/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "contents", "1"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Content",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/contents/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "contents", "1"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Public Endpoints",
+            "item": [
+                {
+                    "name": "Get Terms & Conditions",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/public/contents/terms",
+                            "host": ["{{base_url}}"],
+                            "path": ["public", "contents", "terms"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Privacy Policy",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/public/contents/privacy",
+                            "host": ["{{base_url}}"],
+                            "path": ["public", "contents", "privacy"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get User Guide",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/public/contents/guide",
+                            "host": ["{{base_url}}"],
+                            "path": ["public", "contents", "guide"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get About",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/public/contents/about",
+                            "host": ["{{base_url}}"],
+                            "path": ["public", "contents", "about"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get FAQ",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/public/contents/faq",
+                            "host": ["{{base_url}}"],
+                            "path": ["public", "contents", "faq"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get System Info",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/public/contents/system_info",
+                            "host": ["{{base_url}}"],
+                            "path": ["public", "contents", "system_info"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
+}

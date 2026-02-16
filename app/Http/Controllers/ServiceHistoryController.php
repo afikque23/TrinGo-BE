@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateServiceHistoryRequest;
 use App\Models\ServiceHistory;
 use App\Models\Vehicle;
 use App\Traits\ApiResponse;
+use App\Traits\HasOwnerIdentification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,20 +15,19 @@ use Illuminate\Support\Facades\Storage;
 
 class ServiceHistoryController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, HasOwnerIdentification;
 
     /**
      * Display a listing of service histories for the user's primary vehicle.
+     * Supports both authenticated users and guest mode (device_id).
      */
     public function index(Request $request): JsonResponse
     {
         try {
-            $user = $request->user();
-
-            // Get user's primary vehicle
-            $primaryVehicle = Vehicle::where('user_id', $user->id)
-                ->where('is_primary', true)
-                ->first();
+            // Get owner's primary vehicle
+            $vehicleQuery = Vehicle::query();
+            $this->applyOwnerFilter($vehicleQuery, $request);
+            $primaryVehicle = $vehicleQuery->where('is_primary', true)->first();
 
             if (!$primaryVehicle) {
                 return $this->errorResponse('Motor utama belum ditetapkan. Silakan atur motor utama terlebih dahulu.', 404);
@@ -70,16 +70,15 @@ class ServiceHistoryController extends Controller
 
     /**
      * Store a newly created service history.
+     * Supports both authenticated users and guest mode (device_id).
      */
     public function store(StoreServiceHistoryRequest $request): JsonResponse
     {
         try {
-            $user = $request->user();
-
-            // Get user's primary vehicle
-            $primaryVehicle = Vehicle::where('user_id', $user->id)
-                ->where('is_primary', true)
-                ->first();
+            // Get owner's primary vehicle
+            $vehicleQuery = Vehicle::query();
+            $this->applyOwnerFilter($vehicleQuery, $request);
+            $primaryVehicle = $vehicleQuery->where('is_primary', true)->first();
 
             if (!$primaryVehicle) {
                 return $this->errorResponse('Motor utama belum ditetapkan. Silakan atur motor utama terlebih dahulu.', 404);
@@ -91,7 +90,9 @@ class ServiceHistoryController extends Controller
             $receiptUrl = null;
             if ($request->hasFile('receipt_photo')) {
                 $file = $request->file('receipt_photo');
-                $filename = time() . '_' . $user->id . '_' . $file->getClientOriginalName();
+                $ownerFilter = $this->getOwnerFilter($request);
+                $ownerId = $ownerFilter['id'];
+                $filename = time() . '_' . $ownerId . '_' . $file->getClientOriginalName();
                 $path = $file->storeAs('receipts', $filename, 'public');
                 $receiptUrl = $path;
             }
@@ -137,16 +138,15 @@ class ServiceHistoryController extends Controller
 
     /**
      * Display the specified service history.
+     * Supports both authenticated users and guest mode (device_id).
      */
     public function show(Request $request, string $id): JsonResponse
     {
         try {
-            $user = $request->user();
-
-            // Get user's primary vehicle
-            $primaryVehicle = Vehicle::where('user_id', $user->id)
-                ->where('is_primary', true)
-                ->first();
+            // Get owner's primary vehicle
+            $vehicleQuery = Vehicle::query();
+            $this->applyOwnerFilter($vehicleQuery, $request);
+            $primaryVehicle = $vehicleQuery->where('is_primary', true)->first();
 
             if (!$primaryVehicle) {
                 return $this->errorResponse('Motor utama belum ditetapkan.', 404);
@@ -184,16 +184,15 @@ class ServiceHistoryController extends Controller
 
     /**
      * Update the specified service history.
+     * Supports both authenticated users and guest mode (device_id).
      */
     public function update(UpdateServiceHistoryRequest $request, string $id): JsonResponse
     {
         try {
-            $user = $request->user();
-
-            // Get user's primary vehicle
-            $primaryVehicle = Vehicle::where('user_id', $user->id)
-                ->where('is_primary', true)
-                ->first();
+            // Get owner's primary vehicle
+            $vehicleQuery = Vehicle::query();
+            $this->applyOwnerFilter($vehicleQuery, $request);
+            $primaryVehicle = $vehicleQuery->where('is_primary', true)->first();
 
             if (!$primaryVehicle) {
                 return $this->errorResponse('Motor utama belum ditetapkan.', 404);
@@ -218,7 +217,9 @@ class ServiceHistoryController extends Controller
                 }
 
                 $file = $request->file('receipt_photo');
-                $filename = time() . '_' . $user->id . '_' . $file->getClientOriginalName();
+                $ownerFilter = $this->getOwnerFilter($request);
+                $ownerId = $ownerFilter['id'];
+                $filename = time() . '_' . $ownerId . '_' . $file->getClientOriginalName();
                 $path = $file->storeAs('receipts', $filename, 'public');
                 $validated['receipt_url'] = $path;
             }
@@ -254,16 +255,15 @@ class ServiceHistoryController extends Controller
 
     /**
      * Remove the specified service history.
+     * Supports both authenticated users and guest mode (device_id).
      */
     public function destroy(Request $request, string $id): JsonResponse
     {
         try {
-            $user = $request->user();
-
-            // Get user's primary vehicle
-            $primaryVehicle = Vehicle::where('user_id', $user->id)
-                ->where('is_primary', true)
-                ->first();
+            // Get owner's primary vehicle
+            $vehicleQuery = Vehicle::query();
+            $this->applyOwnerFilter($vehicleQuery, $request);
+            $primaryVehicle = $vehicleQuery->where('is_primary', true)->first();
 
             if (!$primaryVehicle) {
                 return $this->errorResponse('Motor utama belum ditetapkan.', 404);
@@ -295,16 +295,15 @@ class ServiceHistoryController extends Controller
 
     /**
      * Get cost summary and analysis for service histories.
+     * Supports both authenticated users and guest mode (device_id).
      */
     public function costSummary(Request $request): JsonResponse
     {
         try {
-            $user = $request->user();
-
-            // Get user's primary vehicle
-            $primaryVehicle = Vehicle::where('user_id', $user->id)
-                ->where('is_primary', true)
-                ->first();
+            // Get owner's primary vehicle
+            $vehicleQuery = Vehicle::query();
+            $this->applyOwnerFilter($vehicleQuery, $request);
+            $primaryVehicle = $vehicleQuery->where('is_primary', true)->first();
 
             if (!$primaryVehicle) {
                 return $this->errorResponse('Motor utama belum ditetapkan. Silakan atur motor utama terlebih dahulu.', 404);

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Motorcycle Management - ER Diagram</title>
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+        <style>
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                margin: 0;
+                padding: 20px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+            }
+            .container {
+                max-width: 100%;
+                margin: 0 auto;
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            }
+            h1 {
+                color: #333;
+                text-align: center;
+                margin-bottom: 10px;
+            }
+            .subtitle {
+                text-align: center;
+                color: #666;
+                margin-bottom: 30px;
+            }
+            .mermaid {
+                background: #f9f9f9;
+                padding: 20px;
+                border-radius: 8px;
+                overflow-x: auto;
+            }
+            .info-box {
+                background: #e3f2fd;
+                padding: 15px;
+                border-radius: 8px;
+                margin-top: 20px;
+                border-left: 4px solid #2196f3;
+            }
+            .info-box h3 {
+                margin-top: 0;
+                color: #1976d2;
+            }
+            .legend {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 10px;
+                margin-top: 20px;
+            }
+            .legend-item {
+                background: #f5f5f5;
+                padding: 10px;
+                border-radius: 5px;
+                font-size: 14px;
+            }
+            .legend-item strong {
+                color: #333;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🏍️ Motorcycle Management System</h1>
+            <p class="subtitle">
+                Entity Relationship Diagram - Database Design
+            </p>
+
+            <div class="mermaid">
+                erDiagram users ||--o{ vehicles : "owns" users ||--o{ trips :
+                "starts" users ||--o{ fuel_logs : "fills" users ||--o{ reminders
+                : "creates" users ||--o{ documents : "uploads" users }o--o{
+                vehicles : "accesses" vehicles ||--o{ trips : "has" vehicles
+                ||--o{ service_histories : "has" vehicles ||--o{ fuel_logs :
+                "has" vehicles ||--o{ reminders : "has" vehicles ||--o{
+                documents : "polymorphic" trips ||--o{ trip_points : "tracks"
+                service_histories ||--o{ documents : "polymorphic" users {
+                bigint id PK string name string email UK datetime
+                email_verified_at string password string phone string avatar_url
+                timestamps timestamps } vehicles { bigint id PK bigint user_id
+                FK string title string make string model smallint year string
+                vin UK int odometer string license_plate string color string
+                photo_url text notes timestamps timestamps softDeletes
+                deleted_at } trips { bigint id PK bigint vehicle_id FK bigint
+                started_by FK datetime start_at datetime end_at int
+                distance_meters int start_odometer int end_odometer decimal
+                avg_speed_kph decimal max_speed_kph text notes timestamps
+                timestamps softDeletes deleted_at } trip_points { bigint id PK
+                bigint trip_id FK int sequence decimal latitude decimal
+                longitude float altitude smallint speed_kph float
+                accuracy_meters datetime recorded_at timestamp created_at }
+                service_histories { bigint id PK bigint vehicle_id FK string
+                service_type date performed_at int odometer int cost_cents
+                string currency string service_provider string receipt_url text
+                notes timestamps timestamps softDeletes deleted_at } fuel_logs {
+                bigint id PK bigint vehicle_id FK bigint filled_by FK datetime
+                filled_at decimal liters int price_cents string currency int
+                odometer string station_name decimal fuel_efficiency text notes
+                timestamps timestamps } documents { bigint id PK bigint
+                documentable_id string documentable_type bigint uploaded_by FK
+                string filename string path string mime_type int size_bytes
+                string disk string document_type text description timestamps
+                timestamps } vehicle_user { bigint id PK bigint vehicle_id FK
+                bigint user_id FK enum role timestamp granted_at timestamp
+                expires_at boolean is_active timestamps timestamps } reminders {
+                bigint id PK bigint vehicle_id FK bigint user_id FK string title
+                text description enum reminder_type date due_date int
+                due_odometer int advance_days int advance_km boolean
+                is_completed timestamp completed_at timestamps timestamps }
+            </div>
+
+            <div class="info-box">
+                <h3>📊 Database Statistics</h3>
+                <div class="legend">
+                    <div class="legend-item"><strong>9</strong> Tables</div>
+                    <div class="legend-item">
+                        <strong>15+</strong> Foreign Keys
+                    </div>
+                    <div class="legend-item"><strong>20+</strong> Indexes</div>
+                    <div class="legend-item">
+                        <strong>2</strong> Polymorphic Relations
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3>🔑 Key Features</h3>
+                <ul>
+                    <li>
+                        <strong>User Management:</strong> Authentication,
+                        profiles, multi-vehicle ownership
+                    </li>
+                    <li>
+                        <strong>Vehicle Tracking:</strong> Complete vehicle info
+                        with odometer tracking
+                    </li>
+                    <li>
+                        <strong>Trip Logging:</strong> GPS-enabled trip
+                        recording with detailed waypoints
+                    </li>
+                    <li>
+                        <strong>Service History:</strong> Maintenance records
+                        with cost tracking and receipts
+                    </li>
+                    <li>
+                        <strong>Fuel Management:</strong> Fuel consumption
+                        tracking and efficiency calculations
+                    </li>
+                    <li>
+                        <strong>Reminders:</strong> Date and odometer-based
+                        maintenance alerts
+                    </li>
+                    <li>
+                        <strong>Document Storage:</strong> Polymorphic
+                        attachment system for receipts and photos
+                    </li>
+                    <li>
+                        <strong>Shared Access:</strong> Multi-user vehicle
+                        access with role-based permissions
+                    </li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h3>⚙️ Technical Implementation</h3>
+                <ul>
+                    <li><strong>Framework:</strong> Laravel (PHP)</li>
+                    <li><strong>Database:</strong> MySQL / PostgreSQL</li>
+                    <li>
+                        <strong>Soft Deletes:</strong> vehicles, trips,
+                        service_histories
+                    </li>
+                    <li>
+                        <strong>Cascade Deletes:</strong> Automatic cleanup of
+                        related records
+                    </li>
+                    <li>
+                        <strong>Data Precision:</strong> Money in cents, GPS in
+                        DECIMAL(10,7)
+                    </li>
+                    <li>
+                        <strong>Indexes:</strong> Optimized for common queries
+                        and searches
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <script>
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: "default",
+                themeVariables: {
+                    primaryColor: "#667eea",
+                    primaryTextColor: "#fff",
+                    primaryBorderColor: "#5568d3",
+                    lineColor: "#764ba2",
+                    secondaryColor: "#e3f2fd",
+                    tertiaryColor: "#f5f5f5",
+                },
+            });
+        </script>
+    </body>
+</html>

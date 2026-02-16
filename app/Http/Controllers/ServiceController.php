@@ -7,14 +7,16 @@ use App\Http\Requests\UpdateServiceRequest;
 use App\Http\Resources\ServiceResource;
 use App\Http\Resources\ServiceCollection;
 use App\Models\Service;
+use App\Models\Vehicle;
 use App\Services\ServiceSummaryService;
 use App\Traits\ApiResponse;
+use App\Traits\HasOwnerIdentification;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class ServiceController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, HasOwnerIdentification;
 
     protected ServiceSummaryService $summaryService;
 
@@ -26,17 +28,34 @@ class ServiceController extends Controller
     /**
      * Display a listing of services.
      * Supports filtering by vehicle_id.
+     * Only shows services for vehicles owned by current user/device.
      *
      * @param Request $request
      * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Service::with(['vehicle', 'serviceType']);
+        // Get owner's vehicles first
+        $vehicleQuery = Vehicle::query();
+        $this->applyOwnerFilter($vehicleQuery, $request);
+        $ownedVehicleIds = $vehicleQuery->pluck('id');
+
+        $query = Service::with(['vehicle', 'serviceType'])
+            ->whereIn('vehicle_id', $ownedVehicleIds);
 
         // Filter by vehicle_id if provided
         if ($request->has('vehicle_id')) {
-            $query->forVehicle($request->vehicle_id);
+            $vehicleId = $request->vehicle_id;
+            
+            // Validate that vehicle belongs to owner
+            if (!$ownedVehicleIds->contains($vehicleId)) {
+                return $this->errorResponse(
+                    'Anda tidak memiliki akses ke kendaraan ini.',
+                    403
+                );
+            }
+            
+            $query->forVehicle($vehicleId);
         }
 
         // Order by service date descending
@@ -50,12 +69,25 @@ class ServiceController extends Controller
 
     /**
      * Store a newly created service in storage.
+     * Validates that vehicle belongs to current user/device.
      *
      * @param StoreServiceRequest $request
      * @return JsonResponse
      */
     public function store(StoreServiceRequest $request): JsonResponse
     {
+        // Validate vehicle ownership
+        $vehicleQuery = Vehicle::query();
+        $this->applyOwnerFilter($vehicleQuery, $request);
+        $vehicle = $vehicleQuery->find($request->vehicle_id);
+        
+        if (!$vehicle) {
+            return $this->errorResponse(
+                'Kendaraan tidak ditemukan atau bukan milik Anda.',
+                404
+            );
+        }
+
         $service = Service::create($request->validated());
         $service->load(['vehicle', 'serviceType']);
 
@@ -68,12 +100,26 @@ class ServiceController extends Controller
 
     /**
      * Display the specified service.
+     * Validates that service's vehicle belongs to current user/device.
      *
+     * @param Request $request
      * @param Service $service
      * @return JsonResponse
      */
-    public function show(Service $service): JsonResponse
+    public function show(Request $request, Service $service): JsonResponse
     {
+        // Validate vehicle ownership
+        $vehicleQuery = Vehicle::query();
+        $this->applyOwnerFilter($vehicleQuery, $request);
+        $ownsVehicle = $vehicleQuery->where('id', $service->vehicle_id)->exists();
+        
+        if (!$ownsVehicle) {
+            return $this->errorResponse(
+                'Anda tidak memiliki akses ke data service ini.',
+                403
+            );
+        }
+
         $service->load(['vehicle', 'serviceType']);
 
         return $this->successResponse(
@@ -84,6 +130,7 @@ class ServiceController extends Controller
 
     /**
      * Update the specified service in storage.
+     * Validates that service's vehicle belongs to current user/device.
      *
      * @param UpdateServiceRequest $request
      * @param Service $service
@@ -91,6 +138,18 @@ class ServiceController extends Controller
      */
     public function update(UpdateServiceRequest $request, Service $service): JsonResponse
     {
+        // Validate vehicle ownership
+        $vehicleQuery = Vehicle::query();
+        $this->applyOwnerFilter($vehicleQuery, $request);
+        $ownsVehicle = $vehicleQuery->where('id', $service->vehicle_id)->exists();
+        
+        if (!$ownsVehicle) {
+            return $this->errorResponse(
+                'Anda tidak memiliki akses ke data service ini.',
+                403
+            );
+        }
+
         $service->update($request->validated());
         $service->load(['vehicle', 'serviceType']);
 
@@ -102,12 +161,26 @@ class ServiceController extends Controller
 
     /**
      * Remove the specified service from storage.
+     * Validates that service's vehicle belongs to current user/device.
      *
+     * @param Request $request
      * @param Service $service
      * @return JsonResponse
      */
-    public function destroy(Service $service): JsonResponse
+    public function destroy(Request $request, Service $service): JsonResponse
     {
+        // Validate vehicle ownership
+        $vehicleQuery = Vehicle::query();
+        $this->applyOwnerFilter($vehicleQuery, $request);
+        $ownsVehicle = $vehicleQuery->where('id', $service->vehicle_id)->exists();
+        
+        if (!$ownsVehicle) {
+            return $this->errorResponse(
+                'Anda tidak memiliki akses ke data service ini.',
+                403
+            );
+        }
+
         $service->delete();
 
         return $this->successResponse(
@@ -118,13 +191,20 @@ class ServiceController extends Controller
 
     /**
      * Get service summary for a specific vehicle.
+     * Validates that vehicle belongs to current user/device.
      *
+     * @param Request $request
      * @param int $vehicleId
      * @return JsonResponse
      */
-    public function summary(int $vehicleId): JsonResponse
+    public function summary(Request $request, int $vehicleId): JsonResponse
     {
         try {
+            // Validate vehicle ownership
+            $vehicleQuery = Vehicle::query();
+            $this->applyOwnerFilter($vehicleQuery, $request);
+            $vehicle = $vehicleQuery->findOrFail($vehicleId);
+
             $summary = $this->summaryService->getSummary($vehicleId);
 
             return $this->successResponse(
@@ -133,7 +213,7 @@ class ServiceController extends Controller
             );
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->errorResponse(
-                'Kendaraan tidak ditemukan.',
+                'Kendaraan tidak ditemukan atau bukan milik Anda.',
                 404
             );
         }
@@ -141,12 +221,26 @@ class ServiceController extends Controller
 
     /**
      * Get cost breakdown by service type for a vehicle.
+     * Validates that vehicle belongs to current user/device.
      *
+     * @param Request $request
      * @param int $vehicleId
      * @return JsonResponse
      */
-    public function costBreakdown(int $vehicleId): JsonResponse
+    public function costBreakdown(Request $request, int $vehicleId): JsonResponse
     {
+        // Validate vehicle ownership
+        $vehicleQuery = Vehicle::query();
+        $this->applyOwnerFilter($vehicleQuery, $request);
+        $vehicle = $vehicleQuery->find($vehicleId);
+        
+        if (!$vehicle) {
+            return $this->errorResponse(
+                'Kendaraan tidak ditemukan atau bukan milik Anda.',
+                404
+            );
+        }
+
         $breakdown = $this->summaryService->getCostBreakdown($vehicleId);
 
         return $this->successResponse(

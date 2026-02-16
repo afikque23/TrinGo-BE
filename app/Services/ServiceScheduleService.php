@@ -58,8 +58,11 @@ class ServiceScheduleService
      */
     private function evaluateKmBasedSchedule(ServiceSchedule $schedule, Vehicle $vehicle): array
     {
-        $remaining = $schedule->target_km - $vehicle->current_km;
-        $reminderThreshold = $schedule->reminderOption->value;
+        $currentKm = $vehicle->odometer ?? $vehicle->current_km ?? 0;
+        $remaining = $schedule->target_km - $currentKm;
+        
+        // Get reminder threshold if reminder option exists
+        $reminderThreshold = $schedule->reminderOption ? $schedule->reminderOption->value : 500; // default 500km
 
         $status = $this->determineStatus($remaining, $reminderThreshold);
 
@@ -68,12 +71,14 @@ class ServiceScheduleService
             'service_name' => $schedule->serviceType->name,
             'schedule_type' => 'km',
             'target_km' => $schedule->target_km,
-            'current_km' => $vehicle->current_km,
-            'remaining' => $remaining,
+            'current_km' => $currentKm,
+            'remaining_km' => $remaining,
             'unit' => 'km',
             'reminder_threshold' => $reminderThreshold,
             'status' => $status,
+            'status_label' => $this->getStatusLabel($status),
             'message' => $this->generateKmMessage($remaining, $schedule->serviceType->name),
+            'notes' => $schedule->notes,
         ];
     }
 
@@ -89,8 +94,10 @@ class ServiceScheduleService
         $targetDate = Carbon::parse($schedule->target_date);
         $remaining = $today->diffInDays($targetDate, false); // negative if overdue
 
-        // Convert reminder option to days based on its unit
-        $reminderThreshold = $this->convertReminderToDays($schedule->reminderOption);
+        // Convert reminder option to days based on its unit, or use default 7 days
+        $reminderThreshold = $schedule->reminderOption 
+            ? $this->convertReminderToDays($schedule->reminderOption) 
+            : 7;
 
         $status = $this->determineStatus($remaining, $reminderThreshold);
 
@@ -100,11 +107,13 @@ class ServiceScheduleService
             'schedule_type' => 'time',
             'target_date' => $targetDate->format('Y-m-d'),
             'current_date' => $today->format('Y-m-d'),
-            'remaining' => (int) $remaining,
+            'remaining_days' => (int) $remaining,
             'unit' => 'days',
             'reminder_threshold' => $reminderThreshold,
             'status' => $status,
+            'status_label' => $this->getStatusLabel($status),
             'message' => $this->generateTimeMessage($remaining, $schedule->serviceType->name),
+            'notes' => $schedule->notes,
         ];
     }
 
@@ -191,5 +200,21 @@ class ServiceScheduleService
         }
 
         return "{$serviceName} masih {$remaining} hari lagi.";
+    }
+
+    /**
+     * Get status label in Indonesian.
+     *
+     * @param string $status
+     * @return string
+     */
+    private function getStatusLabel(string $status): string
+    {
+        return match ($status) {
+            'critical' => 'Darurat',
+            'warning' => 'Segera',
+            'normal' => 'Aman',
+            default => 'Aman',
+        };
     }
 }

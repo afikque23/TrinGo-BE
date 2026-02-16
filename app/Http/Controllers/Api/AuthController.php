@@ -11,6 +11,10 @@ use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\RefreshTokenRequest;
 use App\Models\OtpVerification;
 use App\Models\User;
+use App\Models\Vehicle;
+use App\Models\Notification;
+use App\Models\Trip;
+use App\Models\FuelLog;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,6 +22,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -105,6 +110,10 @@ class AuthController extends Controller
                     // Generate refresh token (30 days)
                     $refreshToken = $user->generateRefreshToken(30);
 
+                    // Sync device data if device_id provided
+                    $deviceId = $request->input('device_id');
+                    $syncResult = $this->syncDeviceData($user, $deviceId);
+
                     return $this->successResponse([
                         'user' => [
                             'id' => $user->id,
@@ -117,6 +126,7 @@ class AuthController extends Controller
                         'refresh_token' => $refreshToken,
                         'token_type' => 'Bearer',
                         'expires_in' => 1800, // 30 minutes
+                        'sync_info' => $syncResult, // Info sinkronisasi data device
                     ], 'Email berhasil diverifikasi');
                 }
             }
@@ -206,12 +216,17 @@ class AuthController extends Controller
             $refreshToken = $user->generateRefreshToken(30);
 
             // Update device info if provided
+            $deviceId = null;
             if ($request->has('device_id') || $request->has('device_name')) {
+                $deviceId = $request->input('device_id');
                 $user->updateDeviceInfo(
-                    $request->input('device_id'),
+                    $deviceId,
                     $request->input('device_name')
                 );
             }
+
+            // Sync device data to user account
+            $syncResult = $this->syncDeviceData($user, $deviceId);
 
             return $this->successResponse([
                 'user' => [
@@ -227,6 +242,7 @@ class AuthController extends Controller
                 'refresh_token' => $refreshToken,
                 'token_type' => 'Bearer',
                 'expires_in' => 1800, // 30 minutes in seconds
+                'sync_info' => $syncResult, // Info sinkronisasi data device
             ], 'Login berhasil');
             
         } catch (\Exception $e) {
@@ -435,6 +451,88 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             Log::error('Change password error: ' . $e->getMessage());
             return $this->errorResponse('Gagal mengubah password', 500);
+        }
+    }
+
+    /**
+     * Sync device data to user account when login
+     * 
+     * Sinkronisasi semua data yang dibuat dengan device_id ke user_id saat login
+     * 
+     * @param User $user
+     * @param string|null $deviceId
+     * @return array Summary of synced data
+     */
+    protected function syncDeviceData(User $user, ?string $deviceId): array
+    {
+        if (empty($deviceId)) {
+            return [
+                'synced' => false,
+                'message' => 'No device_id provided',
+            ];
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $syncedCount = [
+                'vehicles' => 0,
+                'notifications' => 0,
+                'trips' => 0,
+                'fuel_logs' => 0,
+            ];
+
+            // Sync Vehicles
+            $vehiclesUpdated = Vehicle::where('device_id', $deviceId)
+                ->whereNull('user_id')
+                ->update(['user_id' => $user->id]);
+            $syncedCount['vehicles'] = $vehiclesUpdated;
+
+            // Sync Notifications
+            $notificationsUpdated = Notification::where('device_id', $deviceId)
+                ->whereNull('user_id')
+                ->update(['user_id' => $user->id]);
+            $syncedCount['notifications'] = $notificationsUpdated;
+
+            // Sync Trips
+            $tripsUpdated = Trip::where('device_id', $deviceId)
+                ->whereNull('user_id')
+                ->update(['user_id' => $user->id]);
+            $syncedCount['trips'] = $tripsUpdated;
+
+            // Sync Fuel Logs
+            $fuelLogsUpdated = FuelLog::where('device_id', $deviceId)
+                ->whereNull('user_id')
+                ->update(['user_id' => $user->id]);
+            $syncedCount['fuel_logs'] = $fuelLogsUpdated;
+
+            DB::commit();
+
+            $totalSynced = array_sum($syncedCount);
+
+            Log::info("Device data synced for user {$user->id}", [
+                'device_id' => $deviceId,
+                'synced_count' => $syncedCount,
+                'total' => $totalSynced,
+            ]);
+
+            return [
+                'synced' => true,
+                'total_synced' => $totalSynced,
+                'details' => $syncedCount,
+            ];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Device data sync error: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'device_id' => $deviceId,
+            ]);
+
+            return [
+                'synced' => false,
+                'message' => 'Sync failed: ' . $e->getMessage(),
+            ];
         }
     }
 }

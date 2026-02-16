@@ -23,14 +23,7 @@ class StoreServiceScheduleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'vehicle_id' => [
-                'required',
-                'integer',
-                Rule::exists('vehicles', 'id')->where(function ($query) {
-                    // Ensure user can only create schedule for their own vehicle
-                    $query->where('user_id', auth()->id());
-                }),
-            ],
+            'vehicle_id' => 'required|integer|exists:vehicles,id',
             'service_type_id' => 'required|integer|exists:service_types,id',
             'schedule_type' => 'required|in:km,time',
             'target_km' => [
@@ -50,7 +43,7 @@ class StoreServiceScheduleRequest extends FormRequest
                 }),
             ],
             'reminder_option_id' => [
-                'required',
+                'nullable',
                 'integer',
                 Rule::exists('reminder_options', 'id')->where('is_active', true),
             ],
@@ -76,7 +69,6 @@ class StoreServiceScheduleRequest extends FormRequest
             'target_km.min' => 'Target kilometers must be at least 1.',
             'target_date.required' => 'Target date is required for time-based schedule.',
             'target_date.after' => 'Target date must be in the future.',
-            'reminder_option_id.required' => 'Reminder option is required.',
             'reminder_option_id.exists' => 'Selected reminder option not found or inactive.',
         ];
     }

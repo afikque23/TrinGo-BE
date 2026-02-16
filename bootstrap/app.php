@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'admin' => \App\Http\Middleware\IsAdmin::class,
+            'device.id' => \App\Http\Middleware\DeviceIdentification::class,
         ]);
         
         // Enable session and CSRF for API routes (needed for web admin panel)
