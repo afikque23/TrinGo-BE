@@ -24,6 +24,7 @@ class UpdateServiceScheduleRequest extends FormRequest
     {
         return [
             'service_type_id' => 'sometimes|required|integer|exists:service_types,id',
+            'service_name' => 'nullable|string|max:200',
             'schedule_type' => 'sometimes|required|in:km,time',
             'target_km' => [
                 'nullable',

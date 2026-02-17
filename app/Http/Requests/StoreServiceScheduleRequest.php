@@ -25,6 +25,7 @@ class StoreServiceScheduleRequest extends FormRequest
         return [
             'vehicle_id' => 'required|integer|exists:vehicles,id',
             'service_type_id' => 'required|integer|exists:service_types,id',
+            'service_name' => 'nullable|string|max:200',
             'schedule_type' => 'required|in:km,time',
             'target_km' => [
                 'nullable',

@@ -18,6 +18,7 @@ class ServiceSchedule extends Model
     protected $fillable = [
         'vehicle_id',
         'service_type_id',
+        'service_name',
         'schedule_type',
         'target_km',
         'target_date',

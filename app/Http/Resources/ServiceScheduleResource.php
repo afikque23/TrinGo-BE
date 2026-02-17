@@ -29,6 +29,7 @@ class ServiceScheduleResource extends JsonResource
                 'name' => $this->serviceType->name,
                 'description' => $this->serviceType->description,
             ],
+            'service_name' => $this->service_name ?? $this->serviceType->name,
             'schedule_type' => $this->schedule_type,
             'target_km' => $this->target_km,
             'target_date' => $this->target_date?->format('Y-m-d'),

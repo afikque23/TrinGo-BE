@@ -62,6 +62,8 @@ Route::middleware(['device.id'])->group(function () {
     
     // Vehicle Management
     Route::get('/vehicles/primary', [VehicleController::class, 'getPrimary']);
+    Route::get('/vehicles/primary/service-metrics', [VehicleController::class, 'getServiceMetrics']);
+    Route::get('/vehicles/primary/usage-pattern', [VehicleController::class, 'getUsagePattern']);
     Route::post('/vehicles/{id}/set-primary', [VehicleController::class, 'setPrimary']);
     Route::apiResource('vehicles', VehicleController::class);
 

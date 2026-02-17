@@ -412,4 +412,127 @@ class VehicleController extends Controller
         }
     }
 
+    /**
+     * Get service metrics for primary vehicle.
+     * Returns distance since last service and distance until next service.
+     */
+    public function getServiceMetrics(Request $request): JsonResponse
+    {
+        try {
+            // Get primary vehicle
+            $query = Vehicle::query();
+            $this->applyOwnerFilter($query, $request);
+            $vehicle = $query->where('is_primary', true)->first();
+
+            if (!$vehicle) {
+                return $this->errorResponse('Motor utama belum ditetapkan', 404);
+            }
+
+            $currentOdometer = $vehicle->odometer ?? 0;
+
+            // Get last service from service histories
+            $lastService = $vehicle->serviceHistories()
+                ->latest('performed_at')
+                ->first();
+
+            $distanceSinceService = 0;
+            if ($lastService && $lastService->odometer) {
+                $distanceSinceService = max(0, $currentOdometer - $lastService->odometer);
+            }
+
+            // Get next service from service schedules
+            $nextSchedule = $vehicle->serviceSchedules()
+                ->where('schedule_type', 'mileage')
+                ->where('next_service_mileage', '>', $currentOdometer)
+                ->orderBy('next_service_mileage', 'asc')
+                ->first();
+
+            $distanceUntilNextService = 0;
+            $nextServiceAt = null;
+            if ($nextSchedule && $nextSchedule->next_service_mileage) {
+                $distanceUntilNextService = max(0, $nextSchedule->next_service_mileage - $currentOdometer);
+                $nextServiceAt = $nextSchedule->next_service_mileage;
+            }
+
+            return $this->successResponse([
+                'current_odometer' => $currentOdometer,
+                'distance_since_service' => $distanceSinceService,
+                'last_service_odometer' => $lastService?->odometer,
+                'distance_until_next_service' => $distanceUntilNextService,
+                'next_service_at' => $nextServiceAt,
+            ], 'Service metrics berhasil diambil');
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching service metrics: ' . $e->getMessage());
+            return $this->errorResponse(
+                'Gagal mengambil service metrics',
+                500,
+                ['error' => $e->getMessage()]
+            );
+        }
+    }
+
+    /**
+     * Get usage pattern statistics from trip data for primary vehicle.
+     * Returns average km/day, weekly total, and usage intensity.
+     */
+    public function getUsagePattern(Request $request): JsonResponse
+    {
+        try {
+            // Get primary vehicle
+            $query = Vehicle::query();
+            $this->applyOwnerFilter($query, $request);
+            $vehicle = $query->where('is_primary', true)->first();
+
+            if (!$vehicle) {
+                return $this->errorResponse('Motor utama belum ditetapkan', 404);
+            }
+
+            // Get trips from last 30 days
+            $thirtyDaysAgo = now()->subDays(30);
+            $trips = $vehicle->trips()
+                ->where('start_at', '>=', $thirtyDaysAgo)
+                ->get();
+
+            // Calculate statistics
+            $totalDistance = $trips->sum('distance_meters') / 1000; // Convert to km
+            $tripCount = $trips->count();
+
+            // Average km per day (last 30 days)
+            $averageKmPerDay = $tripCount > 0 ? round($totalDistance / 30, 1) : 0;
+
+            // This week's distance (last 7 days)
+            $sevenDaysAgo = now()->subDays(7);
+            $weeklyDistance = $vehicle->trips()
+                ->where('start_at', '>=', $sevenDaysAgo)
+                ->get()
+                ->sum('distance_meters') / 1000;
+
+            // Determine usage intensity
+            $usageIntensity = 'light'; // default
+            if ($averageKmPerDay > 50) {
+                $usageIntensity = 'heavy';
+            } elseif ($averageKmPerDay > 20) {
+                $usageIntensity = 'moderate';
+            }
+
+            return $this->successResponse([
+                'average_km_per_day' => $averageKmPerDay,
+                'weekly_km' => round($weeklyDistance, 1),
+                'monthly_km' => round($totalDistance, 1),
+                'trip_count_30_days' => $tripCount,
+                'usage_intensity' => $usageIntensity,
+                'odometer' => $vehicle->odometer ?? 0,
+            ], 'Usage pattern berhasil diambil');
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching usage pattern: ' . $e->getMessage());
+            return $this->errorResponse(
+                'Gagal mengambil usage pattern',
+                500,
+                ['error' => $e->getMessage()]
+            );
+        }
+    }
+
 }
