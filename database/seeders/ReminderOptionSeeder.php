@@ -16,6 +16,7 @@ class ReminderOptionSeeder extends Seeder
             // Jarak (Kilometer)
             ['label' => '100 km sebelum', 'value' => 100, 'unit' => 'km', 'is_active' => true],
             ['label' => '200 km sebelum', 'value' => 200, 'unit' => 'km', 'is_active' => true],
+            ['label' => '300 km sebelum', 'value' => 300, 'unit' => 'km', 'is_active' => true],
             ['label' => '500 km sebelum', 'value' => 500, 'unit' => 'km', 'is_active' => true],
             ['label' => '1000 km sebelum', 'value' => 1000, 'unit' => 'km', 'is_active' => true],
             
