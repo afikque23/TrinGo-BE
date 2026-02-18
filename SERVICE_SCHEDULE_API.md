@@ -146,10 +146,16 @@ Content-Type: application/json
   "service_type_id": 1,
   "schedule_type": "km",
   "target_km": 10000,
+  "service_name": "Ganti Oli Mesin Mobil",  // OPTIONAL - custom nama service
   "reminder_option_id": 1,  // OPTIONAL - bisa null
   "notes": "Ganti oli mesin"
 }
 ```
+
+**Request Fields:**
+
+- `service_name` (optional, string, max 200): Nama custom untuk jadwal ini. Jika tidak diisi, otomatis menggunakan nama dari service_type.
+- `reminder_option_id` (optional, integer): ID opsi reminder. Bisa null jika tidak ingin reminder.
 
 ### 2. Create Service Schedule (Time-based)
 
@@ -162,6 +168,7 @@ Content-Type: application/json
   "service_type_id": 5,
   "schedule_type": "time",
   "target_date": "2026-12-31",
+  "service_name": "Service Akhir Tahun",  // OPTIONAL
   "notes": "Service berkala tahunan"
   // reminder_option_id tidak disertakan = no reminder
 }
@@ -187,9 +194,18 @@ Content-Type: application/json
 
 {
   "target_km": 12000,
+  "service_name": "Ganti Oli Premium",  // OPTIONAL - update custom name
   "notes": "Updated notes"
 }
 ```
+
+**Updatable Fields (all optional):**
+
+- `service_name`: Ubah nama custom
+- `target_km` / `target_date`: Ubah target
+- `reminder_option_id`: Ubah/hapus reminder (gunakan null untuk hapus)
+- `notes`: Ubah catatan
+- `is_active`: Toggle active status
 
 ### 6. Delete Schedule
 
@@ -360,5 +376,17 @@ MODIFY reminder_option_id BIGINT UNSIGNED NULL;
 
 ---
 
-**Last Updated**: February 16, 2026  
-**Version**: 2.0
+**Last Updated**: February 17, 2026  
+**Version**: 2.1
+
+### Changelog
+
+**v2.1 (Feb 17, 2026)**
+
+- ✅ Added `service_name` field (optional, nullable, max 200 chars)
+- Field allows custom naming for schedules (e.g., "Ganti Oli Premium" instead of just "Ganti Oli")
+- If not provided, defaults to service type name in API response
+
+**v2.0 (Feb 16, 2026)**
+
+- ✅ Made `reminder_option_id` nullable (schedules can be created without reminders)

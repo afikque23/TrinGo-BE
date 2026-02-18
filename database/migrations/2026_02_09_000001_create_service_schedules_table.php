@@ -10,26 +10,28 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('service_schedules', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('vehicle_id');
-            $table->unsignedBigInteger('service_type_id');
-            $table->enum('schedule_type', ['km', 'time']);
-            $table->unsignedBigInteger('target_km')->nullable();
-            $table->date('target_date')->nullable();
-            $table->unsignedBigInteger('reminder_option_id');
-            $table->boolean('is_active')->default(true);
-            $table->text('notes')->nullable();
-            $table->timestamps();
+        if (!Schema::hasTable('service_schedules')) {
+            Schema::create('service_schedules', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('vehicle_id');
+                $table->unsignedBigInteger('service_type_id');
+                $table->enum('schedule_type', ['km', 'time']);
+                $table->unsignedBigInteger('target_km')->nullable();
+                $table->date('target_date')->nullable();
+                $table->unsignedBigInteger('reminder_option_id');
+                $table->boolean('is_active')->default(true);
+                $table->text('notes')->nullable();
+                $table->timestamps();
 
-            $table->index('vehicle_id');
-            $table->index('is_active');
-            $table->index('schedule_type');
+                $table->index('vehicle_id');
+                $table->index('is_active');
+                $table->index('schedule_type');
 
-            $table->foreign('vehicle_id')->references('id')->on('vehicles')->onDelete('cascade');
-            $table->foreign('service_type_id')->references('id')->on('service_types');
-            $table->foreign('reminder_option_id')->references('id')->on('reminder_options');
-        });
+                $table->foreign('vehicle_id')->references('id')->on('vehicles')->onDelete('cascade');
+                $table->foreign('service_type_id')->references('id')->on('service_types');
+                $table->foreign('reminder_option_id')->references('id')->on('reminder_options');
+            });
+        }
     }
 
     /**
