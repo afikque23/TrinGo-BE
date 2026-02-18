@@ -82,6 +82,7 @@ Route::middleware(['device.id'])->group(function () {
     Route::apiResource('service-schedules', App\Http\Controllers\Api\ServiceScheduleController::class);
 
     // Trip Management
+    Route::post('/trips/manual-distance', [TripController::class, 'addManualDistance']);
     Route::apiResource('trips', TripController::class);
 
     // Notifications (Mobile App)
