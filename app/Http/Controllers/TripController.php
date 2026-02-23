@@ -20,7 +20,7 @@ class TripController extends Controller
 
     /**
      * Get all trips for the current user's vehicles (with optional vehicle filter)
-     * Supports both authenticated users and guest mode (device_id)
+     * Requires authentication.
      */
     public function index(Request $request): JsonResponse
     {
@@ -107,9 +107,12 @@ class TripController extends Controller
             $endOdometer = $startOdometer + $distanceKm;
 
             // Create trip
+            /** @var \Illuminate\Contracts\Auth\Guard $auth */
+            $auth = auth();
+            $user = $auth->user();
             $trip = Trip::create([
                 'vehicle_id' => $validated['vehicle_id'],
-                'started_by' => auth()->id() ?? null, // null for guest mode
+                'started_by' => $user?->id ?? null, // null for guest mode
                 'start_at' => $validated['start_time'],
                 'end_at' => $validated['end_time'] ?? null,
                 'distance_meters' => $distanceMeters,
@@ -147,6 +150,9 @@ class TripController extends Controller
                     'distance_added' => $distanceKm,
                     'new_odometer' => $endOdometer,
                 ]);
+
+                // Kirim notifikasi perjalanan selesai dengan odometer terbaru
+                $this->sendTripCompletedNotification($vehicle->fresh(), $trip, $distanceKm);
             }
 
             DB::commit();
@@ -260,9 +266,12 @@ class TripController extends Controller
             // Use trip_date for both start and end time
             $tripDate = \Carbon\Carbon::parse($validated['trip_date']);
             
+            /** @var \Illuminate\Contracts\Auth\Guard $auth */
+            $auth = auth();
+            $user = $auth->user();
             $trip = Trip::create([
                 'vehicle_id' => $validated['vehicle_id'],
-                'started_by' => auth()->id() ?? null,
+                'started_by' => $user?->id ?? null,
                 'start_at' => $tripDate,
                 'end_at' => $tripDate,
                 'distance_meters' => (int) ($distanceKm * 1000),
@@ -298,6 +307,9 @@ class TripController extends Controller
                 'new_odometer' => $endOdometer,
             ]);
 
+            // Kirim notifikasi jarak manual ditambahkan dengan odometer terbaru
+            $this->sendTripCompletedNotification($vehicle->fresh(), $trip, $distanceKm);
+
             DB::commit();
 
             // Load relationships for response
@@ -323,6 +335,64 @@ class TripController extends Controller
                 'message' => 'Gagal menambahkan jarak',
                 'error' => $e->getMessage(),
             ], 500);
+        }
+    }
+
+    /**
+     * Kirim notifikasi setelah trip selesai dengan odometer yang sudah ter-update
+     */
+    private function sendTripCompletedNotification(Vehicle $vehicle, Trip $trip, float $distanceKm): void
+    {
+        try {
+            $notificationService = app(\App\Services\NotificationService::class);
+            
+            // Reload vehicle untuk pastikan odometer terbaru
+            $vehicle->refresh();
+            
+            // Ambil user (jika authenticated)
+            $user = $vehicle->user_id ? \App\Models\User::find($vehicle->user_id) : null;
+            
+            // Cari template notifikasi untuk trip completion
+            $template = \App\Models\NotificationTemplate::where('category_key', 'trip')
+                ->where('is_active', true)
+                ->first();
+            
+            if (!$template) {
+                Log::info('NotificationService: Tidak ada template aktif untuk kategori trip');
+                return;
+            }
+            
+            // Hitung durasi trip
+            $duration = $trip->end_at && $trip->start_at 
+                ? $trip->start_at->diffInMinutes($trip->end_at) . ' menit'
+                : '-';
+            
+            // Hitung kecepatan rata-rata
+            $avgSpeed = $trip->avg_speed_kph ?? '-';
+            
+            // Kirim notifikasi dengan data odometer terbaru
+            $notificationService->sendFromTemplate(
+                $template,
+                [
+                    'distance' => number_format($distanceKm, 1),  // Jarak perjalanan
+                    'duration' => $duration,                       // Durasi perjalanan
+                    'avg_speed' => $avgSpeed,                      // Kecepatan rata-rata
+                    'current_km' => number_format($vehicle->odometer ?? 0), // Odometer TERBARU setelah trip
+                ],
+                $user,
+                null, // device_id tidak lagi digunakan untuk ownership
+                $vehicle
+            );
+            
+            Log::info('Trip completion notification sent', [
+                'vehicle_id' => $vehicle->id,
+                'trip_id' => $trip->id,
+                'distance_km' => $distanceKm,
+                'new_odometer' => $vehicle->odometer,
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to send trip completion notification: ' . $e->getMessage());
         }
     }
 }

@@ -20,7 +20,7 @@ class VehicleController extends Controller
 
     /**
      * Display a listing of the user's vehicles.
-     * Supports both authenticated users and guest mode (device_id)
+     * Requires authentication.
      */
     public function index(Request $request): JsonResponse
     {
@@ -51,7 +51,7 @@ class VehicleController extends Controller
 
     /**
      * Store a newly created vehicle in storage.
-     * Supports both authenticated users and guest mode (device_id)
+     * Requires authentication. First vehicle is automatically set as primary.
      */
     public function store(StoreVehicleRequest $request): JsonResponse
     {
@@ -68,7 +68,7 @@ class VehicleController extends Controller
                 $validated['photo_url'] = $path;
             }
             
-            // Set owner (user_id atau device_id)
+            // Set owner (user_id) and optional device tracking
             $ownerData = $this->getOwnerData($request);
             $validated = array_merge($validated, $ownerData);
             
@@ -119,7 +119,7 @@ class VehicleController extends Controller
 
     /**
      * Display the specified vehicle.
-     * Supports both authenticated users and guest mode (device_id)
+     * Requires authentication.
      */
     public function show(Request $request, $id): JsonResponse
     {
@@ -165,7 +165,7 @@ class VehicleController extends Controller
 
     /**
      * Update the specified vehicle in storage.
-     * Supports both authenticated users and guest mode (device_id)
+     * Requires authentication.
      */
     public function update(UpdateVehicleRequest $request, $id): JsonResponse
     {
@@ -243,7 +243,7 @@ class VehicleController extends Controller
 
     /**
      * Remove the specified vehicle from storage.
-     * Supports both authenticated users and guest mode (device_id)
+     * Requires authentication.
      */
     public function destroy(Request $request, $id): JsonResponse
     {
@@ -310,8 +310,8 @@ class VehicleController extends Controller
     }
 
     /**
-     * Set primary vehicle for current owner.
-     * Supports both authenticated users and guest mode (device_id)
+     * Set primary vehicle for current user.
+     * Requires authentication.
      */
     public function setPrimary(Request $request, $id): JsonResponse
     {
@@ -363,8 +363,8 @@ class VehicleController extends Controller
     }
 
     /**
-     * Get primary vehicle for current owner.
-     * Supports both authenticated users and guest mode (device_id)
+     * Get primary vehicle for current user.
+     * Requires authentication.
      */
     public function getPrimary(Request $request): JsonResponse
     {
@@ -442,16 +442,16 @@ class VehicleController extends Controller
 
             // Get next service from service schedules
             $nextSchedule = $vehicle->serviceSchedules()
-                ->where('schedule_type', 'mileage')
-                ->where('next_service_mileage', '>', $currentOdometer)
-                ->orderBy('next_service_mileage', 'asc')
+                ->where('schedule_type', 'km')
+                ->where('target_km', '>', $currentOdometer)
+                ->orderBy('target_km', 'asc')
                 ->first();
 
             $distanceUntilNextService = 0;
             $nextServiceAt = null;
-            if ($nextSchedule && $nextSchedule->next_service_mileage) {
-                $distanceUntilNextService = max(0, $nextSchedule->next_service_mileage - $currentOdometer);
-                $nextServiceAt = $nextSchedule->next_service_mileage;
+            if ($nextSchedule && $nextSchedule->target_km) {
+                $distanceUntilNextService = max(0, $nextSchedule->target_km - $currentOdometer);
+                $nextServiceAt = $nextSchedule->target_km;
             }
 
             return $this->successResponse([

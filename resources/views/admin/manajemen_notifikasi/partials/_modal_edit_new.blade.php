@@ -118,22 +118,35 @@
             <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-[17px]">
                 <div class="flex items-center gap-2 mb-3">
                     <div class="w-[6px] h-[6px] bg-[#6B7C4F] rounded-full"></div>
-                    <span class="text-xs text-[#99A1AF] uppercase tracking-wider" style="font-family: Arial, sans-serif; letter-spacing: 0.35px;">Variabel yang Tersedia:</span>
+                    <span class="text-xs text-[#99A1AF] uppercase tracking-wider" style="font-family: Arial, sans-serif; letter-spacing: 0.35px;">Variabel yang Tersedia (klik untuk copy):</span>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-x-8 gap-y-2">
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{current_km}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{km_remaining}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{service_type}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{km_overdue}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{vehicle_name}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{user_name}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{distance}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{predicted_cost}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{workshop_name}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{rating}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{riding_pattern}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{avg_distance}</span>
+                <div class="grid grid-cols-3 gap-x-4 gap-y-2">
+                    <!-- Kendaraan -->
+                    <button type="button" @click="navigator.clipboard.writeText('{vehicle_name}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{vehicle_name}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{vehicle_plate}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{vehicle_plate}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{vehicle_type}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{vehicle_type}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{current_km}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{current_km}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{vehicle_color}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{vehicle_color}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{vehicle_year}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{vehicle_year}</button>
+                    <!-- Servis -->
+                    <button type="button" @click="navigator.clipboard.writeText('{service_type}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{service_type}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{service_name}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{service_name}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{km_remaining}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{km_remaining}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{km_overdue}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{km_overdue}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{target_km}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{target_km}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{target_date}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{target_date}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{days_remaining}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{days_remaining}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{last_service}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{last_service}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{workshop_name}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{workshop_name}</button>
+                    <!-- Perjalanan -->
+                    <button type="button" @click="navigator.clipboard.writeText('{distance}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{distance}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{duration}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{duration}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{avg_speed}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{avg_speed}</button>
+                    <!-- Pengguna & Umum -->
+                    <button type="button" @click="navigator.clipboard.writeText('{user_name}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{user_name}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{app_name}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{app_name}</button>
+                    <button type="button" @click="navigator.clipboard.writeText('{date_now}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{date_now}</button>
                 </div>
             </div>
 

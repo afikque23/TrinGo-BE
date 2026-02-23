@@ -36,6 +36,13 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::put('/notifications/{id}', [NotificationController::class, 'update'])->name('admin.notifications.update');
     Route::post('/notifications/{id}/toggle', [NotificationController::class, 'toggleStatus'])->name('admin.notifications.toggle');
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
+    Route::post('/notifications/{id}/test-push', [NotificationController::class, 'testPush'])->name('admin.notifications.test-push');
+    
+    // DEPRECATED: Guest mode removed, use test-push endpoint instead (sends to all user devices)
+    Route::post('/notifications/{id}/test-push-device', [NotificationController::class, 'testPushToDevice'])->name('admin.notifications.test-push-device');
+    
+    Route::post('/notifications/preview', [NotificationController::class, 'previewMessage'])->name('admin.notifications.preview');
+    Route::get('/notifications/variables', [NotificationController::class, 'getVariables'])->name('admin.notifications.variables');
     
     // Filter Management Routes
     Route::get('/filters', [FilterController::class, 'index'])->name('admin.filters');

@@ -113,22 +113,24 @@
             <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-[17px]">
                 <div class="flex items-center gap-2 mb-3">
                     <div class="w-[6px] h-[6px] bg-[#6B7C4F] rounded-full"></div>
-                    <span class="text-xs text-[#99A1AF] uppercase tracking-wider" style="font-family: Arial, sans-serif; letter-spacing: 0.35px;">Variabel yang Tersedia:</span>
+                    <span class="text-xs text-[#99A1AF] uppercase tracking-wider" style="font-family: Arial, sans-serif; letter-spacing: 0.35px;">Variabel yang Tersedia (klik untuk salin):</span>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-x-8 gap-y-2">
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{current_km}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{km_remaining}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{service_type}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{km_overdue}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{vehicle_name}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{user_name}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{distance}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{predicted_cost}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{workshop_name}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{rating}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{riding_pattern}</span>
-                    <span class="text-xs text-[#6A7282]" style="font-family: Consolas, monospace;">{avg_distance}</span>
+                <div class="grid grid-cols-3 gap-x-4 gap-y-2">
+                    @php
+                    $quickVars = [
+                        '{vehicle_name}', '{vehicle_plate}', '{vehicle_type}',
+                        '{current_km}', '{vehicle_year}', '{vehicle_color}',
+                        '{service_type}', '{service_name}', '{km_remaining}',
+                        '{km_overdue}', '{target_km}', '{target_date}',
+                        '{days_remaining}', '{last_service}', '{workshop_name}',
+                        '{distance}', '{duration}', '{avg_speed}',
+                        '{user_name}', '{app_name}', '{date_now}',
+                    ];
+                    @endphp
+                    @foreach($quickVars as $qv)
+                    <button type="button" @click="navigator.clipboard.writeText('{{ $qv }}'); $el.classList.add('text-[#6B7C4F]'); setTimeout(() => $el.classList.remove('text-[#6B7C4F]'), 1000)" class="text-xs text-[#6A7282] hover:text-white transition-colors text-left cursor-pointer" style="font-family: Consolas, monospace;" title="Klik untuk salin">{{ $qv }}</button>
+                    @endforeach
                 </div>
             </div>
 

@@ -16,7 +16,7 @@ class NotificationController extends Controller
 
     /**
      * Display a listing of notifications for authenticated user or device.
-     * Supports both authenticated users and guest mode (device_id).
+     * Requires authentication.
      *
      * @param Request $request
      * @return JsonResponse
@@ -88,7 +88,7 @@ class NotificationController extends Controller
 
     /**
      * Mark all notifications as read for authenticated user or device.
-     * Supports both authenticated users and guest mode (device_id).
+     * Requires authentication.
      *
      * @param Request $request
      * @return JsonResponse

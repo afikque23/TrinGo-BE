@@ -120,23 +120,35 @@
                 <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-[17px]">
                     <div class="flex items-center gap-2 mb-3">
                         <div class="w-[6px] h-[6px] bg-[#6B7C4F] rounded-full"></div>
-                        <span class="text-xs text-[#99A1AF] uppercase tracking-wider" style="font-family: Arial, sans-serif; letter-spacing: 0.35px;">Variabel yang Tersedia:</span>
+                        <span class="text-xs text-[#99A1AF] uppercase tracking-wider" style="font-family: Arial, sans-serif; letter-spacing: 0.35px;">Variabel yang Tersedia (klik untuk sisipkan):</span>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-x-8 gap-y-2">
+                    <div class="grid grid-cols-3 gap-x-4 gap-y-2">
+                        <!-- Kendaraan -->
+                        <button type="button" @click="insertVariable('{vehicle_name}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{vehicle_name}</button>
+                        <button type="button" @click="insertVariable('{vehicle_plate}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{vehicle_plate}</button>
+                        <button type="button" @click="insertVariable('{vehicle_type}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{vehicle_type}</button>
                         <button type="button" @click="insertVariable('{current_km}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{current_km}</button>
-                        <button type="button" @click="insertVariable('{km_remaining}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{km_remaining}</button>
+                        <button type="button" @click="insertVariable('{vehicle_color}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{vehicle_color}</button>
+                        <button type="button" @click="insertVariable('{vehicle_year}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{vehicle_year}</button>
+                        <!-- Servis -->
                         <button type="button" @click="insertVariable('{service_type}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{service_type}</button>
-                        <button type="button" @click="insertVariable('{days}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{days}</button>
-                        <button type="button" @click="insertVariable('{riding_pattern}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{riding_pattern}</button>
-                        <button type="button" @click="insertVariable('{confidence_score}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{confidence_score}</button>
-                        <button type="button" @click="insertVariable('{overdue_km}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{overdue_km}</button>
-                        <button type="button" @click="insertVariable('{avg_daily_km}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{avg_daily_km}</button>
-                        <button type="button" @click="insertVariable('{predicted_cost}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{predicted_cost}</button>
-                        <button type="button" @click="insertVariable('{month}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{month}</button>
+                        <button type="button" @click="insertVariable('{service_name}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{service_name}</button>
+                        <button type="button" @click="insertVariable('{km_remaining}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{km_remaining}</button>
+                        <button type="button" @click="insertVariable('{km_overdue}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{km_overdue}</button>
+                        <button type="button" @click="insertVariable('{target_km}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{target_km}</button>
+                        <button type="button" @click="insertVariable('{target_date}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{target_date}</button>
+                        <button type="button" @click="insertVariable('{days_remaining}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{days_remaining}</button>
+                        <button type="button" @click="insertVariable('{last_service}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{last_service}</button>
                         <button type="button" @click="insertVariable('{workshop_name}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{workshop_name}</button>
+                        <!-- Perjalanan -->
                         <button type="button" @click="insertVariable('{distance}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{distance}</button>
-                        <button type="button" @click="insertVariable('{rating}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{rating}</button>
+                        <button type="button" @click="insertVariable('{duration}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{duration}</button>
+                        <button type="button" @click="insertVariable('{avg_speed}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{avg_speed}</button>
+                        <!-- Pengguna & Umum -->
+                        <button type="button" @click="insertVariable('{user_name}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{user_name}</button>
+                        <button type="button" @click="insertVariable('{app_name}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{app_name}</button>
+                        <button type="button" @click="insertVariable('{date_now}')" class="text-xs text-[#6A7282] hover:text-[#6B7C4F] text-left transition-colors" style="font-family: Consolas, monospace;">{date_now}</button>
                     </div>
                 </div>
 

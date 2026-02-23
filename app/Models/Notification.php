@@ -17,6 +17,7 @@ class Notification extends Model
      */
     protected $fillable = [
         'user_id',
+        'device_id',
         'vehicle_id',
         'category_key',
         'template_id',
@@ -25,6 +26,8 @@ class Notification extends Model
         'data_payload',
         'priority',
         'sent_via',
+        'push_sent',
+        'push_success',
         'is_read',
         'read_at',
     ];

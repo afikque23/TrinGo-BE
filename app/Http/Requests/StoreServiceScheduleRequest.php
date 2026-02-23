@@ -27,6 +27,9 @@ class StoreServiceScheduleRequest extends FormRequest
             'service_type_id' => 'required|integer|exists:service_types,id',
             'service_name' => 'nullable|string|max:200',
             'schedule_type' => 'required|in:km,time',
+            'interval_value' => 'nullable|integer|min:1',
+            'last_service_mileage' => 'nullable|integer|min:0',
+            'last_service_date' => 'nullable|date',
             'target_km' => [
                 'nullable',
                 'integer',
@@ -47,6 +50,32 @@ class StoreServiceScheduleRequest extends FormRequest
                 'nullable',
                 'integer',
                 Rule::exists('reminder_options', 'id')->where('is_active', true),
+            ],
+            'reminder_threshold' => [
+                'nullable',
+                'integer',
+                'min:1',
+                function ($attribute, $value, $fail) {
+                    if (!$value) return; // Skip validation if null
+                    
+                    if ($this->schedule_type === 'km') {
+                        // For km-based: threshold harus kurang dari interval
+                        if ($value > 1000) {
+                            $fail('Reminder threshold untuk km maksimal 1000.');
+                        }
+                        if ($this->interval_value && $value >= $this->interval_value) {
+                            $fail('Reminder threshold harus kurang dari interval value.');
+                        }
+                    } elseif ($this->schedule_type === 'time') {
+                        // For time-based: threshold maksimal 60 hari
+                        if ($value > 60) {
+                            $fail('Reminder threshold untuk waktu maksimal 60 hari.');
+                        }
+                        if ($this->interval_value && $value >= $this->interval_value) {
+                            $fail('Reminder threshold harus kurang dari interval value.');
+                        }
+                    }
+                },
             ],
             'notes' => 'nullable|string|max:1000',
         ];

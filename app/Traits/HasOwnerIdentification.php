@@ -5,36 +5,29 @@ namespace App\Traits;
 use Illuminate\Http\Request;
 
 /**
- * Trait untuk handle identifikasi owner data (user_id atau device_id)
- * Digunakan untuk mendukung Guest Mode
+ * Trait untuk handle identifikasi owner data berdasarkan user_id
+ * Note: Guest mode sudah dihapus, semua data harus punya user_id
  */
 trait HasOwnerIdentification
 {
     /**
-     * Get owner filter untuk query (user_id atau device_id)
+     * Get owner filter untuk query (user_id only)
      * 
      * @param Request $request
-     * @return array ['type' => 'user'|'device', 'id' => mixed, 'column' => 'user_id'|'device_id']
+     * @return array ['type' => 'user', 'id' => mixed, 'column' => 'user_id']
      */
     protected function getOwnerFilter(Request $request): array
     {
         $user = $request->user();
         
-        if ($user) {
-            return [
-                'type' => 'user',
-                'id' => $user->id,
-                'column' => 'user_id',
-            ];
+        if (!$user) {
+            throw new \Exception('Unauthorized - User must be authenticated');
         }
         
-        // Guest mode - gunakan device_id
-        $deviceId = $request->header('X-Device-ID') ?? $request->input('device_id');
-        
         return [
-            'type' => 'device',
-            'id' => $deviceId,
-            'column' => 'device_id',
+            'type' => 'user',
+            'id' => $user->id,
+            'column' => 'user_id',
         ];
     }
 
@@ -61,26 +54,20 @@ trait HasOwnerIdentification
     {
         $user = $request->user();
         
-        if ($user) {
-            return [
-                'user_id' => $user->id,
-                'device_id' => null, // Tidak perlu device_id jika sudah login
-            ];
+        if (!$user) {
+            throw new \Exception('Unauthorized - User must be authenticated');
         }
         
-        // Guest mode
-        $deviceId = $request->header('X-Device-ID') ?? $request->input('device_id');
-        
         return [
-            'user_id' => null,
-            'device_id' => $deviceId,
+            'user_id' => $user->id,
+            'device_id' => $request->header('X-Device-ID') ?? $request->input('device_id'), // For tracking only
         ];
     }
 
     /**
      * Check if current request owner can access the model
      * 
-     * @param mixed $model Model instance yang punya user_id/device_id
+     * @param mixed $model Model instance yang punya user_id
      * @param Request $request
      * @return bool
      */
@@ -88,11 +75,7 @@ trait HasOwnerIdentification
     {
         $owner = $this->getOwnerFilter($request);
         
-        // Check berdasarkan column (user_id atau device_id)
-        if ($owner['column'] === 'user_id') {
-            return $model->user_id == $owner['id'];
-        } else {
-            return $model->device_id == $owner['id'];
-        }
+        // Check berdasarkan user_id only
+        return $model->user_id == $owner['id'];
     }
 }

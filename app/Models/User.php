@@ -21,6 +21,7 @@ class User extends Authenticatable
         'email',
         'role',
         'phone',
+        'location',
         'password',
         'avatar',
         'is_active',
@@ -31,6 +32,8 @@ class User extends Authenticatable
         'refresh_token_expires_at',
         'device_id',
         'device_name',
+        'fcm_token',
+        'fcm_token_updated_at',
     ];
 
     /**

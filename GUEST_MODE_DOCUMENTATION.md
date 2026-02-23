@@ -1,4 +1,55 @@
-# 🔥 Guest Mode Implementation - Motorcycle Management API
+# ⚠️ DEPRECATED - Guest Mode Documentation
+
+## 🚨 Important Notice
+
+**Guest Mode has been DEPRECATED and REMOVED as of February 20, 2026.**
+
+This system has been replaced with **Persistent Login** for better security and user experience.
+
+### Why Deprecated?
+
+1. ✅ **Better UX**: Users don't need to login repeatedly (like Shopee, Tokopedia)
+2. ✅ **Cross-Device Sync**: Data automatically syncs across devices
+3. ✅ **Better Security**: All data tied to authenticated users only
+4. ✅ **Simplified Architecture**: No complex device_id ownership logic
+
+### Migration Required
+
+All applications using Guest Mode must migrate to **Persistent Login System**.
+
+📖 **See new documentation**: [PERSISTENT_LOGIN_GUIDE.md](./PERSISTENT_LOGIN_GUIDE.md)
+
+---
+
+## Old Documentation (For Reference Only)
+
+# ⚠️ DEPRECATED - Guest Mode Documentation
+
+## 🚨 IMPORTANT NOTICE
+
+**Guest Mode has been DEPRECATED and removed from the system as of February 20, 2026.**
+
+The system now uses **Persistent Login** instead of Guest Mode. All users are required to have an account, but they only need to login once (session persists for 90 days).
+
+## 📖 Migration to Persistent Login
+
+Please refer to **PERSISTENT_LOGIN_GUIDE.md** for the new implementation.
+
+### Key Changes:
+
+1. **No Guest Mode**: Users must register and login
+2. **Persistent Login**: Refresh token valid for 90 days
+3. **Cross-Device Sync**: Data syncs across all devices (tied to user_id)
+4. **user_id Required**: All data now requires user_id (NOT NULL)
+5. **device_id**: Now only used for tracking, not for ownership
+
+---
+
+## ❌ Old Guest Mode Implementation (DEPRECATED)
+
+The following documentation is kept for reference only. **DO NOT USE THIS IMPLEMENTATION.**
+
+# 🔥 Guest Mode Implementation - Motorcycle Management API (DEPRECATED)
 
 ## 📋 Overview
 

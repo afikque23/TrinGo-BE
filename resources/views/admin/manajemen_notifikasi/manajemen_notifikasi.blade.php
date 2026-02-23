@@ -75,6 +75,9 @@
 <!-- Modal Variable Info -->
 @include('admin.manajemen_notifikasi.partials._modal_variable_info')
 
+<!-- Modal Test Push -->
+@include('admin.manajemen_notifikasi.partials._modal_test_push')
+
 <script>
 const _notificationRoot = document.getElementById('notification-root');
 const _templatesData = _notificationRoot ? JSON.parse(_notificationRoot.getAttribute('data-templates') || '[]') : [];
@@ -85,9 +88,13 @@ document.addEventListener('alpine:init', () => {
         showAddModal: false,
         showEditModal: false,
         showVariableInfoModal: false,
+        showTestPushModal: false,
         selectedNotification: null,
         editingId: null,
         testingNotification: null,
+        selectedTemplateId: null,
+        testTargetUserId: null,
+        users: @json($users),
         templates: _templatesData,
         categories: _categoriesData,
         openEdit(template) {
@@ -98,12 +105,70 @@ document.addEventListener('alpine:init', () => {
             this.selectedNotification = template;
             this.showDeleteModal = true;
         },
-        async testPush(templateId) {
-            this.testingNotification = templateId;
-            await new Promise(resolve => setTimeout(resolve, 1500));
+        testPush(templateId) {
+            this.selectedTemplateId = templateId;
+            this.testTargetUserId = {{ Auth::id() }}; // Default to current admin
+            this.showTestPushModal = true;
+        },
+        getSelectedUserName() {
+            if (!this.testTargetUserId) return '';
+            
+            const user = this.users.find(u => u.id == this.testTargetUserId);
+            return user ? user.name : 'Unknown User';
+        },
+        async sendTestPush() {
+            if (!this.testTargetUserId) {
+                alert('❌ Pilih user terlebih dahulu!');
+                return;
+            }
+
+            this.testingNotification = this.selectedTemplateId;
+            
+            try {
+                // Send to selected user (all devices)
+                const url = '/admin/notifications/' + this.selectedTemplateId + '/test-push';
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: this.testTargetUserId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.showTestPushModal = false;
+                    
+                    let msg = '✅ Notifikasi test berhasil dikirim!\n\n';
+                    msg += '� Template: ' + (data.data.template_name || 'N/A') + '\n';
+                    msg += '👤 Target: ' + (data.data.target_user || 'Unknown') + '\n';
+                    msg += '💬 Preview: ' + data.data.message_preview?.substring(0, 100) + '...\n\n';
+                    
+                    if (data.data.push_sent && data.data.push_result?.success) {
+                        msg += '✅ Push notification berhasil dikirim!\n';
+                        msg += '📱 Total device: ' + (data.data.push_result.total_sent || 0) + ' device';
+                    } else if (data.data.push_sent && !data.data.push_result?.success) {
+                        msg += '⚠️ Push notification gagal dikirim.\n';
+                        msg += 'Kemungkinan: User belum login ke mobile app atau FCM token tidak valid.';
+                    } else {
+                        msg += '📋 Notifikasi tersimpan di database (channel: ' + data.data.channel + ')';
+                    }
+                    
+                    alert(msg);
+                } else {
+                    alert('❌ Gagal mengirim notifikasi test: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+            
             this.testingNotification = null;
-            const template = this.templates.find(t => t.id === templateId);
-            alert('Push notification "' + (template ? template.name : '') + '" berhasil dikirim ke test device!');
         },
         toggleActive(templateId) {
             const form = document.createElement('form');

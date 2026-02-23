@@ -35,4 +35,19 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Firebase Cloud Messaging (FCM)
+    |--------------------------------------------------------------------------
+    |
+    | Konfigurasi untuk mengirim push notification via Firebase.
+    | Download service account JSON dari Firebase Console:
+    | Project Settings > Service Accounts > Generate New Private Key
+    |
+    */
+    'fcm' => [
+        'credentials_path' => env('FCM_CREDENTIALS_PATH', storage_path('app/firebase/service-account.json')),
+        'project_id' => env('FCM_PROJECT_ID', ''),
+    ],
+
 ];

@@ -1,0 +1,3272 @@
+﻿{
+    "info": {
+        "_postman_id": "motorcycle-management-api-v3",
+        "name": "Motorcycle Management API v3.0 - Persistent Login",
+        "description": "Complete API collection with 90-day Persistent Login & Primary Vehicle System. All endpoints require authentication. Guest mode has been removed.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{access_token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "1. Register",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.otp) {",
+                                    "        pm.environment.set('otp', response.data.otp);",
+                                    "        pm.environment.set('test_email', pm.request.body.raw ? JSON.parse(pm.request.body.raw).email : '');",
+                                    "        console.log('âœ… OTP saved:', response.data.otp);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"test@example.com\",\n    \"phone\": \"081234567890\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/register",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "register"]
+                        },
+                        "description": "Register user baru. OTP akan dikirim ke email dan disimpan otomatis ke environment variable."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Verify Email",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data) {",
+                                    "        pm.environment.set('access_token', response.data.access_token);",
+                                    "        pm.environment.set('refresh_token', response.data.refresh_token);",
+                                    "        console.log('âœ… Access Token saved');",
+                                    "        console.log('âœ… Refresh Token saved');",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"{{test_email}}\",\n    \"otp\": \"{{otp}}\",\n    \"type\": \"email_verification\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/verify-email",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "verify-email"]
+                        },
+                        "description": "Verifikasi email dengan OTP. Akan mendapat access_token & refresh_token."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data) {",
+                                    "        pm.environment.set('access_token', response.data.access_token);",
+                                    "        pm.environment.set('refresh_token', response.data.refresh_token);",
+                                    "        console.log('âœ… Login successful');",
+                                    "        console.log('âœ… Access Token saved');",
+                                    "        console.log('âœ… Refresh Token saved');",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\",\n    \"device_id\": \"device-uuid-123\",\n    \"device_name\": \"Postman Test\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "login"]
+                        },
+                        "description": "Login dan mendapat access_token (30 menit) + refresh_token (90 hari)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Refresh Token â­",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data) {",
+                                    "        pm.environment.set('access_token', response.data.access_token);",
+                                    "        pm.environment.set('refresh_token', response.data.refresh_token);",
+                                    "        console.log('âœ… Token refreshed successfully');",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"refresh_token\": \"{{refresh_token}}\",\n    \"email\": \"test@example.com\",\n    \"device_id\": \"device-uuid-123\",\n    \"device_name\": \"Postman Test\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/refresh-token",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "refresh-token"]
+                        },
+                        "description": "Refresh access token menggunakan refresh token. Dapat access_token & refresh_token baru."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Get Current User",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/auth/me",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "me"]
+                        },
+                        "description": "Get data user yang sedang login."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Resend OTP",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.otp) {",
+                                    "        pm.environment.set('otp', response.data.otp);",
+                                    "        console.log('âœ… OTP resent:', response.data.otp);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"test@example.com\",\n    \"type\": \"email_verification\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/resend-otp",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "resend-otp"]
+                        },
+                        "description": "Kirim ulang OTP ke email."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Forgot Password",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.otp) {",
+                                    "        pm.environment.set('reset_otp', response.data.otp);",
+                                    "        console.log('âœ… Reset OTP saved:', response.data.otp);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"test@example.com\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/forgot-password",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "forgot-password"]
+                        },
+                        "description": "Request reset password. OTP akan dikirim ke email."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Reset Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"test@example.com\",\n    \"otp\": \"{{reset_otp}}\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/reset-password",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "reset-password"]
+                        },
+                        "description": "Reset password dengan OTP."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "9. Change Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"current_password\": \"password123\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/change-password",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "change-password"]
+                        },
+                        "description": "Change password untuk user yang sudah login."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "10. Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/auth/logout",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "logout"]
+                        },
+                        "description": "Logout dan revoke semua token (access + refresh)."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Endpoint untuk autentikasi dengan sistem refresh token"
+        },
+        {
+            "name": "User Profile",
+            "item": [
+                {
+                    "name": "Get User Profile",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data) {",
+                                    "        console.log('âœ… Profile loaded');",
+                                    "        console.log('Total Vehicles:', response.data.total_vehicles);",
+                                    "        console.log('Total Trips:', response.data.total_trips);",
+                                    "        console.log('Total KM:', response.data.total_km);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/profile",
+                            "host": ["{{base_url}}"],
+                            "path": ["profile"]
+                        },
+                        "description": "Get current user profile with stats (total_vehicles, total_trips, total_km)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Profile",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.access_token) {",
+                                    "        pm.environment.set('access_token', response.data.access_token);",
+                                    "        console.log('âœ… Access Token updated');",
+                                    "    }",
+                                    "    console.log('âœ… Profile updated successfully');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "name",
+                                    "value": "Updated User Name",
+                                    "type": "text",
+                                    "description": "User's full name (optional)"
+                                },
+                                {
+                                    "key": "email",
+                                    "value": "newemail@example.com",
+                                    "type": "text",
+                                    "description": "User's email address (optional)"
+                                },
+                                {
+                                    "key": "phone",
+                                    "value": "081234567890",
+                                    "type": "text",
+                                    "description": "User's phone number (optional)"
+                                },
+                                {
+                                    "key": "location",
+                                    "value": "Jakarta, Indonesia",
+                                    "type": "text",
+                                    "description": "User's location (optional)"
+                                },
+                                {
+                                    "key": "avatar",
+                                    "type": "file",
+                                    "description": "Profile avatar image file (optional)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "current_password",
+                                    "value": "",
+                                    "type": "text",
+                                    "description": "Current password (required when changing password)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "new_password",
+                                    "value": "",
+                                    "type": "text",
+                                    "description": "New password (optional, min 8 characters)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "new_password_confirmation",
+                                    "value": "",
+                                    "type": "text",
+                                    "description": "Confirm new password (optional)",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/profile/update",
+                            "host": ["{{base_url}}"],
+                            "path": ["profile", "update"]
+                        },
+                        "description": "Update user profile. All fields are optional. If changing password, current_password is required along with new_password (min 8 chars) and new_password_confirmation."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Avatar",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    console.log('âœ… Avatar deleted successfully');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/profile/avatar",
+                            "host": ["{{base_url}}"],
+                            "path": ["profile", "avatar"]
+                        },
+                        "description": "Delete user profile avatar"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Endpoints for managing user profile and settings"
+        },
+        {
+            "name": "Vehicles - Primary System",
+            "item": [
+                {
+                    "name": "1. Add Vehicle (Auto Primary)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.id) {",
+                                    "        pm.environment.set('vehicle_id', response.data.id);",
+                                    "        console.log('âœ… Vehicle created, ID:', response.data.id);",
+                                    "        console.log('Is Primary:', response.data.is_primary);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Honda PCX Saya\",\n    \"make\": \"Honda\",\n    \"model\": \"PCX 160\",\n    \"year\": 2023,\n    \"tipe_motor\": \"matic\",\n    \"odometer\": 5000,\n    \"license_plate\": \"B 1234 XYZ\",\n    \"color\": \"Hitam\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/vehicles",
+                            "host": ["{{base_url}}"],
+                            "path": ["vehicles"]
+                        },
+                        "description": "Tambah motor baru. Motor pertama otomatis jadi primary."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Get Primary Vehicle â­",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    console.log('âœ… Primary Vehicle:', response.data.title);",
+                                    "    console.log('Motor ID:', response.data.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/vehicles/primary",
+                            "host": ["{{base_url}}"],
+                            "path": ["vehicles", "primary"]
+                        },
+                        "description": "Get motor utama user. Endpoint ini yang akan digunakan dashboard & fitur lainnya."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. List All Vehicles",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/vehicles",
+                            "host": ["{{base_url}}"],
+                            "path": ["vehicles"]
+                        },
+                        "description": "List semua motor milik user."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get Vehicle by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/vehicles/{{vehicle_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["vehicles", "{{vehicle_id}}"]
+                        },
+                        "description": "Get detail motor by ID."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Add Second Vehicle",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.id) {",
+                                    "        pm.environment.set('vehicle_id_2', response.data.id);",
+                                    "        console.log('âœ… Second vehicle created, ID:', response.data.id);",
+                                    "        console.log('Is Primary:', response.data.is_primary);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Yamaha NMAX Saya\",\n    \"make\": \"Yamaha\",\n    \"model\": \"NMAX 155\",\n    \"year\": 2024,\n    \"tipe_motor\": \"matic\",\n    \"odometer\": 1000,\n    \"license_plate\": \"B 5678 ABC\",\n    \"color\": \"Merah\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/vehicles",
+                            "host": ["{{base_url}}"],
+                            "path": ["vehicles"]
+                        },
+                        "description": "Tambah motor kedua. Tidak otomatis jadi primary karena sudah ada primary."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Set as Primary Vehicle â­",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/vehicles/{{vehicle_id_2}}/set-primary",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "vehicles",
+                                "{{vehicle_id_2}}",
+                                "set-primary"
+                            ]
+                        },
+                        "description": "Set motor sebagai primary. Motor lain otomatis jadi non-primary."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Update Vehicle",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Honda PCX Updated\",\n    \"odometer\": 6000,\n    \"color\": \"Putih\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/vehicles/{{vehicle_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["vehicles", "{{vehicle_id}}"]
+                        },
+                        "description": "Update data motor."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Delete Vehicle",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/vehicles/{{vehicle_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["vehicles", "{{vehicle_id}}"]
+                        },
+                        "description": "Hapus motor (soft delete)."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Endpoint untuk manajemen kendaraan dengan sistem primary vehicle"
+        },
+        {
+            "name": "Services",
+            "item": [
+                {
+                    "name": "1. Create Service",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.id) {",
+                                    "        pm.environment.set('service_id', response.data.id);",
+                                    "        console.log('âœ… Service created, ID:', response.data.id);",
+                                    "        console.log('Total Cost:', response.data.cost);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"vehicle_id\": {{vehicle_id}},\n    \"service_type_id\": 1,\n    \"service_date\": \"2024-01-15\",\n    \"odometer_km\": 5000,\n    \"cost\": 150000,\n    \"workshop_name\": \"Bengkel Jaya Motor\",\n    \"notes\": \"Ganti oli mesin dan filter oli\",\n    \"receipt_image\": null\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/services",
+                            "host": ["{{base_url}}"],
+                            "path": ["services"]
+                        },
+                        "description": "Tambah service baru untuk kendaraan. Service type: 1=Ganti Oli, 2=Tune Up, 3=Ganti Ban, 4=Ganti Kampas Rem, 5=Service Berkala, 6=Perbaikan Mesin, 7=Ganti Aki, 8=Lainnya"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Get All Services",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/services",
+                            "host": ["{{base_url}}"],
+                            "path": ["services"]
+                        },
+                        "description": "List semua service. Dapat difilter dengan parameter vehicle_id."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Get Services by Vehicle",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/services?vehicle_id={{vehicle_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["services"],
+                            "query": [
+                                {
+                                    "key": "vehicle_id",
+                                    "value": "{{vehicle_id}}"
+                                }
+                            ]
+                        },
+                        "description": "List service untuk kendaraan tertentu."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get Service Detail",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/services/{{service_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["services", "{{service_id}}"]
+                        },
+                        "description": "Get detail service by ID."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Update Service",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"service_type_id\": 2,\n    \"service_date\": \"2024-01-20\",\n    \"odometer_km\": 5200,\n    \"cost\": 250000,\n    \"workshop_name\": \"Bengkel Makmur\",\n    \"notes\": \"Tune up dan ganti busi\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/services/{{service_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["services", "{{service_id}}"]
+                        },
+                        "description": "Update data service."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Delete Service",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/services/{{service_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["services", "{{service_id}}"]
+                        },
+                        "description": "Hapus service."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Get Service Summary â­",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    console.log('âœ… Total Services:', response.data.total_services);",
+                                    "    console.log('Total Cost:', response.data.total_cost);",
+                                    "    console.log('Last Service:', response.data.last_service_date);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/services/summary/{{vehicle_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["services", "summary", "{{vehicle_id}}"]
+                        },
+                        "description": "Get ringkasan service untuk kendaraan: total service, total biaya, service terakhir."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Get Cost Breakdown",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    console.log('âœ… Cost breakdown by service type');",
+                                    "    response.data.breakdown.forEach(item => {",
+                                    "        console.log(`${item.service_type}: Rp ${item.total_cost} (${item.count}x)`);",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/services/cost-breakdown/{{vehicle_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "services",
+                                "cost-breakdown",
+                                "{{vehicle_id}}"
+                            ]
+                        },
+                        "description": "Get breakdown biaya per jenis service untuk analisis."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Endpoint untuk manajemen service kendaraan dengan perhitungan biaya otomatis"
+        },
+        {
+            "name": "Service Types - Master Data",
+            "item": [
+                {
+                    "name": "1. Get Active Service Types (Mobile) â­",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    console.log('âœ… Active Service Types:');",
+                                    "    response.data.forEach(type => {",
+                                    "        console.log(`${type.id}. ${type.name}`);",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-types?active=1",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-types"],
+                            "query": [
+                                {
+                                    "key": "active",
+                                    "value": "1",
+                                    "description": "Filter hanya service type yang aktif"
+                                }
+                            ]
+                        },
+                        "description": "Endpoint untuk mobile app - dapatkan daftar jenis service aktif untuk dropdown. Response simple: hanya id dan name."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Get All Service Types (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-types",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-types"]
+                        },
+                        "description": "List semua service types untuk admin panel (termasuk yang non-aktif). Response lengkap dengan semua field."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Create Service Type",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.id) {",
+                                    "        pm.environment.set('service_type_id', response.data.id);",
+                                    "        console.log('âœ… Service Type created, ID:', response.data.id);",
+                                    "        console.log('Name:', response.data.name);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Ganti CVT\",\n    \"description\": \"Penggantian CVT dan komponennya\",\n    \"is_active\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/service-types",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-types"]
+                        },
+                        "description": "Tambah jenis service baru dari admin panel."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get Service Type Detail",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-types/{{service_type_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-types", "{{service_type_id}}"]
+                        },
+                        "description": "Get detail service type by ID."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Update Service Type",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Ganti CVT Lengkap\",\n    \"description\": \"Penggantian CVT dan komponen terkait\",\n    \"is_active\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/service-types/{{service_type_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-types", "{{service_type_id}}"]
+                        },
+                        "description": "Update data service type."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Toggle Status",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-types/{{service_type_id}}/toggle-status",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "service-types",
+                                "{{service_type_id}}",
+                                "toggle-status"
+                            ]
+                        },
+                        "description": "Toggle status aktif/non-aktif service type. Digunakan untuk menonaktifkan jenis service tanpa menghapus data."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Delete Service Type",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-types/{{service_type_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-types", "{{service_type_id}}"]
+                        },
+                        "description": "Hapus service type. Tidak bisa dihapus jika masih digunakan oleh data service."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Master data jenis service untuk Web Admin dan Mobile App dropdown"
+        },
+        {
+            "name": "Reminder Options - Master Data",
+            "item": [
+                {
+                    "name": "1. Get Active Reminder Options (Mobile) â­",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    console.log('âœ… Active Reminder Options:');",
+                                    "    response.data.forEach(option => {",
+                                    "        console.log(`${option.id}. ${option.display_text} (${option.value} ${option.unit})`);",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/reminder-options?active=1&unit=km",
+                            "host": ["{{base_url}}"],
+                            "path": ["reminder-options"],
+                            "query": [
+                                {
+                                    "key": "active",
+                                    "value": "1",
+                                    "description": "Filter hanya reminder option yang aktif"
+                                },
+                                {
+                                    "key": "unit",
+                                    "value": "km",
+                                    "description": "Filter by unit: km, days, weeks, months, years"
+                                }
+                            ]
+                        },
+                        "description": "Endpoint untuk mobile app - dapatkan daftar opsi pengingat aktif untuk dropdown. Response dengan display_text siap pakai."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Get All Reminder Options (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/reminder-options",
+                            "host": ["{{base_url}}"],
+                            "path": ["reminder-options"]
+                        },
+                        "description": "List semua reminder options untuk admin panel (termasuk yang non-aktif)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Create Reminder Option",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.id) {",
+                                    "        pm.environment.set('reminder_option_id', response.data.id);",
+                                    "        console.log('âœ… Reminder Option created, ID:', response.data.id);",
+                                    "        console.log('Label:', response.data.label);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"label\": \"3 bulan sebelum\",\n    \"value\": 3,\n    \"unit\": \"months\",\n    \"is_active\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/reminder-options",
+                            "host": ["{{base_url}}"],
+                            "path": ["reminder-options"]
+                        },
+                        "description": "Tambah opsi pengingat baru dari admin panel. Unit harus salah satu dari: 'km', 'days', 'weeks', 'months', 'years'. Value + Unit harus unik."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get Reminder Option Detail",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/reminder-options/{{reminder_option_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "reminder-options",
+                                "{{reminder_option_id}}"
+                            ]
+                        },
+                        "description": "Get detail reminder option by ID."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Update Reminder Option",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"label\": \"6 bulan sebelum\",\n    \"value\": 6,\n    \"unit\": \"months\",\n    \"is_active\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/reminder-options/{{reminder_option_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "reminder-options",
+                                "{{reminder_option_id}}"
+                            ]
+                        },
+                        "description": "Update data reminder option. Unit must be one of: 'km', 'days', 'weeks', 'months', 'years'."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Toggle Status",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/reminder-options/{{reminder_option_id}}/toggle-status",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "reminder-options",
+                                "{{reminder_option_id}}",
+                                "toggle-status"
+                            ]
+                        },
+                        "description": "Toggle status aktif/non-aktif reminder option."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Delete Reminder Option",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/reminder-options/{{reminder_option_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "reminder-options",
+                                "{{reminder_option_id}}"
+                            ]
+                        },
+                        "description": "Hapus reminder option."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Master data opsi pengingat untuk Web Admin dan Mobile App dropdown"
+        },
+        {
+            "name": "Health Check",
+            "item": [
+                {
+                    "name": "API Health Check",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/health",
+                            "host": ["{{base_url}}"],
+                            "path": ["health"]
+                        },
+                        "description": "Cek status API."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Content Management - Admin",
+            "item": [
+                {
+                    "name": "Get All Contents",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/contents",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "contents"]
+                        },
+                        "description": "Get all content records for admin panel"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Content",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Syarat dan Ketentuan\",\n    \"type\": \"terms\",\n    \"body\": \"[{\\\"section\\\":\\\"Penerimaan Syarat\\\",\\\"content\\\":\\\"Dengan menggunakan aplikasi ini, Anda menyetujui syarat dan ketentuan yang berlaku.\\\"}]\",\n    \"status\": \"published\",\n    \"order\": 1\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/contents",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "contents"]
+                        },
+                        "description": "Create new content (admin only)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Single Content",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/contents/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "contents", "1"]
+                        },
+                        "description": "Get single content by ID"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Content",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Updated Title\",\n    \"status\": \"draft\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/contents/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "contents", "1"]
+                        },
+                        "description": "Update content (partial or full update)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Content",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/contents/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "contents", "1"]
+                        },
+                        "description": "Delete content by ID"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Content Management endpoints for admin panel - CRUD operations"
+        },
+        {
+            "name": "Content Management - Public",
+            "item": [
+                {
+                    "name": "Get Terms & Conditions",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/contents/terms",
+                            "host": ["{{base_url}}"],
+                            "path": ["contents", "terms"]
+                        },
+                        "description": "Get published Terms & Conditions for mobile app"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Privacy Policy",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/contents/privacy",
+                            "host": ["{{base_url}}"],
+                            "path": ["contents", "privacy"]
+                        },
+                        "description": "Get published Privacy Policy for mobile app"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get User Guide",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/contents/guide",
+                            "host": ["{{base_url}}"],
+                            "path": ["contents", "guide"]
+                        },
+                        "description": "Get published User Guide for mobile app"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get About",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/contents/about",
+                            "host": ["{{base_url}}"],
+                            "path": ["contents", "about"]
+                        },
+                        "description": "Get published About info for mobile app"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get FAQ",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/contents/faq",
+                            "host": ["{{base_url}}"],
+                            "path": ["contents", "faq"]
+                        },
+                        "description": "Get published FAQ for mobile app"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get System Info",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/contents/system_info",
+                            "host": ["{{base_url}}"],
+                            "path": ["contents", "system_info"]
+                        },
+                        "description": "Get published System Info (algorithm transparency) for mobile app"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Public content endpoints for mobile app - no authentication required"
+        },
+        {
+            "name": "Service Schedules",
+            "item": [
+                {
+                    "name": "1. Create Service Schedule (KM)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.data && response.data.id) {",
+                                    "        pm.environment.set('service_schedule_id', response.data.id);",
+                                    "        console.log('âœ… Service schedule created, ID:', response.data.id);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"vehicle_id\": 1,\n  \"service_type_id\": 2,\n  \"schedule_type\": \"km\",\n  \"target_km\": 15000,\n  \"reminder_option_id\": 1,\n  \"notes\": \"Ganti oli setiap 5000 km\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-schedules"]
+                        },
+                        "description": "Create a KM-based service schedule. reminder_option_id is optional - you can create schedules without setting a reminder."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Create Service Schedule (Time)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"vehicle_id\": 1,\n  \"service_type_id\": 3,\n  \"schedule_type\": \"time\",\n  \"target_date\": \"2026-06-30\",\n  \"notes\": \"Service berkala 6 bulan (no reminder)\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-schedules"]
+                        },
+                        "description": "Create a time-based service schedule. reminder_option_id is optional - this example shows creating without a reminder."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. List Service Schedules (Admin/User)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules?vehicle_id=1",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-schedules"],
+                            "query": [
+                                {
+                                    "key": "vehicle_id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "List schedules, filter by vehicle_id, is_active, schedule_type"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get Service Schedule Detail",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules/{{service_schedule_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "service-schedules",
+                                "{{service_schedule_id}}"
+                            ]
+                        },
+                        "description": "Get schedule detail by id"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Update Service Schedule",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"notes\": \"Perbarui catatan\",\n  \"is_active\": false\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules/{{service_schedule_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "service-schedules",
+                                "{{service_schedule_id}}"
+                            ]
+                        },
+                        "description": "Update schedule (partial/sometimes fields accepted)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Delete Service Schedule",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules/{{service_schedule_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "service-schedules",
+                                "{{service_schedule_id}}"
+                            ]
+                        },
+                        "description": "Delete schedule by id"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Get Primary Vehicle Schedules â­ NEW",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules/primary",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-schedules", "primary"]
+                        },
+                        "description": "Get all service schedules for primary vehicle with live status evaluation based on current odometer. Status dinamis: Darurat (critical), Segera (warning), Aman (normal). Otomatis switch ketika ganti primary vehicle."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Evaluate Schedule Status (Vehicle)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/service-schedules/status/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["service-schedules", "status", "1"]
+                        },
+                        "description": "Evaluate all active schedules for a specific vehicle and return status (critical/warning/normal)"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Service Schedule master data & evaluation endpoints"
+        },
+        {
+            "name": "Trips",
+            "item": [
+                {
+                    "name": "1. Create Trip (GPS Tracking)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const response = pm.response.json();",
+                                    "if (response.success && response.data) {",
+                                    "    pm.collectionVariables.set('trip_id', response.data.id);",
+                                    "    console.log('âœ… Trip created, ID:', response.data.id);",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"vehicle_id\": {{vehicle_id}},\n    \"start_time\": \"2026-02-19T08:00:00+07:00\",\n    \"end_time\": \"2026-02-19T08:30:00+07:00\",\n    \"total_distance\": 15.5,\n    \"duration\": 1800,\n    \"average_speed\": 31.0,\n    \"max_speed\": 50.0,\n    \"status\": \"completed\",\n    \"notes\": \"Perjalanan ke kantor pagi hari\",\n    \"points\": [\n        {\n            \"latitude\": -6.2088,\n            \"longitude\": 106.8456,\n            \"speed\": 0,\n            \"altitude\": 10,\n            \"accuracy\": 5,\n            \"timestamp\": \"2026-02-19T08:00:00+07:00\"\n        },\n        {\n            \"latitude\": -6.2100,\n            \"longitude\": 106.8470,\n            \"speed\": 30,\n            \"altitude\": 12,\n            \"accuracy\": 5,\n            \"timestamp\": \"2026-02-19T08:15:00+07:00\"\n        },\n        {\n            \"latitude\": -6.2150,\n            \"longitude\": 106.8500,\n            \"speed\": 0,\n            \"altitude\": 15,\n            \"accuracy\": 5,\n            \"timestamp\": \"2026-02-19T08:30:00+07:00\"\n        }\n    ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/trips",
+                            "host": ["{{base_url}}"],
+                            "path": ["trips"]
+                        },
+                        "description": "Simpan trip dari GPS tracking. Odometer kendaraan akan otomatis ter-update saat status=completed. Notifikasi akan dikirim dengan odometer terbaru."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Add Manual Distance â­",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const response = pm.response.json();",
+                                    "if (response.success && response.data) {",
+                                    "    pm.collectionVariables.set('trip_id', response.data.id);",
+                                    "    console.log('âœ… Manual distance added, Trip ID:', response.data.id);",
+                                    "    console.log('ðŸ“Š New odometer:', response.new_odometer);",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"vehicle_id\": {{vehicle_id}},\n    \"distance_km\": 25.5,\n    \"trip_date\": \"2026-02-19\",\n    \"notes\": \"Perjalanan pulang kampung\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/trips/manual-distance",
+                            "host": ["{{base_url}}"],
+                            "path": ["trips", "manual-distance"]
+                        },
+                        "description": "Tambah jarak manual tanpa GPS tracking. Odometer akan otomatis ter-update dan notifikasi dikirim dengan odometer terbaru. Cocok untuk kasus lupa nyalakan tracking atau input jarak dari luar app."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Get All Trips",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/trips?vehicle_id={{vehicle_id}}&limit=20&offset=0",
+                            "host": ["{{base_url}}"],
+                            "path": ["trips"],
+                            "query": [
+                                {
+                                    "key": "vehicle_id",
+                                    "value": "{{vehicle_id}}",
+                                    "description": "Filter by vehicle (optional)"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "20",
+                                    "description": "Items per page"
+                                },
+                                {
+                                    "key": "offset",
+                                    "value": "0",
+                                    "description": "Offset for pagination"
+                                }
+                            ]
+                        },
+                        "description": "Dapatkan daftar semua trip dengan pagination. Bisa difilter berdasarkan vehicle_id."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get Trip Detail",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/trips/{{trip_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["trips", "{{trip_id}}"]
+                        },
+                        "description": "Dapatkan detail trip termasuk semua GPS points."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Delete Trip",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/trips/{{trip_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["trips", "{{trip_id}}"]
+                        },
+                        "description": "Hapus trip (soft delete)."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Trip tracking endpoints - supports GPS tracking and manual distance entry with auto odometer update"
+        },
+        {
+            "name": "Device Tokens (FCM Push)",
+            "item": [
+                {
+                    "name": "1. Register FCM Token â­",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const response = pm.response.json();",
+                                    "if (response.success && response.data) {",
+                                    "    pm.collectionVariables.set('device_token_id', response.data.id);",
+                                    "    console.log('âœ… FCM Token registered, ID:', response.data.id);",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"fcm_token\": \"dXhY7abcDEF123456789ghijKLMNOP-qrstuVWXYZ_0123456789_abcdefghijklmnop:APA91bFakeTokenForTestingPurpose123456789\",\n    \"platform\": \"android\",\n    \"device_name\": \"Samsung Galaxy A54\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/device-tokens/register",
+                            "host": ["{{base_url}}"],
+                            "path": ["device-tokens", "register"]
+                        },
+                        "description": "Register FCM token untuk push notification. Panggil saat app pertama dibuka, token di-refresh, atau user login. Support guest mode dengan X-Device-ID."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Unregister FCM Token",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"fcm_token\": \"dXhY7abcDEF123456789ghijKLMNOP-qrstuVWXYZ_0123456789_abcdefghijklmnop:APA91bFakeTokenForTestingPurpose123456789\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/device-tokens/unregister",
+                            "host": ["{{base_url}}"],
+                            "path": ["device-tokens", "unregister"]
+                        },
+                        "description": "Hapus FCM token. Panggil saat user logout atau app di-uninstall."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Get Token Status",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/device-tokens/status",
+                            "host": ["{{base_url}}"],
+                            "path": ["device-tokens", "status"]
+                        },
+                        "description": "Cek status device token yang terdaftar. Useful untuk debugging push notification."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "FCM Device Token management for push notifications - supports both authenticated & guest mode"
+        },
+        {
+            "name": "Notifications",
+            "item": [
+                {
+                    "name": "1. Get Notification Categories",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notification-categories",
+                            "host": ["{{base_url}}"],
+                            "path": ["notification-categories"]
+                        },
+                        "description": "Get all active notification categories for tab navigation"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Get All Notifications",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications?per_page=10",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications"],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "10",
+                                    "description": "Items per page"
+                                },
+                                {
+                                    "key": "category",
+                                    "value": "service",
+                                    "disabled": true,
+                                    "description": "Filter by category (service, trip, alert, insight)"
+                                },
+                                {
+                                    "key": "unread",
+                                    "value": "true",
+                                    "disabled": true,
+                                    "description": "Filter unread only"
+                                }
+                            ]
+                        },
+                        "description": "Get paginated user notifications with filters"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Get Notification by Category",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications?category=service&per_page=10",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications"],
+                            "query": [
+                                {
+                                    "key": "category",
+                                    "value": "service",
+                                    "description": "Filter: service, trip, alert, insight, system"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "10"
+                                }
+                            ]
+                        },
+                        "description": "Get notifications filtered by category key (service, trip, alert, insight, system)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3a. Get Service Notifications â­",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications?category=service&per_page=20",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications"],
+                            "query": [
+                                {
+                                    "key": "category",
+                                    "value": "service",
+                                    "description": "Notifikasi terkait servis motor"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "20"
+                                }
+                            ]
+                        },
+                        "description": "Notifikasi kategori Servis: pengingat servis, servis jatuh tempo, servis terlambat"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3b. Get Trip Notifications â­",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications?category=trip&per_page=20",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications"],
+                            "query": [
+                                {
+                                    "key": "category",
+                                    "value": "trip",
+                                    "description": "Notifikasi terkait perjalanan"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "20"
+                                }
+                            ]
+                        },
+                        "description": "Notifikasi kategori Perjalanan: perjalanan selesai, jarak ditambahkan, odometer ter-update"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3c. Get Alert Notifications â­",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications?category=alert&per_page=20",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications"],
+                            "query": [
+                                {
+                                    "key": "category",
+                                    "value": "alert",
+                                    "description": "Notifikasi peringatan penting"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "20"
+                                }
+                            ]
+                        },
+                        "description": "Notifikasi kategori Peringatan: servis darurat, servis terlambat, peringatan penting lainnya"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3d. Get Insight Notifications â­",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications?category=insight&per_page=20",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications"],
+                            "query": [
+                                {
+                                    "key": "category",
+                                    "value": "insight",
+                                    "description": "Notifikasi insight & rekomendasi"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "20"
+                                }
+                            ]
+                        },
+                        "description": "Notifikasi kategori Insight: rekomendasi servis, tips perawatan, insight pola penggunaan"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3e. Get System Notifications",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications?category=system&per_page=20",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications"],
+                            "query": [
+                                {
+                                    "key": "category",
+                                    "value": "system",
+                                    "description": "Notifikasi sistem"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "20"
+                                }
+                            ]
+                        },
+                        "description": "Notifikasi kategori Sistem: update aplikasi, maintenance, pengumuman sistem"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get Unread Notifications",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications?unread=true",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications"],
+                            "query": [
+                                {
+                                    "key": "unread",
+                                    "value": "true"
+                                }
+                            ]
+                        },
+                        "description": "Get only unread notifications"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4a. Get Unread Service Notifications â­",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications?category=service&unread=true",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications"],
+                            "query": [
+                                {
+                                    "key": "category",
+                                    "value": "service",
+                                    "description": "Filter kategori servis"
+                                },
+                                {
+                                    "key": "unread",
+                                    "value": "true",
+                                    "description": "Hanya yang belum dibaca"
+                                }
+                            ]
+                        },
+                        "description": "Kombinasi filter: Hanya notifikasi servis yang belum dibaca"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4b. Get Unread Trip Notifications â­",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications?category=trip&unread=true",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications"],
+                            "query": [
+                                {
+                                    "key": "category",
+                                    "value": "trip",
+                                    "description": "Filter kategori perjalanan"
+                                },
+                                {
+                                    "key": "unread",
+                                    "value": "true",
+                                    "description": "Hanya yang belum dibaca"
+                                }
+                            ]
+                        },
+                        "description": "Kombinasi filter: Hanya notifikasi perjalanan yang belum dibaca"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4c. Get Unread Alert Notifications â­",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications?category=alert&unread=true",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications"],
+                            "query": [
+                                {
+                                    "key": "category",
+                                    "value": "alert",
+                                    "description": "Filter kategori peringatan"
+                                },
+                                {
+                                    "key": "unread",
+                                    "value": "true",
+                                    "description": "Hanya yang belum dibaca"
+                                }
+                            ]
+                        },
+                        "description": "Kombinasi filter: Hanya notifikasi peringatan yang belum dibaca (PRIORITAS TINGGI)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Get Single Notification",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications/{{notification_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications", "{{notification_id}}"]
+                        },
+                        "description": "Get single notification detail"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Mark Notification as Read",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications/{{notification_id}}/read",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "notifications",
+                                "{{notification_id}}",
+                                "read"
+                            ]
+                        },
+                        "description": "Mark a specific notification as read"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Mark All as Read",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications/read-all",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications", "read-all"]
+                        },
+                        "description": "Mark all user notifications as read"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Delete Notification",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notifications/{{notification_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["notifications", "{{notification_id}}"]
+                        },
+                        "description": "Delete a notification"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "9. Get Notification Preferences",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/notification-preferences",
+                            "host": ["{{base_url}}"],
+                            "path": ["notification-preferences"]
+                        },
+                        "description": "Get all notification templates grouped by category with user's preference status (enabled/disabled). Returns both category-level and template-specific preferences."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "10. Toggle Template Preference",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"template_id\": 1,\n    \"is_enabled\": false\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/notification-preferences",
+                            "host": ["{{base_url}}"],
+                            "path": ["notification-preferences"]
+                        },
+                        "description": "Toggle notification preference for a specific template. Set is_enabled to true to enable, false to disable. Provide either template_id or category_key, not both."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "11. Toggle Category Preference",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"category_key\": \"service\",\n    \"is_enabled\": false\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/notification-preferences",
+                            "host": ["{{base_url}}"],
+                            "path": ["notification-preferences"]
+                        },
+                        "description": "Toggle notification preference for an entire category. This will affect all templates in the category unless they have specific template-level preferences."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "12. Reset Preference (Delete)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "X-Device-ID",
+                                "value": "{{device_id}}",
+                                "type": "string",
+                                "description": "Device ID for Guest Mode support (auto-sync with user on login)"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"template_id\": 1\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/notification-preferences",
+                            "host": ["{{base_url}}"],
+                            "path": ["notification-preferences"]
+                        },
+                        "description": "Reset notification preference to default (enabled). Provide either template_id or category_key to reset. Alternative body example: {\"category_key\": \"service\"}"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "User notification management endpoints for mobile app"
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000/api/v1/motorcycle",
+            "type": "string"
+        },
+        {
+            "key": "trip_id",
+            "value": "",
+            "type": "string",
+            "description": "Auto-filled dari response Create Trip atau Add Manual Distance"
+        },
+        {
+            "key": "device_token_id",
+            "value": "",
+            "type": "string",
+            "description": "Auto-filled dari response Register FCM Token"
+        }
+    ]
+}

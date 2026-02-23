@@ -37,7 +37,7 @@
                     <div>
                         <p class="text-sm text-white font-semibold mb-1" style="font-family: Arial, sans-serif;">Cara Penggunaan</p>
                         <p class="text-xs text-[#99A1AF]" style="font-family: Arial, sans-serif;">
-                            Salin variabel di bawah dan tempelkan ke dalam template pesan. Variabel akan otomatis diganti dengan data sebenarnya saat notifikasi dikirim.
+                            Salin variabel di bawah dan tempelkan ke dalam template pesan. Variabel akan otomatis diganti dengan data sebenarnya saat notifikasi dikirim ke pengguna Flutter.
                         </p>
                     </div>
                 </div>
@@ -45,118 +45,104 @@
 
             <!-- Variables Grid -->
             <div class="space-y-3">
-                <!-- Section: Kendaraan & Servis -->
+                <!-- Section: Kendaraan -->
                 <div>
-                    <h4 class="text-xs font-bold text-[#6B7C4F] uppercase tracking-wider mb-3" style="font-family: Arial, sans-serif; letter-spacing: 0.5px;">🔧 Kendaraan & Servis</h4>
+                    <h4 class="text-xs font-bold text-[#6B7C4F] uppercase tracking-wider mb-3" style="font-family: Arial, sans-serif; letter-spacing: 0.5px;">🏍️ Kendaraan</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <!-- Variable Item -->
+                        @php
+                        $vehicleVars = [
+                            ['{vehicle_name}', 'Nama kendaraan (contoh: Honda Beat 2023)'],
+                            ['{vehicle_plate}', 'Plat nomor kendaraan'],
+                            ['{vehicle_type}', 'Tipe motor (matic/manual/sport)'],
+                            ['{current_km}', 'Kilometer odometer saat ini'],
+                            ['{vehicle_color}', 'Warna kendaraan'],
+                            ['{vehicle_year}', 'Tahun kendaraan'],
+                        ];
+                        @endphp
+                        @foreach($vehicleVars as $var)
                         <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-3 hover:border-[#6B7C4F] transition-colors">
                             <div class="flex items-start justify-between gap-2 mb-2">
-                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{vehicle_name}</code>
-                                <button @click="navigator.clipboard.writeText('{vehicle_name}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
+                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{{ $var[0] }}</code>
+                                <button @click="navigator.clipboard.writeText('{{ $var[0] }}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
                             </div>
-                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">Nama kendaraan</p>
+                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">{{ $var[1] }}</p>
                         </div>
-
-                        <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-3 hover:border-[#6B7C4F] transition-colors">
-                            <div class="flex items-start justify-between gap-2 mb-2">
-                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{current_km}</code>
-                                <button @click="navigator.clipboard.writeText('{current_km}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
-                            </div>
-                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">Kilometer saat ini</p>
-                        </div>
-
-                        <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-3 hover:border-[#6B7C4F] transition-colors">
-                            <div class="flex items-start justify-between gap-2 mb-2">
-                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{service_type}</code>
-                                <button @click="navigator.clipboard.writeText('{service_type}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
-                            </div>
-                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">Jenis servis</p>
-                        </div>
-
-                        <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-3 hover:border-[#6B7C4F] transition-colors">
-                            <div class="flex items-start justify-between gap-2 mb-2">
-                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{km_remaining}</code>
-                                <button @click="navigator.clipboard.writeText('{km_remaining}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
-                            </div>
-                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">KM tersisa sebelum servis</p>
-                        </div>
-
-                        <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-3 hover:border-[#6B7C4F] transition-colors">
-                            <div class="flex items-start justify-between gap-2 mb-2">
-                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{km_overdue}</code>
-                                <button @click="navigator.clipboard.writeText('{km_overdue}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
-                            </div>
-                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">KM terlambat servis</p>
-                        </div>
-
-                        <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-3 hover:border-[#6B7C4F] transition-colors">
-                            <div class="flex items-start justify-between gap-2 mb-2">
-                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{predicted_cost}</code>
-                                <button @click="navigator.clipboard.writeText('{predicted_cost}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
-                            </div>
-                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">Perkiraan biaya servis</p>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
 
-                <!-- Section: Bengkel -->
+                <!-- Section: Servis -->
                 <div class="pt-3 border-t border-[#1E2939]">
-                    <h4 class="text-xs font-bold text-[#6B7C4F] uppercase tracking-wider mb-3" style="font-family: Arial, sans-serif; letter-spacing: 0.5px;">🏪 Bengkel</h4>
+                    <h4 class="text-xs font-bold text-[#6B7C4F] uppercase tracking-wider mb-3" style="font-family: Arial, sans-serif; letter-spacing: 0.5px;">🔧 Servis & Jadwal</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        @php
+                        $serviceVars = [
+                            ['{service_type}', 'Jenis servis (contoh: Ganti Oli)'],
+                            ['{service_name}', 'Nama jadwal servis'],
+                            ['{km_remaining}', 'KM tersisa sebelum waktunya servis'],
+                            ['{km_overdue}', 'KM terlambat dari jadwal servis'],
+                            ['{target_km}', 'Target KM untuk servis berikutnya'],
+                            ['{target_date}', 'Tanggal target servis berikutnya'],
+                            ['{days_remaining}', 'Hari tersisa sebelum jadwal servis'],
+                            ['{last_service}', 'Tanggal servis terakhir'],
+                            ['{workshop_name}', 'Nama bengkel terakhir'],
+                        ];
+                        @endphp
+                        @foreach($serviceVars as $var)
                         <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-3 hover:border-[#6B7C4F] transition-colors">
                             <div class="flex items-start justify-between gap-2 mb-2">
-                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{workshop_name}</code>
-                                <button @click="navigator.clipboard.writeText('{workshop_name}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
+                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{{ $var[0] }}</code>
+                                <button @click="navigator.clipboard.writeText('{{ $var[0] }}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
                             </div>
-                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">Nama bengkel</p>
+                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">{{ $var[1] }}</p>
                         </div>
-
-                        <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-3 hover:border-[#6B7C4F] transition-colors">
-                            <div class="flex items-start justify-between gap-2 mb-2">
-                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{rating}</code>
-                                <button @click="navigator.clipboard.writeText('{rating}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
-                            </div>
-                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">Rating bengkel</p>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
 
-                <!-- Section: Perjalanan & Pengguna -->
+                <!-- Section: Perjalanan -->
                 <div class="pt-3 border-t border-[#1E2939]">
-                    <h4 class="text-xs font-bold text-[#6B7C4F] uppercase tracking-wider mb-3" style="font-family: Arial, sans-serif; letter-spacing: 0.5px;">👤 Perjalanan & Pengguna</h4>
+                    <h4 class="text-xs font-bold text-[#6B7C4F] uppercase tracking-wider mb-3" style="font-family: Arial, sans-serif; letter-spacing: 0.5px;">🗺️ Perjalanan</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        @php
+                        $tripVars = [
+                            ['{distance}', 'Jarak perjalanan (km)'],
+                            ['{duration}', 'Durasi perjalanan'],
+                            ['{avg_speed}', 'Kecepatan rata-rata (km/h)'],
+                        ];
+                        @endphp
+                        @foreach($tripVars as $var)
                         <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-3 hover:border-[#6B7C4F] transition-colors">
                             <div class="flex items-start justify-between gap-2 mb-2">
-                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{user_name}</code>
-                                <button @click="navigator.clipboard.writeText('{user_name}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
+                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{{ $var[0] }}</code>
+                                <button @click="navigator.clipboard.writeText('{{ $var[0] }}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
                             </div>
-                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">Nama pengguna</p>
+                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">{{ $var[1] }}</p>
                         </div>
+                        @endforeach
+                    </div>
+                </div>
 
+                <!-- Section: Pengguna & Umum -->
+                <div class="pt-3 border-t border-[#1E2939]">
+                    <h4 class="text-xs font-bold text-[#6B7C4F] uppercase tracking-wider mb-3" style="font-family: Arial, sans-serif; letter-spacing: 0.5px;">👤 Pengguna & Umum</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        @php
+                        $generalVars = [
+                            ['{user_name}', 'Nama pengguna'],
+                            ['{app_name}', 'Nama aplikasi (MotoTracker)'],
+                            ['{date_now}', 'Tanggal saat ini'],
+                        ];
+                        @endphp
+                        @foreach($generalVars as $var)
                         <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-3 hover:border-[#6B7C4F] transition-colors">
                             <div class="flex items-start justify-between gap-2 mb-2">
-                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{distance}</code>
-                                <button @click="navigator.clipboard.writeText('{distance}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
+                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{{ $var[0] }}</code>
+                                <button @click="navigator.clipboard.writeText('{{ $var[0] }}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
                             </div>
-                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">Jarak perjalanan</p>
+                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">{{ $var[1] }}</p>
                         </div>
-
-                        <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-3 hover:border-[#6B7C4F] transition-colors">
-                            <div class="flex items-start justify-between gap-2 mb-2">
-                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{riding_pattern}</code>
-                                <button @click="navigator.clipboard.writeText('{riding_pattern}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
-                            </div>
-                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">Pola berkendara</p>
-                        </div>
-
-                        <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-3 hover:border-[#6B7C4F] transition-colors">
-                            <div class="flex items-start justify-between gap-2 mb-2">
-                                <code class="text-sm text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-1 rounded" style="font-family: Consolas, monospace;">{avg_distance}</code>
-                                <button @click="navigator.clipboard.writeText('{avg_distance}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
-                            </div>
-                            <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">Rata-rata jarak harian</p>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -164,11 +150,19 @@
             <!-- Example Section -->
             <div class="mt-6 pt-6 border-t border-[#1E2939]">
                 <h4 class="text-sm font-bold text-white mb-3" style="font-family: Arial, sans-serif;">💡 Contoh Penggunaan</h4>
-                <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-4">
-                    <p class="text-xs text-[#6A7282] mb-2" style="font-family: Arial, sans-serif;">Template:</p>
-                    <code class="text-xs text-white block bg-[#1A1A1A] p-3 rounded-lg mb-3" style="font-family: Consolas, monospace; white-space: pre-wrap;">Halo {user_name}, {vehicle_name} Anda memerlukan {service_type} dalam {km_remaining} km lagi. Perkiraan biaya: {predicted_cost}</code>
-                    <p class="text-xs text-[#6A7282] mb-2" style="font-family: Arial, sans-serif;">Hasil:</p>
-                    <code class="text-xs text-[#6B7C4F] block bg-[#1A1A1A] p-3 rounded-lg" style="font-family: Consolas, monospace; white-space: pre-wrap;">Halo Budi Santoso, Honda Beat Anda memerlukan Ganti Oli dalam 500 km lagi. Perkiraan biaya: Rp 45.000</code>
+                <div class="space-y-3">
+                    <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-4">
+                        <p class="text-xs text-[#6A7282] mb-2" style="font-family: Arial, sans-serif;">Template Pengingat Servis:</p>
+                        <code class="text-xs text-white block bg-[#1A1A1A] p-3 rounded-lg mb-3" style="font-family: Consolas, monospace; white-space: pre-wrap;">🔧 Halo {user_name}, {vehicle_name} perlu {service_type} dalam {km_remaining} km lagi (target: {target_km} km). Jadwalkan sekarang!</code>
+                        <p class="text-xs text-[#6A7282] mb-2" style="font-family: Arial, sans-serif;">Hasil yang dikirim ke Flutter:</p>
+                        <code class="text-xs text-[#6B7C4F] block bg-[#1A1A1A] p-3 rounded-lg" style="font-family: Consolas, monospace; white-space: pre-wrap;">🔧 Halo Budi Santoso, Honda Beat 2023 perlu Ganti Oli dalam 500 km lagi (target: 16.000 km). Jadwalkan sekarang!</code>
+                    </div>
+                    <div class="bg-[#0A0A0A] border border-[#364153] rounded-[10px] p-4">
+                        <p class="text-xs text-[#6A7282] mb-2" style="font-family: Arial, sans-serif;">Template Servis Terlambat:</p>
+                        <code class="text-xs text-white block bg-[#1A1A1A] p-3 rounded-lg mb-3" style="font-family: Consolas, monospace; white-space: pre-wrap;">⚠️ {vehicle_name} sudah melewati jadwal {service_type} sebanyak {km_overdue} km! Segera servis di {workshop_name}.</code>
+                        <p class="text-xs text-[#6A7282] mb-2" style="font-family: Arial, sans-serif;">Hasil:</p>
+                        <code class="text-xs text-[#6B7C4F] block bg-[#1A1A1A] p-3 rounded-lg" style="font-family: Consolas, monospace; white-space: pre-wrap;">⚠️ Honda Beat 2023 sudah melewati jadwal Ganti Oli sebanyak 200 km! Segera servis di Bengkel AHASS Maju Jaya.</code>
+                    </div>
                 </div>
             </div>
         </div>

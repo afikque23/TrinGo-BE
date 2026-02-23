@@ -18,8 +18,24 @@ class ServiceHistoryController extends Controller
     use ApiResponse, HasOwnerIdentification;
 
     /**
+     * Generate file URL using file serving route
+     */
+    private function getFileUrl(?string $path): ?string
+    {
+        if (!$path) {
+            return null;
+        }
+
+        // Extract filename from path (e.g., 'receipts/file.png' -> 'file.png')
+        $filename = basename($path);
+        
+        // Use the file serving route
+        return url('/api/v1/motorcycle/files/receipts/' . $filename);
+    }
+
+    /**
      * Display a listing of service histories for the user's primary vehicle.
-     * Supports both authenticated users and guest mode (device_id).
+     * Requires authentication.
      */
     public function index(Request $request): JsonResponse
     {
@@ -47,7 +63,7 @@ class ServiceHistoryController extends Controller
                         'cost' => $service->cost_cents ? $service->cost_cents / 100 : null,
                         'currency' => $service->currency,
                         'service_provider' => $service->service_provider,
-                        'receipt_url' => $service->receipt_url ? Storage::url($service->receipt_url) : null,
+                        'receipt_url' => $this->getFileUrl($service->receipt_url),
                         'notes' => $service->notes,
                         'created_at' => $service->created_at->toIso8601String(),
                     ];
@@ -70,7 +86,7 @@ class ServiceHistoryController extends Controller
 
     /**
      * Store a newly created service history.
-     * Supports both authenticated users and guest mode (device_id).
+     * Requires authentication.
      */
     public function store(StoreServiceHistoryRequest $request): JsonResponse
     {
@@ -125,7 +141,7 @@ class ServiceHistoryController extends Controller
                     'cost' => $serviceHistory->cost_cents ? $serviceHistory->cost_cents / 100 : null,
                     'currency' => $serviceHistory->currency,
                     'service_provider' => $serviceHistory->service_provider,
-                    'receipt_url' => $serviceHistory->receipt_url ? Storage::url($serviceHistory->receipt_url) : null,
+                    'receipt_url' => $this->getFileUrl($serviceHistory->receipt_url),
                     'notes' => $serviceHistory->notes,
                     'created_at' => $serviceHistory->created_at->toIso8601String(),
                 ],
@@ -138,7 +154,7 @@ class ServiceHistoryController extends Controller
 
     /**
      * Display the specified service history.
-     * Supports both authenticated users and guest mode (device_id).
+     * Requires authentication.
      */
     public function show(Request $request, string $id): JsonResponse
     {
@@ -170,7 +186,7 @@ class ServiceHistoryController extends Controller
                     'cost' => $serviceHistory->cost_cents ? $serviceHistory->cost_cents / 100 : null,
                     'currency' => $serviceHistory->currency,
                     'service_provider' => $serviceHistory->service_provider,
-                    'receipt_url' => $serviceHistory->receipt_url ? Storage::url($serviceHistory->receipt_url) : null,
+                    'receipt_url' => $this->getFileUrl($serviceHistory->receipt_url),
                     'notes' => $serviceHistory->notes,
                     'created_at' => $serviceHistory->created_at->toIso8601String(),
                     'updated_at' => $serviceHistory->updated_at->toIso8601String(),
@@ -184,7 +200,7 @@ class ServiceHistoryController extends Controller
 
     /**
      * Update the specified service history.
-     * Supports both authenticated users and guest mode (device_id).
+     * Requires authentication.
      */
     public function update(UpdateServiceHistoryRequest $request, string $id): JsonResponse
     {
@@ -242,7 +258,7 @@ class ServiceHistoryController extends Controller
                     'cost' => $serviceHistory->cost_cents ? $serviceHistory->cost_cents / 100 : null,
                     'currency' => $serviceHistory->currency,
                     'service_provider' => $serviceHistory->service_provider,
-                    'receipt_url' => $serviceHistory->receipt_url ? Storage::url($serviceHistory->receipt_url) : null,
+                    'receipt_url' => $this->getFileUrl($serviceHistory->receipt_url),
                     'notes' => $serviceHistory->notes,
                     'updated_at' => $serviceHistory->updated_at->toIso8601String(),
                 ],
@@ -255,7 +271,7 @@ class ServiceHistoryController extends Controller
 
     /**
      * Remove the specified service history.
-     * Supports both authenticated users and guest mode (device_id).
+     * Requires authentication.
      */
     public function destroy(Request $request, string $id): JsonResponse
     {
@@ -295,7 +311,7 @@ class ServiceHistoryController extends Controller
 
     /**
      * Get cost summary and analysis for service histories.
-     * Supports both authenticated users and guest mode (device_id).
+     * Requires authentication.
      */
     public function costSummary(Request $request): JsonResponse
     {

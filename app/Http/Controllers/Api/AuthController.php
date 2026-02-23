@@ -9,6 +9,7 @@ use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\VerifyOtpRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\RefreshTokenRequest;
+use App\Http\Resources\ProfileResource;
 use App\Models\OtpVerification;
 use App\Models\User;
 use App\Models\Vehicle;
@@ -107,26 +108,23 @@ class AuthController extends Controller
                     // Generate access token (30 minutes)
                     $token = $user->createToken('auth_token', ['*'], now()->addMinutes(30))->plainTextToken;
 
-                    // Generate refresh token (30 days)
-                    $refreshToken = $user->generateRefreshToken(30);
+                    // Generate refresh token (90 days for persistent login)
+                    $refreshToken = $user->generateRefreshToken(90);
 
-                    // Sync device data if device_id provided
-                    $deviceId = $request->input('device_id');
-                    $syncResult = $this->syncDeviceData($user, $deviceId);
+                    // Update device info if provided
+                    if ($request->has('device_id') || $request->has('device_name')) {
+                        $user->updateDeviceInfo(
+                            $request->input('device_id'),
+                            $request->input('device_name')
+                        );
+                    }
 
                     return $this->successResponse([
-                        'user' => [
-                            'id' => $user->id,
-                            'name' => $user->name,
-                            'email' => $user->email,
-                            'phone' => $user->phone,
-                            'email_verified_at' => $user->email_verified_at,
-                        ],
+                        'user' => new ProfileResource($user->fresh()),
                         'access_token' => $token,
                         'refresh_token' => $refreshToken,
                         'token_type' => 'Bearer',
                         'expires_in' => 1800, // 30 minutes
-                        'sync_info' => $syncResult, // Info sinkronisasi data device
                     ], 'Email berhasil diverifikasi');
                 }
             }
@@ -212,37 +210,23 @@ class AuthController extends Controller
             // Generate access token (30 minutes)
             $token = $user->createToken('auth_token', ['*'], now()->addMinutes(30))->plainTextToken;
 
-            // Generate refresh token (30 days)
-            $refreshToken = $user->generateRefreshToken(30);
+            // Generate refresh token (90 days for persistent login)
+            $refreshToken = $user->generateRefreshToken(90);
 
             // Update device info if provided
-            $deviceId = null;
             if ($request->has('device_id') || $request->has('device_name')) {
-                $deviceId = $request->input('device_id');
                 $user->updateDeviceInfo(
-                    $deviceId,
+                    $request->input('device_id'),
                     $request->input('device_name')
                 );
             }
 
-            // Sync device data to user account
-            $syncResult = $this->syncDeviceData($user, $deviceId);
-
             return $this->successResponse([
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'phone' => $user->phone,
-                    'avatar' => $user->avatar,
-                    'email_verified_at' => $user->email_verified_at,
-                    'last_login_at' => $user->last_login_at,
-                ],
+                'user' => new ProfileResource($user->fresh()),
                 'access_token' => $token,
                 'refresh_token' => $refreshToken,
                 'token_type' => 'Bearer',
                 'expires_in' => 1800, // 30 minutes in seconds
-                'sync_info' => $syncResult, // Info sinkronisasi data device
             ], 'Login berhasil');
             
         } catch (\Exception $e) {
@@ -257,17 +241,16 @@ class AuthController extends Controller
     public function refreshToken(RefreshTokenRequest $request): JsonResponse
     {
         try {
-            // Find user by email or from token if authenticated
-            $email = $request->input('email');
-            $user = $email ? User::where('email', $email)->first() : $request->user();
+            // Find user by refresh token (hash it first since it's stored hashed in DB)
+            $user = User::where('refresh_token', hash('sha256', $request->refresh_token))->first();
 
             if (!$user) {
-                return $this->errorResponse('User tidak ditemukan', 404);
+                return $this->errorResponse('Refresh token tidak valid. Silakan login kembali.', 401);
             }
 
-            // Verify refresh token
+            // Verify refresh token is not expired
             if (!$user->verifyRefreshToken($request->refresh_token)) {
-                return $this->errorResponse('Refresh token tidak valid atau sudah kadaluarsa. Silakan login kembali.', 401);
+                return $this->errorResponse('Refresh token sudah kadaluarsa. Silakan login kembali.', 401);
             }
 
             // Revoke old access tokens
@@ -276,16 +259,8 @@ class AuthController extends Controller
             // Generate new access token (30 minutes)
             $newAccessToken = $user->createToken('auth_token', ['*'], now()->addMinutes(30))->plainTextToken;
 
-            // Generate new refresh token (30 days)
-            $newRefreshToken = $user->generateRefreshToken(30);
-
-            // Update device info if provided
-            if ($request->has('device_id') || $request->has('device_name')) {
-                $user->updateDeviceInfo(
-                    $request->input('device_id'),
-                    $request->input('device_name')
-                );
-            }
+            // Generate new refresh token (90 days for persistent login)
+            $newRefreshToken = $user->generateRefreshToken(90);
 
             return $this->successResponse([
                 'access_token' => $newAccessToken,
@@ -322,27 +297,17 @@ class AuthController extends Controller
     }
 
     /**
-     * Get authenticated user
+     * Get authenticated user with stats
      */
     public function me(Request $request): JsonResponse
     {
         try {
             $user = $request->user();
             
-            return $this->successResponse([
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'phone' => $user->phone,
-                    'avatar' => $user->avatar,
-                    'email_verified_at' => $user->email_verified_at,
-                    'phone_verified_at' => $user->phone_verified_at,
-                    'last_login_at' => $user->last_login_at,
-                    'is_active' => $user->is_active,
-                    'created_at' => $user->created_at,
-                ],
-            ], 'Data user berhasil diambil');
+            return $this->successResponse(
+                new ProfileResource($user),
+                'Data user berhasil diambil'
+            );
         } catch (\Exception $e) {
             Log::error('Get user error: ' . $e->getMessage());
             return $this->errorResponse('Gagal mengambil data user', 500);
@@ -454,85 +419,4 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Sync device data to user account when login
-     * 
-     * Sinkronisasi semua data yang dibuat dengan device_id ke user_id saat login
-     * 
-     * @param User $user
-     * @param string|null $deviceId
-     * @return array Summary of synced data
-     */
-    protected function syncDeviceData(User $user, ?string $deviceId): array
-    {
-        if (empty($deviceId)) {
-            return [
-                'synced' => false,
-                'message' => 'No device_id provided',
-            ];
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $syncedCount = [
-                'vehicles' => 0,
-                'notifications' => 0,
-                'trips' => 0,
-                'fuel_logs' => 0,
-            ];
-
-            // Sync Vehicles
-            $vehiclesUpdated = Vehicle::where('device_id', $deviceId)
-                ->whereNull('user_id')
-                ->update(['user_id' => $user->id]);
-            $syncedCount['vehicles'] = $vehiclesUpdated;
-
-            // Sync Notifications
-            $notificationsUpdated = Notification::where('device_id', $deviceId)
-                ->whereNull('user_id')
-                ->update(['user_id' => $user->id]);
-            $syncedCount['notifications'] = $notificationsUpdated;
-
-            // Sync Trips
-            $tripsUpdated = Trip::where('device_id', $deviceId)
-                ->whereNull('user_id')
-                ->update(['user_id' => $user->id]);
-            $syncedCount['trips'] = $tripsUpdated;
-
-            // Sync Fuel Logs
-            $fuelLogsUpdated = FuelLog::where('device_id', $deviceId)
-                ->whereNull('user_id')
-                ->update(['user_id' => $user->id]);
-            $syncedCount['fuel_logs'] = $fuelLogsUpdated;
-
-            DB::commit();
-
-            $totalSynced = array_sum($syncedCount);
-
-            Log::info("Device data synced for user {$user->id}", [
-                'device_id' => $deviceId,
-                'synced_count' => $syncedCount,
-                'total' => $totalSynced,
-            ]);
-
-            return [
-                'synced' => true,
-                'total_synced' => $totalSynced,
-                'details' => $syncedCount,
-            ];
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Device data sync error: ' . $e->getMessage(), [
-                'user_id' => $user->id,
-                'device_id' => $deviceId,
-            ]);
-
-            return [
-                'synced' => false,
-                'message' => 'Sync failed: ' . $e->getMessage(),
-            ];
-        }
-    }
 }

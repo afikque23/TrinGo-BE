@@ -2,11 +2,14 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ContentController;
+use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\NotificationCategoryController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\NotificationPreferenceController;
 use App\Http\Controllers\Api\ReminderOptionController;
 use App\Http\Controllers\Api\ServiceTypeController;
+use App\Http\Controllers\FileController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\ServiceHistoryController;
 use App\Http\Controllers\ServiceController;
@@ -24,11 +27,13 @@ use Illuminate\Support\Facades\Route;
 | All responses return JSON
 |
 | Route Structure:
-| - Public Auth Routes: No authentication required
-| - Public Content Routes: No authentication required  
-| - Public App Routes: No auth but requires device_id (Guest Mode support)
-| - Protected User Routes: Requires authentication (auth:sanctum,web)
+| - Public Auth Routes: No authentication required (login, register, etc)
+| - Public Content Routes: No authentication required (terms, privacy, etc)
+| - Protected User Routes: Requires authentication (vehicles, services, trips, etc)
 | - Admin Routes: Requires authentication + admin role
+|
+| Note: All user data endpoints now require authentication.
+| Use refresh_token (valid for 90 days) for persistent login.
 |
 */
 
@@ -52,12 +57,20 @@ Route::prefix('public')->group(function () {
     Route::get('/contents/{type}', [ContentController::class, 'getByType']);
 });
 
+// Public File Serving Routes - Serve uploaded files with proper headers
+Route::get('/files/receipts/{filename}', [FileController::class, 'serveReceipt'])
+    ->where('filename', '.*')
+    ->name('files.receipt');
+Route::get('/files/avatars/{filename}', [FileController::class, 'serveAvatar'])
+    ->where('filename', '.*')
+    ->name('files.avatar');
+
 // ============================================================================
-// APP ROUTES - Support Guest Mode (Device ID Required if Not Logged In)
+// PROTECTED ROUTES - Authentication Required (User Routes)
 // ============================================================================
 
-Route::middleware(['device.id'])->group(function () {
-    // Master Data - Reminder Options (Public read-only access)
+Route::middleware(['auth:sanctum,web'])->group(function () {
+    // Master Data - Reminder Options
     Route::get('/reminder-options', [ReminderOptionController::class, 'index']);
     
     // Vehicle Management
@@ -79,6 +92,8 @@ Route::middleware(['device.id'])->group(function () {
     // Service Schedules
     Route::get('/service-schedules/primary', [App\Http\Controllers\Api\ServiceScheduleController::class, 'primaryVehicleSchedules']);
     Route::get('/service-schedules/status/{vehicle_id}', [App\Http\Controllers\Api\ServiceScheduleController::class, 'evaluateStatus']);
+    Route::post('/service-schedules/check-reminders/{vehicle_id}', [App\Http\Controllers\Api\ServiceScheduleController::class, 'checkReminders']);
+    Route::post('/service-schedules/{schedule_id}/reset-reminder', [App\Http\Controllers\Api\ServiceScheduleController::class, 'resetReminder']);
     Route::apiResource('service-schedules', App\Http\Controllers\Api\ServiceScheduleController::class);
 
     // Trip Management
@@ -97,18 +112,24 @@ Route::middleware(['device.id'])->group(function () {
     Route::get('/notification-preferences', [NotificationPreferenceController::class, 'index']);
     Route::patch('/notification-preferences', [NotificationPreferenceController::class, 'update']);
     Route::delete('/notification-preferences', [NotificationPreferenceController::class, 'destroy']);
-});
 
-// ============================================================================
-// PROTECTED ROUTES - Authentication Required (User Routes)
-// ============================================================================
+    // Device Token Management (FCM Push Notification) - Requires auth
+    Route::post('/device-tokens/register', [DeviceTokenController::class, 'register']);
+    Route::post('/device-tokens/unregister', [DeviceTokenController::class, 'unregister']);
+    Route::get('/device-tokens/status', [DeviceTokenController::class, 'status']);
 
-Route::middleware('auth:sanctum,web')->group(function () {
     // Auth routes
     Route::prefix('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/change-password', [AuthController::class, 'changePassword']);
+    });
+
+    // User Profile Management
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'show']);
+        Route::post('/update', [ProfileController::class, 'update']); // Use POST for file upload support
+        Route::delete('/avatar', [ProfileController::class, 'deleteAvatar']);
     });
 });
 

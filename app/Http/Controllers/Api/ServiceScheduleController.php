@@ -9,6 +9,7 @@ use App\Http\Resources\ServiceScheduleResource;
 use App\Models\ServiceSchedule;
 use App\Models\Vehicle;
 use App\Services\ServiceScheduleService;
+use App\Services\ServiceScheduleReminderService;
 use App\Traits\ApiResponse;
 use App\Traits\HasOwnerIdentification;
 use Illuminate\Http\JsonResponse;
@@ -20,10 +21,14 @@ class ServiceScheduleController extends Controller
     use ApiResponse, HasOwnerIdentification;
 
     protected ServiceScheduleService $scheduleService;
+    protected ServiceScheduleReminderService $reminderService;
 
-    public function __construct(ServiceScheduleService $scheduleService)
-    {
+    public function __construct(
+        ServiceScheduleService $scheduleService,
+        ServiceScheduleReminderService $reminderService
+    ) {
         $this->scheduleService = $scheduleService;
+        $this->reminderService = $reminderService;
     }
 
     /**
@@ -67,6 +72,9 @@ class ServiceScheduleController extends Controller
 
         $schedules = $query->latest()->get();
 
+        // Note: interval_value is auto-calculated via Model accessor if value is 0
+        // No need to manually save here, accessor handles it automatically
+
         return ServiceScheduleResource::collection($schedules);
     }
 
@@ -91,7 +99,24 @@ class ServiceScheduleController extends Controller
             );
         }
 
-        $schedule = ServiceSchedule::create($request->validated());
+        $validated = $request->validated();
+
+        // Calculate interval_value if not provided or is 0
+        if (!isset($validated['interval_value']) || $validated['interval_value'] == 0) {
+            if ($validated['schedule_type'] == 'km') {
+                // For mileage-based: interval = target_km - last_service_mileage
+                $validated['interval_value'] = $validated['target_km'] - ($validated['last_service_mileage'] ?? 0);
+            } elseif ($validated['schedule_type'] == 'time') {
+                // For time-based: calculate days between dates if both are provided
+                if (isset($validated['target_date']) && isset($validated['last_service_date'])) {
+                    $targetDate = \Carbon\Carbon::parse($validated['target_date']);
+                    $lastDate = \Carbon\Carbon::parse($validated['last_service_date']);
+                    $validated['interval_value'] = $targetDate->diffInDays($lastDate);
+                }
+            }
+        }
+
+        $schedule = ServiceSchedule::create($validated);
 
         $schedule->load(['vehicle', 'serviceType', 'reminderOption']);
 
@@ -144,7 +169,29 @@ class ServiceScheduleController extends Controller
         $schedule = ServiceSchedule::whereIn('vehicle_id', $ownedVehicleIds)
             ->findOrFail($id);
 
-        $schedule->update($request->validated());
+        $validated = $request->validated();
+
+        // Recalculate interval_value if target or last service values changed
+        if (isset($validated['target_km']) || isset($validated['last_service_mileage'])) {
+            if ($schedule->schedule_type == 'km' || (isset($validated['schedule_type']) && $validated['schedule_type'] == 'km')) {
+                $targetKm = $validated['target_km'] ?? $schedule->target_km;
+                $lastMileage = $validated['last_service_mileage'] ?? $schedule->last_service_mileage ?? 0;
+                $validated['interval_value'] = $targetKm - $lastMileage;
+            }
+        }
+
+        if (isset($validated['target_date']) || isset($validated['last_service_date'])) {
+            if ($schedule->schedule_type == 'time' || (isset($validated['schedule_type']) && $validated['schedule_type'] == 'time')) {
+                $targetDate = isset($validated['target_date']) ? \Carbon\Carbon::parse($validated['target_date']) : \Carbon\Carbon::parse($schedule->target_date);
+                $lastDate = isset($validated['last_service_date']) ? \Carbon\Carbon::parse($validated['last_service_date']) : ($schedule->last_service_date ? \Carbon\Carbon::parse($schedule->last_service_date) : null);
+                
+                if ($lastDate) {
+                    $validated['interval_value'] = $targetDate->diffInDays($lastDate);
+                }
+            }
+        }
+
+        $schedule->update($validated);
 
         $schedule->load(['vehicle', 'serviceType', 'reminderOption']);
 
@@ -383,6 +430,74 @@ class ServiceScheduleController extends Controller
             'years' => $value * 365,
             default => 0,
         };
+    }
+
+    /**
+     * Check reminders for a specific vehicle based on current odometer.
+     * This endpoint should be called when odometer is updated or manually by the app.
+     *
+     * @param Request $request
+     * @param string $vehicleId
+     * @return JsonResponse
+     */
+    public function checkReminders(Request $request, string $vehicleId): JsonResponse
+    {
+        // Validate request
+        $request->validate([
+            'current_odometer' => 'required|integer|min:0',
+        ]);
+
+        // Verify vehicle belongs to owner
+        $vehicleQuery = Vehicle::query();
+        $this->applyOwnerFilter($vehicleQuery, $request);
+        $vehicle = $vehicleQuery->findOrFail($vehicleId);
+
+        $currentOdometer = $request->input('current_odometer');
+
+        // Check KM-based reminders
+        $triggeredReminders = $this->reminderService->checkKmBasedReminders(
+            $vehicleId,
+            $currentOdometer
+        );
+
+        return $this->success([
+            'vehicle_id' => $vehicleId,
+            'current_odometer' => $currentOdometer,
+            'reminders_triggered' => count($triggeredReminders),
+            'reminders' => $triggeredReminders,
+        ], count($triggeredReminders) > 0 
+            ? 'Reminder notifications have been sent.' 
+            : 'No reminders to trigger at this time.');
+    }
+
+    /**
+     * Reset reminder flag for a schedule (e.g., when user updates target)
+     * Internal use or can be called when schedule is marked as completed
+     *
+     * @param Request $request
+     * @param string $scheduleId
+     * @return JsonResponse
+     */
+    public function resetReminder(Request $request, string $scheduleId): JsonResponse
+    {
+        // Get owner's vehicles first
+        $vehicleQuery = Vehicle::query();
+        $this->applyOwnerFilter($vehicleQuery, $request);
+        $ownedVehicleIds = $vehicleQuery->pluck('id');
+
+        $schedule = ServiceSchedule::whereIn('vehicle_id', $ownedVehicleIds)
+            ->findOrFail($scheduleId);
+
+        $reset = $this->reminderService->resetReminderFlag($schedule->id);
+
+        if ($reset) {
+            return $this->success(
+                ['schedule_id' => $schedule->id],
+                'Reminder flag reset successfully.'
+            );
+        }
+
+        return $this->errorResponse('Failed to reset reminder flag.', 500);
     }
 }
 
