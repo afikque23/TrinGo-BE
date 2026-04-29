@@ -14,6 +14,7 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\ServiceHistoryController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TripController;
+use App\Http\Controllers\TipsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -54,7 +55,12 @@ Route::prefix('auth')->name('api.auth.')->group(function () {
 
 // Public Content Routes (for Mobile App) - No authentication required
 Route::prefix('public')->group(function () {
+    Route::get('/contents', [ContentController::class, 'publicIndex']);
     Route::get('/contents/{type}', [ContentController::class, 'getByType']);
+    
+    // Public Tips - Browse without authentication
+    Route::get('/tips', [TipsController::class, 'index']);
+    Route::get('/tips/{tip}', [TipsController::class, 'show']);
 });
 
 // Public File Serving Routes - Serve uploaded files with proper headers
@@ -99,6 +105,15 @@ Route::middleware(['auth:sanctum,web'])->group(function () {
     // Trip Management
     Route::post('/trips/manual-distance', [TripController::class, 'addManualDistance']);
     Route::apiResource('trips', TripController::class);
+
+    // Tips Management (Maintenance Tips & Tricks)
+    Route::get('/tips/my', [TipsController::class, 'myTips']);
+    Route::post('/tips/{tip}/like', [TipsController::class, 'like']);
+    Route::post('/tips/{tip}/bookmark', [TipsController::class, 'bookmark']);
+    Route::post('/tips/{tip}/share', [TipsController::class, 'share']);
+    Route::post('/tips/{tip}/rate', [TipsController::class, 'rate']);
+    Route::post('/tips/{tip}/use-template', [TipsController::class, 'useTemplate']);
+    Route::apiResource('tips', TipsController::class);
 
     // Notifications (Mobile App)
     Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);

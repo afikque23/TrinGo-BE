@@ -27,12 +27,32 @@ class Vehicle extends Model
         'license_plate',
         'color',
         'photo_url',
+        'last_latitude',
+        'last_longitude',
+        'last_speed_kph',
+        'last_heading_deg',
+        'last_altitude',
+        'last_accuracy_meters',
+        'last_satellites',
+        'last_hdop',
+        'last_telemetry_at',
+        'last_telemetry_received_at',
         'is_primary',
     ];
 
     protected $casts = [
         'year' => 'integer',
         'odometer' => 'integer',
+        'last_latitude' => 'decimal:7',
+        'last_longitude' => 'decimal:7',
+        'last_speed_kph' => 'integer',
+        'last_heading_deg' => 'integer',
+        'last_altitude' => 'float',
+        'last_accuracy_meters' => 'float',
+        'last_satellites' => 'integer',
+        'last_hdop' => 'float',
+        'last_telemetry_at' => 'datetime',
+        'last_telemetry_received_at' => 'datetime',
         'is_primary' => 'boolean',
     ];
 

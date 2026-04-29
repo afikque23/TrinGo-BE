@@ -15,8 +15,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h3 class="text-lg font-bold text-white" style="font-family: Arial, sans-serif;">Variabel Yang Tersedia</h3>
-                    <p class="text-xs text-[#99A1AF]" style="font-family: Arial, sans-serif;">Gunakan variabel ini dalam template pesan notifikasi</p>
+                    <h3 class="text-lg font-bold text-white" style="font-family: Arial, sans-serif;">Panduan Template Notifikasi</h3>
+                    <p class="text-xs text-[#99A1AF]" style="font-family: Arial, sans-serif;">Variabel dan trigger type yang tersedia</p>
                 </div>
             </div>
             <button @click="showVariableInfoModal = false" class="text-[#99A1AF] hover:text-white transition-colors">
@@ -35,9 +35,10 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <div>
-                        <p class="text-sm text-white font-semibold mb-1" style="font-family: Arial, sans-serif;">Cara Penggunaan</p>
+                        <p class="text-sm text-white font-semibold mb-1" style="font-family: Arial, sans-serif;">Panduan Lengkap</p>
                         <p class="text-xs text-[#99A1AF]" style="font-family: Arial, sans-serif;">
-                            Salin variabel di bawah dan tempelkan ke dalam template pesan. Variabel akan otomatis diganti dengan data sebenarnya saat notifikasi dikirim ke pengguna Flutter.
+                            <strong>Variabel</strong>: Klik untuk salin, lalu tempelkan ke template pesan. Otomatis diganti dengan data real saat notifikasi dikirim.
+                            <br><strong>Trigger Type</strong>: Kode unik yang menentukan kapan notifikasi dipicu dari backend secara otomatis.
                         </p>
                     </div>
                 </div>
@@ -45,6 +46,13 @@
 
             <!-- Variables Grid -->
             <div class="space-y-3">
+                <!-- Header -->
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="flex-1 h-[1px] bg-[#1E2939]"></div>
+                    <h3 class="text-sm font-bold text-white px-3" style="font-family: Arial, sans-serif;">📝 Variabel Template</h3>
+                    <div class="flex-1 h-[1px] bg-[#1E2939]"></div>
+                </div>
+                
                 <!-- Section: Kendaraan -->
                 <div>
                     <h4 class="text-xs font-bold text-[#6B7C4F] uppercase tracking-wider mb-3" style="font-family: Arial, sans-serif; letter-spacing: 0.5px;">🏍️ Kendaraan</h4>
@@ -143,6 +151,138 @@
                             <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">{{ $var[1] }}</p>
                         </div>
                         @endforeach
+                    </div>
+                </div>
+
+                <!-- Section: Jenis Trigger -->
+                <div class="pt-3 border-t-2 border-[#1E2939]">
+                    <!-- Header -->
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="flex-1 h-[1px] bg-[#1E2939]"></div>
+                        <h3 class="text-sm font-bold text-white px-3" style="font-family: Arial, sans-serif;">⚡ Jenis Trigger</h3>
+                        <div class="flex-1 h-[1px] bg-[#1E2939]"></div>
+                    </div>
+                    
+                    <p class="text-xs text-[#6A7282] mb-4" style="font-family: Arial, sans-serif;">
+                        Trigger type adalah kode unik untuk memicu notifikasi otomatis dari backend. Pilih yang sesuai dengan kebutuhan template Anda.
+                    </p>
+                    
+                    <!-- Service Triggers -->
+                    <div class="mb-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-xs font-semibold text-white px-2 py-1 bg-[#6B7C4F]/20 rounded" style="font-family: Arial, sans-serif;">Service</span>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2">
+                            @php
+                            $serviceTriggers = [
+                                ['km_before_interval', 'Pengingat otomatis X km sebelum jadwal servis'],
+                                ['time_before_interval', 'Pengingat otomatis X hari sebelum tanggal servis'],
+                                ['service_completed', 'Konfirmasi setelah user mencatat servis selesai'],
+                                ['schedule_reminder_km', 'Custom reminder manual yang diset user berdasarkan KM'],
+                                ['schedule_reminder_time', 'Custom reminder manual yang diset user berdasarkan hari'],
+                            ];
+                            @endphp
+                            @foreach($serviceTriggers as $trigger)
+                            <div class="bg-[#0A0A0A] border border-[#364153] rounded-[8px] p-3 hover:border-[#6B7C4F] transition-colors">
+                                <div class="flex items-start justify-between gap-2 mb-1">
+                                    <code class="text-xs text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-0.5 rounded" style="font-family: Consolas, monospace;">{{ $trigger[0] }}</code>
+                                    <button @click="navigator.clipboard.writeText('{{ $trigger[0] }}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
+                                </div>
+                                <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">{{ $trigger[1] }}</p>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Alert Triggers -->
+                    <div class="mb-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-xs font-semibold text-white px-2 py-1 bg-[#FB2C36]/20 rounded" style="font-family: Arial, sans-serif;">Alert</span>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2">
+                            @php
+                            $alertTriggers = [
+                                ['overdue', 'Peringatan saat motor melewati jadwal servis'],
+                                ['high_odometer', 'Peringatan saat odometer mencapai angka tertentu (misal 50.000 km)'],
+                            ];
+                            @endphp
+                            @foreach($alertTriggers as $trigger)
+                            <div class="bg-[#0A0A0A] border border-[#364153] rounded-[8px] p-3 hover:border-[#6B7C4F] transition-colors">
+                                <div class="flex items-start justify-between gap-2 mb-1">
+                                    <code class="text-xs text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-0.5 rounded" style="font-family: Consolas, monospace;">{{ $trigger[0] }}</code>
+                                    <button @click="navigator.clipboard.writeText('{{ $trigger[0] }}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
+                                </div>
+                                <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">{{ $trigger[1] }}</p>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Trip Triggers -->
+                    <div class="mb-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-xs font-semibold text-white px-2 py-1 bg-[#3B82F6]/20 rounded" style="font-family: Arial, sans-serif;">Trip</span>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2">
+                            @php
+                            $tripTriggers = [
+                                ['trip_completed', 'Notifikasi setelah user menyelesaikan perjalanan'],
+                            ];
+                            @endphp
+                            @foreach($tripTriggers as $trigger)
+                            <div class="bg-[#0A0A0A] border border-[#364153] rounded-[8px] p-3 hover:border-[#6B7C4F] transition-colors">
+                                <div class="flex items-start justify-between gap-2 mb-1">
+                                    <code class="text-xs text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-0.5 rounded" style="font-family: Consolas, monospace;">{{ $trigger[0] }}</code>
+                                    <button @click="navigator.clipboard.writeText('{{ $trigger[0] }}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
+                                </div>
+                                <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">{{ $trigger[1] }}</p>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Insight Triggers -->
+                    <div class="mb-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-xs font-semibold text-white px-2 py-1 bg-[#8B5CF6]/20 rounded" style="font-family: Arial, sans-serif;">Insight</span>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2">
+                            @php
+                            $insightTriggers = [
+                                ['service_insight', 'Rekomendasi servis berdasarkan pola berkendara user'],
+                            ];
+                            @endphp
+                            @foreach($insightTriggers as $trigger)
+                            <div class="bg-[#0A0A0A] border border-[#364153] rounded-[8px] p-3 hover:border-[#6B7C4F] transition-colors">
+                                <div class="flex items-start justify-between gap-2 mb-1">
+                                    <code class="text-xs text-[#6B7C4F] font-mono bg-[#1A1A1A] px-2 py-0.5 rounded" style="font-family: Consolas, monospace;">{{ $trigger[0] }}</code>
+                                    <button @click="navigator.clipboard.writeText('{{ $trigger[0] }}'); $el.innerHTML = '✓'; setTimeout(() => $el.innerHTML = '📋', 1000)" class="text-xs hover:scale-110 transition-transform" title="Salin">📋</button>
+                                </div>
+                                <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">{{ $trigger[1] }}</p>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Custom Trigger Info -->
+                    <div class="bg-[#0A0A0A] border border-[#6B7C4F]/30 rounded-[10px] p-4">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-[#6B7C4F] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            <div>
+                                <p class="text-xs text-white font-semibold mb-1" style="font-family: Arial, sans-serif;">Membuat Trigger Custom</p>
+                                <p class="text-xs text-[#6A7282] mb-2" style="font-family: Arial, sans-serif;">
+                                    Anda bisa membuat trigger type baru dengan format: <code class="text-[#6B7C4F] bg-[#1A1A1A] px-1 rounded" style="font-family: Consolas, monospace;">kategori_aksi</code>
+                                </p>
+                                <p class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">
+                                    Contoh: <code class="text-[#6B7C4F] bg-[#1A1A1A] px-1 rounded" style="font-family: Consolas, monospace;">tire_change_reminder</code>, <code class="text-[#6B7C4F] bg-[#1A1A1A] px-1 rounded" style="font-family: Consolas, monospace;">battery_check</code>, <code class="text-[#6B7C4F] bg-[#1A1A1A] px-1 rounded" style="font-family: Consolas, monospace;">monthly_summary</code>
+                                </p>
+                                <p class="text-xs text-[#FB2C36] mt-2" style="font-family: Arial, sans-serif;">
+                                    ⚠️ Pastikan backend sudah dikonfigurasi untuk mengenali trigger custom Anda!
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

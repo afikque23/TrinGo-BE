@@ -25,7 +25,7 @@ class FilterController extends Controller
                 'name' => 'Jenis Motor',
                 'description' => 'Filter berdasarkan tipe motor (Matic, Sport, dll)',
                 'type' => 'Dropdown',
-                'used_in' => ['Template', 'Komunitas'],
+                'used_in' => ['Template'],
                 'options_count' => 5,
                 'order' => 1,
                 'status' => 'active'
@@ -43,9 +43,9 @@ class FilterController extends Controller
             [
                 'id' => 3,
                 'name' => 'Kategori Konten',
-                'description' => 'Multi-select kategori untuk konten komunitas',
+                'description' => 'Multi-select kategori untuk tips perawatan',
                 'type' => 'Multi-select',
-                'used_in' => ['Komunitas'],
+                'used_in' => ['Template'],
                 'options_count' => 7,
                 'order' => 3,
                 'status' => 'active'
@@ -65,7 +65,7 @@ class FilterController extends Controller
                 'name' => 'Brand Motor',
                 'description' => 'Filter berdasarkan brand motor',
                 'type' => 'Dropdown',
-                'used_in' => ['Template', 'Komunitas', 'AI'],
+                'used_in' => ['Template', 'AI'],
                 'options_count' => 8,
                 'order' => 5,
                 'status' => 'active'
@@ -75,7 +75,7 @@ class FilterController extends Controller
                 'name' => 'Status Moderasi',
                 'description' => 'Status konten untuk admin moderasi',
                 'type' => 'Multi-select',
-                'used_in' => ['Komunitas'],
+                'used_in' => ['Template'],
                 'options_count' => 4,
                 'order' => 6,
                 'status' => 'inactive'

@@ -1,0 +1,383 @@
+{
+    "info": {
+        "_postman_id": "tips-api-collection-2026",
+        "name": "Tips Perawatan Motor API",
+        "description": "API Collection for Motorcycle Maintenance Tips & Tricks",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Public - Get Tips List",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/public/tips?page=1&limit=10",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "v1", "motorcycle", "public", "tips"],
+                    "query": [
+                        { "key": "page", "value": "1" },
+                        { "key": "limit", "value": "10" },
+                        { "key": "search", "value": "", "disabled": true },
+                        { "key": "brand", "value": "", "disabled": true },
+                        {
+                            "key": "riding_style",
+                            "value": "",
+                            "disabled": true
+                        },
+                        { "key": "tags", "value": "", "disabled": true },
+                        {
+                            "key": "sort_by",
+                            "value": "latest",
+                            "disabled": true
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Public - Get Tips Detail",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/public/tips/1",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "v1", "motorcycle", "public", "tips", "1"]
+                }
+            }
+        },
+        {
+            "name": "Auth - Get Tips List",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{access_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/tips?page=1&limit=10",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "v1", "motorcycle", "tips"],
+                    "query": [
+                        { "key": "page", "value": "1" },
+                        { "key": "limit", "value": "10" }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Create Tip",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{access_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"title\": \"Cara Efisien Ganti Oli untuk Pemakaian Harian\",\n  \"description\": \"Metode ganti oli yang terbukti memperpanjang umur mesin hingga 30%\",\n  \"vehicle\": {\n    \"brand\": \"Honda\",\n    \"model\": \"PCX 160\",\n    \"year\": 2023,\n    \"riding_style\": \"Harian / Commuter\"\n  },\n  \"estimated_time\": \"30 menit\",\n  \"tools\": [\n    {\n      \"name\": \"Kunci Ring 17\",\n      \"is_optional\": false\n    },\n    {\n      \"name\": \"Wadah Oli Bekas\",\n      \"is_optional\": false\n    },\n    {\n      \"name\": \"Filter Oli\",\n      \"is_optional\": true\n    }\n  ],\n  \"steps\": [\n    {\n      \"title\": \"Persiapan\",\n      \"description\": \"Siapkan semua alat yang diperlukan: kunci ring 17, wadah oli bekas, kain lap, dan oli mesin original. Pastikan motor dalam kondisi dingin.\"\n    },\n    {\n      \"title\": \"Posisikan Motor\",\n      \"description\": \"Parkirkan motor di tempat yang rata dan gunakan standar tengah. Pastikan motor dalam posisi stabil sebelum memulai.\"\n    },\n    {\n      \"title\": \"Kuras Oli Lama\",\n      \"description\": \"Lepaskan baut pembuangan oli menggunakan kunci ring 17. Letakkan wadah di bawah untuk menampung oli bekas.\"\n    }\n  ],\n  \"maintenance_interval\": {\n    \"distance_km\": 2000,\n    \"time_months\": 3\n  },\n  \"important_notes\": \"Pastikan oli yang digunakan sesuai spesifikasi pabrikan. Gunakan oli dengan viskositas yang tepat untuk iklim tropis.\",\n  \"hashtags\": [\"Oli Mesin\", \"Perawatan Rutin\", \"Daily Rider\"],\n  \"is_copyable\": true\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/tips",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "v1", "motorcycle", "tips"]
+                }
+            }
+        },
+        {
+            "name": "Update Tip",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{access_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"title\": \"Cara Efisien Ganti Oli untuk Pemakaian Harian (Updated)\",\n  \"description\": \"Metode ganti oli yang terbukti memperpanjang umur mesin hingga 40%\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/tips/1",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "v1", "motorcycle", "tips", "1"]
+                }
+            }
+        },
+        {
+            "name": "Delete Tip",
+            "request": {
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{access_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/tips/1",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "v1", "motorcycle", "tips", "1"]
+                }
+            }
+        },
+        {
+            "name": "Like Tip",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{access_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"action\": \"like\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/tips/1/like",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "v1", "motorcycle", "tips", "1", "like"]
+                }
+            }
+        },
+        {
+            "name": "Unlike Tip",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{access_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"action\": \"unlike\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/tips/1/like",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "v1", "motorcycle", "tips", "1", "like"]
+                }
+            }
+        },
+        {
+            "name": "Bookmark Tip",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{access_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"action\": \"bookmark\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/tips/1/bookmark",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "v1", "motorcycle", "tips", "1", "bookmark"]
+                }
+            }
+        },
+        {
+            "name": "Unbookmark Tip",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{access_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"action\": \"unbookmark\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/tips/1/bookmark",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "v1", "motorcycle", "tips", "1", "bookmark"]
+                }
+            }
+        },
+        {
+            "name": "Share Tip",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{access_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"platform\": \"whatsapp\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/tips/1/share",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "v1", "motorcycle", "tips", "1", "share"]
+                }
+            }
+        },
+        {
+            "name": "Use Tip as Template",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{access_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"vehicle_id\": 1,\n  \"schedule_type\": \"interval\",\n  \"interval_type\": \"distance\",\n  \"interval_value\": 2000,\n  \"start_date\": \"2026-03-15\",\n  \"notes\": \"Ganti oli rutin sesuai rekomendasi\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/tips/1/use-template",
+                    "host": ["{{base_url}}"],
+                    "path": [
+                        "api",
+                        "v1",
+                        "motorcycle",
+                        "tips",
+                        "1",
+                        "use-template"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Filter by Brand",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/public/tips?brand=Honda,Yamaha",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "v1", "motorcycle", "public", "tips"],
+                    "query": [{ "key": "brand", "value": "Honda,Yamaha" }]
+                }
+            }
+        },
+        {
+            "name": "Filter by Riding Style",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/public/tips?riding_style=Harian / Commuter,Touring",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "v1", "motorcycle", "public", "tips"],
+                    "query": [
+                        {
+                            "key": "riding_style",
+                            "value": "Harian / Commuter,Touring"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Search Tips",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/public/tips?search=ganti oli",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "v1", "motorcycle", "public", "tips"],
+                    "query": [{ "key": "search", "value": "ganti oli" }]
+                }
+            }
+        },
+        {
+            "name": "Sort by Popular",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/motorcycle/public/tips?sort_by=popular",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "v1", "motorcycle", "public", "tips"],
+                    "query": [{ "key": "sort_by", "value": "popular" }]
+                }
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost",
+            "type": "string"
+        },
+        {
+            "key": "access_token",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}

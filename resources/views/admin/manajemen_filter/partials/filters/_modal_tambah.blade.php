@@ -46,7 +46,7 @@
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <input type="checkbox" name="modules[]" value="komunitas" class="w-4 h-4 bg-[#111111] border border-[#364153] rounded text-[#6B7C4F] focus:ring-[#6B7C4F]">
-                                    <span class="text-sm text-white" style="font-family: Arial, sans-serif;">Komunitas</span>
+                                    <span class="text-sm text-white" style="font-family: Arial, sans-serif;">Tips Perawatan</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <input type="checkbox" name="modules[]" value="ai" class="w-4 h-4 bg-[#111111] border border-[#364153] rounded text-[#6B7C4F] focus:ring-[#6B7C4F]">
