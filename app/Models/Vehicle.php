@@ -22,18 +22,27 @@ class Vehicle extends Model
         'model',
         'year',
         'tipe_motor',
+        'kapasitas_cc',
+        'transmisi',
         'vin',
         'odometer',
         'license_plate',
         'color',
         'photo_url',
         'is_primary',
+        // Parameter default untuk kalkulasi jadwal service
+        'default_beban',
+        'default_penumpang',
+        'default_gaya_berkendara',
+        'default_kondisi_jalan',
+        'default_medan',
     ];
 
     protected $casts = [
         'year' => 'integer',
         'odometer' => 'integer',
         'is_primary' => 'boolean',
+        'default_penumpang' => 'boolean',
     ];
 
     /**
