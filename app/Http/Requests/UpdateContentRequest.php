@@ -27,7 +27,7 @@ class UpdateContentRequest extends FormRequest
         return [
             'title' => ['sometimes', 'required', 'string', 'max:255'],
             'slug' => ['sometimes', 'nullable', 'string', 'max:255', Rule::unique('contents', 'slug')->ignore($contentId)],
-            'type' => ['sometimes', 'required', 'string', Rule::in(['terms', 'privacy', 'guide', 'about', 'faq', 'system_info'])],
+            'type' => ['sometimes', 'required', 'string', Rule::in(['terms', 'privacy', 'guide', 'about', 'faq', 'system_info', 'support'])],
             'body' => ['sometimes', 'required', 'string'],
             'status' => ['sometimes', 'nullable', 'string', Rule::in(['draft', 'published'])],
             'order' => ['sometimes', 'nullable', 'integer', 'min:0'],
@@ -46,7 +46,7 @@ class UpdateContentRequest extends FormRequest
             'title.max' => 'Judul konten maksimal 255 karakter.',
             'slug.unique' => 'Slug sudah digunakan, silakan gunakan slug lain.',
             'type.required' => 'Tipe konten wajib diisi.',
-            'type.in' => 'Tipe konten tidak valid. Pilihan: terms, privacy, guide, about, faq, system_info.',
+            'type.in' => 'Tipe konten tidak valid. Pilihan: terms, privacy, guide, about, faq, system_info, support.',
             'body.required' => 'Isi konten wajib diisi.',
             'status.in' => 'Status tidak valid. Pilihan: draft, published.',
             'order.integer' => 'Urutan harus berupa angka.',

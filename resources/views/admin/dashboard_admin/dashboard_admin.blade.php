@@ -64,18 +64,6 @@
         <p class="text-xs text-[#6A7282] uppercase tracking-wide" style="font-family: Arial, sans-serif; letter-spacing: 0.3px;">Template Perawatan</p>
     </div>
 
-    <!-- Konten Komunitas -->
-    <div class="bg-[#111111] border border-[#1E2939] rounded-[14px] p-[21px]">
-        <div class="flex items-center mb-3">
-            <div class="w-10 h-10 bg-[#1A1A1A] rounded-[10px] flex items-center justify-center">
-                <svg class="w-5 h-5 text-[#99A1AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.67" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-            </div>
-        </div>
-        <p class="text-[30px] font-bold text-white leading-9 mb-3" style="font-family: Arial, sans-serif;">423</p>
-        <p class="text-xs text-[#6A7282] uppercase tracking-wide" style="font-family: Arial, sans-serif; letter-spacing: 0.3px;">Konten Komunitas</p>
-    </div>
 </div>
 
 <!-- Charts Section -->
@@ -142,15 +130,15 @@
                 Konfigurasi AI
             </a>
             <a href="{{ route('admin.templates') }}" class="block w-full h-10 bg-[#1A1A1A] border border-[#364153] rounded-[10px] flex items-center justify-center text-sm text-white" style="font-family: Arial, sans-serif;">
-                Kelola Template
+                Monitoring Tips Perawatan
             </a>
         </div>
     </div>
 </div>
 
-<!-- Pertumbuhan Konten Komunitas -->
+<!-- Pertumbuhan Tips Perawatan -->
 <div class="bg-[#111111] border border-[#1E2939] rounded-[14px] p-[21px]">
-    <h3 class="text-base font-bold text-white mb-4" style="font-family: Arial, sans-serif;">Pertumbuhan Konten Komunitas</h3>
+    <h3 class="text-base font-bold text-white mb-4" style="font-family: Arial, sans-serif;">Pertumbuhan Tips Perawatan</h3>
     <div class="flex items-end justify-between gap-3 h-48">
         <div class="flex flex-col items-center flex-1 gap-2">
             <div class="w-full h-0 bg-[#6B7C4F] rounded-t"></div>

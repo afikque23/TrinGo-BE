@@ -137,7 +137,7 @@
                 <select class="w-full h-[38.5px] bg-[#0A0A0A] border border-[#364153] rounded-[10px] px-3 text-sm text-white focus:outline-none focus:border-[#6B7C4F]" style="font-family: Arial, sans-serif;">
                     <option value="">Semua</option>
                     <option value="template">Template</option>
-                    <option value="komunitas">Komunitas</option>
+                    <option value="komunitas">Tips Perawatan</option>
                     <option value="ai">AI</option>
                 </select>
             </div>

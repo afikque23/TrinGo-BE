@@ -54,17 +54,17 @@ class ServiceScheduleReminderService
             if ($currentOdometer >= $reminderTriggerOdometer) {
                 $kmUntilService = $schedule->target_km - $currentOdometer;
 
-                // Kirim notification
-                $sent = $this->sendReminderNotification(
-                    $schedule,
-                    "Kendaraan Anda akan mencapai jadwal servis dalam {$kmUntilService} km lagi",
-                    [
-                        'type' => 'schedule_reminder',
-                        'schedule_id' => $schedule->id,
-                        'current_odometer' => $currentOdometer,
-                        'target_km' => $schedule->target_km,
-                        'remaining_km' => $kmUntilService,
+                // Kirim notification menggunakan template
+                $sent = $this->sendReminderNotificationFromTemplate(
+                    schedule: $schedule,
+                    triggerType: 'schedule_reminder_km',
+                    variables: [
+                        'service_name' => $schedule->service_name ?? $schedule->serviceType->name,
                         'service_type' => $schedule->service_name ?? $schedule->serviceType->name,
+                        'km_remaining' => $kmUntilService,
+                        'target_km' => $schedule->target_km,
+                        'current_km' => $currentOdometer,
+                        'vehicle_name' => $schedule->vehicle->name ?? $schedule->vehicle->brand . ' ' . $schedule->vehicle->model,
                     ]
                 );
 
@@ -121,16 +121,16 @@ class ServiceScheduleReminderService
                 $daysUntilService = $today->diffInDays($targetDate, false); // false = bisa negatif jika sudah lewat
 
                 if ($daysUntilService >= 0) { // Hanya kirim jika belum melewati target date
-                    // Kirim notification
-                    $sent = $this->sendReminderNotification(
-                        $schedule,
-                        "Jadwal servis Anda dalam {$daysUntilService} hari lagi",
-                        [
-                            'type' => 'schedule_reminder',
-                            'schedule_id' => $schedule->id,
-                            'target_date' => $targetDate->format('Y-m-d'),
-                            'remaining_days' => $daysUntilService,
+                    // Kirim notification menggunakan template
+                    $sent = $this->sendReminderNotificationFromTemplate(
+                        schedule: $schedule,
+                        triggerType: 'schedule_reminder_time',
+                        variables: [
+                            'service_name' => $schedule->service_name ?? $schedule->serviceType->name,
                             'service_type' => $schedule->service_name ?? $schedule->serviceType->name,
+                            'days_remaining' => $daysUntilService,
+                            'target_date' => $targetDate->format('d/m/Y'),
+                            'vehicle_name' => $schedule->vehicle->name ?? $schedule->vehicle->brand . ' ' . $schedule->vehicle->model,
                         ]
                     );
 
@@ -157,23 +157,89 @@ class ServiceScheduleReminderService
     }
 
     /**
-     * Send reminder notification via FCM dan simpan ke database
+     * Send reminder notification menggunakan template dari database
      *
      * @param ServiceSchedule $schedule
-     * @param string $message
-     * @param array $data
+     * @param string $triggerType
+     * @param array $variables
      * @return bool
      */
-    protected function sendReminderNotification(ServiceSchedule $schedule, string $message, array $data = []): bool
-    {
+    protected function sendReminderNotificationFromTemplate(
+        ServiceSchedule $schedule,
+        string $triggerType,
+        array $variables = []
+    ): bool {
         $vehicle = $schedule->vehicle;
-        $serviceName = $schedule->service_name ?? $schedule->serviceType->name;
 
         // Get user_id dari vehicle
         $userId = $vehicle->user_id;
         $deviceId = $vehicle->device_id;
 
-        // Simpan notification ke database
+        // Cari template notifikasi yang sesuai
+        $template = \App\Models\NotificationTemplate::where('category_key', 'service')
+            ->where('trigger_type', $triggerType)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$template) {
+            Log::warning("No active notification template found for trigger: {$triggerType}");
+            
+            // Fallback ke hardcoded message jika template tidak ada
+            return $this->sendFallbackNotification($schedule, $triggerType, $variables);
+        }
+
+        try {
+            // Kirim notification dari template
+            $notification = $this->notificationService->sendFromTemplate(
+                template: $template,
+                variables: $variables,
+                user: $userId ? \App\Models\User::find($userId) : null,
+                deviceId: $deviceId,
+                vehicle: $vehicle
+            );
+
+            if ($notification) {
+                Log::info("Reminder notification sent from template for schedule #{$schedule->id}", [
+                    'notification_id' => $notification->id,
+                    'template_id' => $template->id,
+                    'trigger_type' => $triggerType,
+                ]);
+
+                return $notification->push_sent ?? false;
+            }
+
+            return false;
+
+        } catch (\Exception $e) {
+            Log::error("Failed to send reminder notification for schedule #{$schedule->id}: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Fallback notification jika template tidak ditemukan
+     *
+     * @param ServiceSchedule $schedule
+     * @param string $triggerType
+     * @param array $variables
+     * @return bool
+     */
+    protected function sendFallbackNotification(
+        ServiceSchedule $schedule,
+        string $triggerType,
+        array $variables
+    ): bool {
+        $vehicle = $schedule->vehicle;
+        $userId = $vehicle->user_id;
+        $deviceId = $vehicle->device_id;
+
+        // Generate default message
+        $message = match($triggerType) {
+            'schedule_reminder_km' => "🔧 Pengingat Servis: {$variables['service_name']} dalam {$variables['km_remaining']} km lagi!",
+            'schedule_reminder_time' => "🔧 Pengingat Servis: {$variables['service_name']} dalam {$variables['days_remaining']} hari lagi!",
+            default => "🔧 Pengingat Servis: {$variables['service_name']}",
+        };
+
         try {
             $notification = $this->notificationService->sendDirect(
                 title: '🔔 Pengingat Servis',
@@ -184,19 +250,18 @@ class ServiceScheduleReminderService
                 user: $userId ? \App\Models\User::find($userId) : null,
                 deviceId: $deviceId,
                 vehicle: $vehicle,
-                dataPayload: $data
+                dataPayload: array_merge([
+                    'type' => 'schedule_reminder',
+                    'schedule_id' => $schedule->id,
+                    'trigger_type' => $triggerType,
+                ], $variables)
             );
 
-            Log::info("Reminder notification created for schedule #{$schedule->id}", [
-                'notification_id' => $notification->id,
-                'push_sent' => $notification->push_sent ?? false,
-            ]);
-
-            // Check if push was successful
+            Log::warning("Fallback notification sent (no template) for schedule #{$schedule->id}");
             return $notification->push_sent ?? false;
 
         } catch (\Exception $e) {
-            Log::error("Failed to send reminder notification for schedule #{$schedule->id}: " . $e->getMessage());
+            Log::error("Failed to send fallback notification for schedule #{$schedule->id}: " . $e->getMessage());
             return false;
         }
     }

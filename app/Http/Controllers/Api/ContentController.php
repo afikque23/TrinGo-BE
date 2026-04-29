@@ -13,6 +13,89 @@ use Illuminate\Support\Str;
 
 class ContentController extends Controller
 {
+    private function normalizeBodyForType(string $type, string $body): string
+    {
+        if ($type !== 'faq') {
+            return $body;
+        }
+
+        try {
+            $decoded = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\Throwable $e) {
+            return $body;
+        }
+
+        if (!is_array($decoded)) {
+            return $body;
+        }
+
+        $normalized = [];
+
+        foreach ($decoded as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            if (array_key_exists('question', $item) || array_key_exists('answer', $item)) {
+                $question = (string) ($item['question'] ?? '');
+                $answer = (string) ($item['answer'] ?? '');
+
+                $normalized[] = [
+                    'question' => $question,
+                    'answer' => $answer,
+                ];
+                continue;
+            }
+
+            if (array_key_exists('section', $item) || array_key_exists('content', $item)) {
+                $question = (string) ($item['section'] ?? '');
+                $answer = (string) ($item['content'] ?? '');
+
+                $normalized[] = [
+                    'question' => $question,
+                    'answer' => $answer,
+                ];
+            }
+        }
+
+        if ($normalized === []) {
+            return $body;
+        }
+
+        return json_encode($normalized, JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Get all published contents (Public endpoint).
+     * Useful for mobile to fetch all static pages dynamically.
+     */
+    public function publicIndex(): JsonResponse
+    {
+        try {
+            $contents = Content::published()
+                ->orderBy('type')
+                ->ordered()
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            $grouped = $contents->groupBy('type')->map(
+                fn ($items) => ContentResource::collection($items)->values()
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Contents fetched successfully',
+                'data' => $grouped,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch contents',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     /**
      * Display a listing of all contents (Admin only).
      *
@@ -51,9 +134,19 @@ class ContentController extends Controller
         try {
             $validated = $request->validated();
 
+            if (($validated['type'] ?? null) === 'faq') {
+                // Enforce single canonical FAQ content.
+                Content::query()->where('type', 'faq')->delete();
+                $validated['slug'] = 'faq';
+            }
+
             // Auto-generate slug if not provided
             if (empty($validated['slug'])) {
                 $validated['slug'] = Str::slug($validated['title']);
+            }
+
+            if (isset($validated['body']) && isset($validated['type'])) {
+                $validated['body'] = $this->normalizeBodyForType($validated['type'], $validated['body']);
             }
 
             // Set default status if not provided
@@ -135,9 +228,20 @@ class ContentController extends Controller
 
             $validated = $request->validated();
 
-            // Auto-generate slug if title is updated but slug is not provided
-            if (isset($validated['title']) && !isset($validated['slug'])) {
-                $validated['slug'] = Str::slug($validated['title']);
+            $type = $validated['type'] ?? $content->type;
+
+            if ($type === 'faq') {
+                // Enforce single canonical FAQ content and stable slug.
+                Content::query()
+                    ->where('type', 'faq')
+                    ->where('id', '!=', $content->id)
+                    ->delete();
+
+                $validated['slug'] = 'faq';
+            }
+
+            if (isset($validated['body'])) {
+                $validated['body'] = $this->normalizeBodyForType($type, $validated['body']);
             }
 
             $content->update($validated);
@@ -198,7 +302,7 @@ class ContentController extends Controller
     public function getByType(string $type): JsonResponse
     {
         try {
-            $validTypes = ['terms', 'privacy', 'guide', 'about', 'faq', 'system_info'];
+            $validTypes = ['terms', 'privacy', 'guide', 'about', 'faq', 'system_info', 'support'];
             
             if (!in_array($type, $validTypes)) {
                 return response()->json([

@@ -155,7 +155,8 @@
             'guide': '📖',
             'about': 'ℹ️',
             'faq': '❓',
-            'system_info': '⚙️'
+            'system_info': '⚙️',
+            'support': '🆘'
         };
         return emojis[type] || '📄';
     },
@@ -167,7 +168,8 @@
             'guide': 'Tutorial lengkap penggunaan fitur aplikasi',
             'about': 'Informasi aplikasi MotoTracker',
             'faq': 'Pertanyaan yang sering diajukan (FAQ)',
-            'system_info': 'Transparansi algoritma dan logika sistem'
+            'system_info': 'Transparansi algoritma dan logika sistem',
+            'support': 'Pusat bantuan, kontak, dan dukungan pengguna'
         };
         return descriptions[type] || 'Konten aplikasi mobile';
     },
@@ -179,7 +181,8 @@
             'guide': 'Berbasis Section',
             'about': 'Halaman Info',
             'faq': 'FAQ (Tanya Jawab)',
-            'system_info': 'Berbasis Section'
+            'system_info': 'Berbasis Section',
+            'support': 'Bantuan & Dukungan'
         };
         return labels[type] || 'Dokumen';
     },

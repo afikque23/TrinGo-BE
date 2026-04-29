@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TemplateController;
-use App\Http\Controllers\Admin\CommunityController;
 use App\Http\Controllers\Admin\AIConfigController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\ContentController;
@@ -27,7 +26,6 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/templates/{id}/edit', [TemplateController::class, 'edit'])->name('admin.templates.edit');
     Route::match(['put', 'post'], '/templates/{id}', [TemplateController::class, 'update'])->name('admin.templates.update');
     Route::delete('/templates/{id}', [TemplateController::class, 'destroy'])->name('admin.templates.destroy');
-    Route::get('/community', [CommunityController::class, 'index'])->name('admin.community');
     Route::get('/ai-config', [AIConfigController::class, 'index'])->name('admin.ai-config');
     
     // Notification Management Routes
@@ -70,8 +68,6 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::patch('/filters/notification-categories/{notificationCategory}/toggle-status', [FilterController::class, 'toggleNotificationCategoryStatus'])->name('admin.filters.notification-categories.toggle-status');
     
     Route::get('/content', [ContentController::class, 'index'])->name('admin.content');
-    Route::get('/konten-komunitas', [CommunityController::class, 'konten'])->name('admin.konten.komunitas');
-    Route::get('/konten-komunitas/{id}', [CommunityController::class, 'detail'])->name('admin.konten.detail');
 });
 
 // Auth Routes for Web
