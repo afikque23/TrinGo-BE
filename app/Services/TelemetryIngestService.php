@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Trip;
+use App\Models\TripPoint;
 use App\Models\Vehicle;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -72,7 +74,21 @@ class TelemetryIngestService
 
         $telemetryAt = $this->parseTelemetryAt($data);
 
-        $vehicle = Vehicle::query()->where('device_id', $deviceId)->first();
+        $matches = Vehicle::query()
+            ->where('device_id', $deviceId)
+            ->orderBy('id')
+            ->limit(2)
+            ->get();
+
+        if ($matches->count() > 1) {
+            Log::warning('Multiple vehicles share the same device_id. Using the lowest id match.', [
+                'topic' => $topic,
+                'device_id' => $deviceId,
+                'vehicle_ids' => $matches->pluck('id')->all(),
+            ]);
+        }
+
+        $vehicle = $matches->first();
         if (!$vehicle) {
             Log::warning('Telemetry received for unknown device_id.', [
                 'topic' => $topic,
@@ -93,6 +109,60 @@ class TelemetryIngestService
             'last_telemetry_at' => $telemetryAt,
             'last_telemetry_received_at' => $receivedAt,
         ])->save();
+
+        if ((bool) config('mqtt.trip_points.enabled', false)) {
+            $this->appendTripPoint(
+                vehicle: $vehicle,
+                latitude: $latitude,
+                longitude: $longitude,
+                altitude: $altitude,
+                speedKph: $speedKph,
+                accuracyMeters: $accuracyMeters,
+                recordedAt: $telemetryAt ?? $receivedAt,
+            );
+        }
+    }
+
+    private function appendTripPoint(
+        Vehicle $vehicle,
+        float $latitude,
+        float $longitude,
+        ?float $altitude,
+        ?float $speedKph,
+        ?float $accuracyMeters,
+        Carbon $recordedAt,
+    ): void {
+        $trip = Trip::query()
+            ->where('vehicle_id', $vehicle->id)
+            ->whereNull('end_at')
+            ->orderByDesc('id')
+            ->first();
+
+        if (!$trip) {
+            // Auto-start a trip so incoming telemetry can be stored as trip history.
+            $trip = Trip::query()->create([
+                'vehicle_id' => $vehicle->id,
+                'started_by' => $vehicle->user_id,
+                'start_at' => $recordedAt,
+                'end_at' => null,
+                'distance_meters' => 0,
+                'start_odometer' => $vehicle->odometer ?? 0,
+                'notes' => 'Auto-started from MQTT telemetry',
+            ]);
+        }
+
+        $nextSequence = (int) (TripPoint::query()->where('trip_id', $trip->id)->max('sequence') ?? 0) + 1;
+
+        TripPoint::create([
+            'trip_id' => $trip->id,
+            'sequence' => $nextSequence,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'altitude' => $altitude,
+            'speed_kph' => $speedKph !== null ? (int) round($speedKph) : null,
+            'accuracy_meters' => $accuracyMeters,
+            'recorded_at' => $recordedAt,
+        ]);
     }
 
     private function extractDeviceId(string $topic): ?string

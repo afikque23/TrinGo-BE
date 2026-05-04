@@ -24,4 +24,9 @@ return [
 
     // If the connection drops, the command will wait this many seconds before reconnecting.
     'reconnect_delay_seconds' => (int) env('MQTT_RECONNECT_DELAY_SECONDS', 5),
+
+    // Optional: append incoming telemetry points into trip_points for the active trip (end_at is null).
+    'trip_points' => [
+        'enabled' => (bool) env('MQTT_TRIP_POINTS_ENABLED', false),
+    ],
 ];

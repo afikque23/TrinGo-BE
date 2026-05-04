@@ -8,6 +8,7 @@ use App\Http\Resources\TripResource;
 use App\Models\Trip;
 use App\Models\TripPoint;
 use App\Models\Vehicle;
+use App\Traits\ApiResponse;
 use App\Traits\HasOwnerIdentification;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 
 class TripController extends Controller
 {
-    use HasOwnerIdentification;
+    use ApiResponse, HasOwnerIdentification;
 
     /**
      * Get all trips for the current user's vehicles (with optional vehicle filter)
@@ -63,9 +64,15 @@ class TripController extends Controller
 
             $total = Trip::whereIn('vehicle_id', $vehicleIds)->count();
 
+            // IMPORTANT: JsonResource collections serialize as { data: [...] }.
+            // Our API convention expects `data` to be the list directly.
+            $resourceArray = TripResource::collection($trips)->toArray($request);
+            $tripList = $resourceArray['data'] ?? $resourceArray;
+
             return response()->json([
                 'success' => true,
-                'data' => TripResource::collection($trips),
+                'message' => 'Trips retrieved successfully',
+                'data' => $tripList,
                 'meta' => [
                     'total' => $total,
                     'limit' => $limit,

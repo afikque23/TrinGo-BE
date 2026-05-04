@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Models\Vehicle;
 
 class UpdateVehicleRequest extends FormRequest
 {
@@ -20,9 +21,11 @@ class UpdateVehicleRequest extends FormRequest
      */
     public function rules(): array
     {
-        $vehicleId = $this->route('vehicle');
+        $vehicleParam = $this->route('vehicle');
+        $vehicleId = $vehicleParam instanceof Vehicle ? $vehicleParam->getKey() : $vehicleParam;
         
         return [
+            'device_id' => ['nullable', 'string', 'max:128', Rule::unique('vehicles', 'device_id')->ignore($vehicleId)],
             'title' => ['sometimes', 'required', 'string', 'max:200'],
             'make' => ['nullable', 'string', 'max:100'],
             'model' => ['nullable', 'string', 'max:100'],
@@ -42,6 +45,7 @@ class UpdateVehicleRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'device_id.unique' => 'Device ID sudah terpakai oleh kendaraan lain',
             'title.required' => 'Nama kendaraan wajib diisi',
             'title.max' => 'Nama kendaraan maksimal 200 karakter',
             'tipe_motor.required' => 'Tipe motor wajib dipilih',
