@@ -20,24 +20,17 @@ class StoreVehicleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'          => ['required', 'string', 'max:200'],
-            'make'           => ['nullable', 'string', 'max:100'],
-            'model'          => ['nullable', 'string', 'max:100'],
-            'year'           => ['nullable', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'tipe_motor'     => ['required', 'in:matic,manual,sport'],
-            'kapasitas_cc'   => ['nullable', 'in:<125,125-250,>250'],
-            'transmisi'      => ['nullable', 'in:manual,cvt'],
-            'vin'            => ['nullable', 'string', 'max:64', 'unique:vehicles,vin'],
-            'odometer'       => ['nullable', 'integer', 'min:0'],
-            'license_plate'  => ['nullable', 'string', 'max:20'],
-            'color'          => ['nullable', 'string', 'max:50'],
-            'photo'          => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
-            // Parameter default untuk kalkulasi jadwal service
-            'default_beban'            => ['nullable', 'in:ringan,sedang,berat'],
-            'default_penumpang'        => ['nullable', 'boolean'],
-            'default_gaya_berkendara'  => ['nullable', 'in:pelan,normal,agresif'],
-            'default_kondisi_jalan'    => ['nullable', 'in:macet,sedang,lancar'],
-            'default_medan'            => ['nullable', 'in:datar,berbukit,campuran'],
+            'device_id' => ['nullable', 'string', 'max:128', 'unique:vehicles,device_id'],
+            'title' => ['required', 'string', 'max:200'],
+            'make' => ['nullable', 'string', 'max:100'],
+            'model' => ['nullable', 'string', 'max:100'],
+            'year' => ['nullable', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
+            'tipe_motor' => ['required', 'in:matic,manual,sport'],
+            'vin' => ['nullable', 'string', 'max:64', 'unique:vehicles,vin'],
+            'odometer' => ['nullable', 'integer', 'min:0'],
+            'license_plate' => ['nullable', 'string', 'max:20'],
+            'color' => ['nullable', 'string', 'max:50'],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'], // Max 5MB
         ];
     }
 
@@ -47,6 +40,7 @@ class StoreVehicleRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'device_id.unique' => 'Device ID sudah terpakai oleh kendaraan lain',
             'title.required' => 'Nama kendaraan wajib diisi',
             'title.max' => 'Nama kendaraan maksimal 200 karakter',
             'tipe_motor.required' => 'Tipe motor wajib dipilih',
