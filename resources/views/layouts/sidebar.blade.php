@@ -40,11 +40,11 @@
                         <span class="text-sm" style="font-family: Arial, sans-serif;">Monitoring Tips Perawatan</span>
                     </a>
 
-                    <a href="{{ route('admin.ai-config') }}" class="flex items-center gap-3 pl-3 h-10 rounded-[10px] transition-colors {{ request()->routeIs('admin.ai-config*') ? 'bg-[#6B7C4F] text-white' : 'text-[#99A1AF] hover:bg-[#1E2939]' }}">
+                    <a href="{{ route('admin.fuzzy.index') }}" class="flex items-center gap-3 pl-3 h-10 rounded-[10px] transition-colors {{ request()->routeIs('admin.fuzzy*') ? 'bg-[#6B7C4F] text-white' : 'text-[#99A1AF] hover:bg-[#1E2939]' }}">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
                         </svg>
-                        <span class="text-sm" style="font-family: Arial, sans-serif;">Konfigurasi AI</span>
+                        <span class="text-sm" style="font-family: Arial, sans-serif;">Konfigurasi Fuzzy</span>
                     </a>
 
                     <a href="{{ route('admin.notifications') }}" class="flex items-center gap-3 pl-3 h-10 rounded-[10px] transition-colors {{ request()->routeIs('admin.notifications*') ? 'bg-[#6B7C4F] text-white' : 'text-[#99A1AF] hover:bg-[#1E2939]' }}">

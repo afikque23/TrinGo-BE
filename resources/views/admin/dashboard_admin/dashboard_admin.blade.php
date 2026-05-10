@@ -126,8 +126,8 @@
 
         <!-- Action Buttons -->
         <div class="mt-2 space-y-2">
-            <a href="{{ route('admin.ai-config') }}" class="block w-full h-10 bg-[#6B7C4F] rounded-[10px] flex items-center justify-center text-sm text-white" style="font-family: Arial, sans-serif;">
-                Konfigurasi AI
+            <a href="{{ route('admin.fuzzy-config.index') }}" class="block w-full h-10 bg-[#6B7C4F] rounded-[10px] flex items-center justify-center text-sm text-white" style="font-family: Arial, sans-serif;">
+                Konfigurasi Fuzzy
             </a>
             <a href="{{ route('admin.templates') }}" class="block w-full h-10 bg-[#1A1A1A] border border-[#364153] rounded-[10px] flex items-center justify-center text-sm text-white" style="font-family: Arial, sans-serif;">
                 Monitoring Tips Perawatan

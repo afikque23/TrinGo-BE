@@ -322,9 +322,41 @@ class VehicleController extends Controller
             $query = Vehicle::query();
             $this->applyOwnerFilter($query, $request);
             $vehicle = $query->findOrFail($id);
+
+            $ownerFilter = $this->getOwnerFilter($request);
+
+            // If the new primary has no device_id yet, transfer the device_id from the previous
+            // primary (or any other owned vehicle). This ensures MQTT telemetry for the device
+            // is routed to the current primary vehicle without changing firmware/topic.
+            if ($vehicle->device_id === null) {
+                $previousPrimary = Vehicle::query()
+                    ->where($ownerFilter['column'], $ownerFilter['id'])
+                    ->where('is_primary', true)
+                    ->where('id', '!=', $vehicle->id)
+                    ->first();
+
+                $deviceIdToMove = $previousPrimary?->device_id;
+                if ($deviceIdToMove === null) {
+                    $deviceIdToMove = Vehicle::query()
+                        ->where($ownerFilter['column'], $ownerFilter['id'])
+                        ->where('id', '!=', $vehicle->id)
+                        ->whereNotNull('device_id')
+                        ->value('device_id');
+                }
+
+                if ($deviceIdToMove !== null) {
+                    // Detach device_id from any other vehicle under this owner.
+                    Vehicle::query()
+                        ->where($ownerFilter['column'], $ownerFilter['id'])
+                        ->where('id', '!=', $vehicle->id)
+                        ->where('device_id', $deviceIdToMove)
+                        ->update(['device_id' => null]);
+
+                    $vehicle->device_id = $deviceIdToMove;
+                }
+            }
             
             // Unset all other vehicles as primary for this owner
-            $ownerFilter = $this->getOwnerFilter($request);
             Vehicle::where($ownerFilter['column'], $ownerFilter['id'])
                 ->where('id', '!=', $vehicle->id)
                 ->update(['is_primary' => false]);

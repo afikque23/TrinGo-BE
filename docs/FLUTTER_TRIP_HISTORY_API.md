@@ -37,6 +37,8 @@ Supaya telemetry MQTT `vehicle/{deviceId}/telemetry` masuk ke **kendaraan yang s
 - `device_id` harus **unik** (kalau sudah dipakai kendaraan lain, API akan balas error validasi).
 - Setelah bind sukses, publish MQTT ke topic: `vehicle/esp32-motor-a/telemetry`.
 
+Catatan: saat user mengganti **motor utama** lewat endpoint `POST /vehicles/{id}/set-primary`, backend akan otomatis memindahkan `device_id` dari motor utama lama ke motor utama baru **jika** motor utama baru belum punya `device_id`. Ini membuat data MQTT selalu masuk ke motor utama tanpa perlu ubah kode ESP.
+
 Jika dapat response `422` dengan pesan `Device ID sudah terpakai oleh kendaraan lain`, berarti ada kendaraan lain di DB yang sudah memakai `device_id` itu (sering terjadi karena data demo/seeder). Solusi: pastikan `device_id` yang bentrok dibebaskan (set `null`/ubah) di record yang salah.
 
 ### cURL contoh

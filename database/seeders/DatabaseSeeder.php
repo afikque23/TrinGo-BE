@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             ReminderOptionSeeder::class,
             NotificationCategorySeeder::class,
             NotificationTemplateSeeder::class,
+            FuzzyLogicSeeder::class,
         ]);
 
         // Create test user
@@ -32,3 +33,4 @@ class DatabaseSeeder extends Seeder
         $this->command->info('All seeders completed successfully!');
     }
 }
+

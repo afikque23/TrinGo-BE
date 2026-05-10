@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\NotificationPreferenceController;
 use App\Http\Controllers\Api\ReminderOptionController;
 use App\Http\Controllers\Api\ServiceTypeController;
+use App\Http\Controllers\Api\MaintenanceRecommendationController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VehicleController;
@@ -83,6 +84,8 @@ Route::middleware(['auth:sanctum,web'])->group(function () {
     Route::get('/vehicles/primary', [VehicleController::class, 'getPrimary']);
     Route::get('/vehicles/primary/service-metrics', [VehicleController::class, 'getServiceMetrics']);
     Route::get('/vehicles/primary/usage-pattern', [VehicleController::class, 'getUsagePattern']);
+    Route::get('/vehicles/primary/maintenance-recommendations', [MaintenanceRecommendationController::class, 'primary']);
+    Route::get('/vehicles/{vehicle}/maintenance-recommendations', [MaintenanceRecommendationController::class, 'show']);
     Route::post('/vehicles/{id}/set-primary', [VehicleController::class, 'setPrimary']);
     Route::apiResource('vehicles', VehicleController::class);
 

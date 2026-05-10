@@ -50,4 +50,18 @@ return [
         'project_id' => env('FCM_PROJECT_ID', ''),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Gemini (Google Generative Language API)
+    |--------------------------------------------------------------------------
+    */
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-2.0-flash'),
+        'temperature' => (float) env('GEMINI_TEMPERATURE', 0.4),
+        'max_output_tokens' => (int) env('GEMINI_MAX_OUTPUT_TOKENS', 900),
+        'score_delta_trigger' => (float) env('GEMINI_SCORE_DELTA_TRIGGER', 5),
+    ],
+
 ];
+
