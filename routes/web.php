@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TemplateController;
-use App\Http\Controllers\Admin\AIConfigController;
+use App\Http\Controllers\Admin\FuzzyConfigController;
+use App\Http\Controllers\Admin\FuzzyLogicController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\ContentController;
 use App\Http\Controllers\Admin\FilterController;
@@ -26,7 +27,39 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/templates/{id}/edit', [TemplateController::class, 'edit'])->name('admin.templates.edit');
     Route::match(['put', 'post'], '/templates/{id}', [TemplateController::class, 'update'])->name('admin.templates.update');
     Route::delete('/templates/{id}', [TemplateController::class, 'destroy'])->name('admin.templates.destroy');
-    Route::get('/ai-config', [AIConfigController::class, 'index'])->name('admin.ai-config');
+
+    // Fuzzy Config (DB-driven, no redeploy)
+    Route::get('/fuzzy-config', [FuzzyConfigController::class, 'index'])->name('admin.fuzzy-config.index');
+    Route::get('/fuzzy-config/data', [FuzzyConfigController::class, 'data'])->name('admin.fuzzy-config.data');
+    Route::put('/fuzzy-config/data', [FuzzyConfigController::class, 'bulkUpdate'])->name('admin.fuzzy-config.bulk-update');
+    Route::post('/fuzzy-config/test', [FuzzyConfigController::class, 'test'])->name('admin.fuzzy-config.test');
+    Route::post('/fuzzy-config', [FuzzyConfigController::class, 'store'])->name('admin.fuzzy-config.store');
+    Route::get('/fuzzy-config/{motorTypeComponent}/edit', [FuzzyConfigController::class, 'edit'])->name('admin.fuzzy-config.edit');
+    Route::put('/fuzzy-config/{motorTypeComponent}', [FuzzyConfigController::class, 'update'])->name('admin.fuzzy-config.update');
+    Route::post('/fuzzy-config/{motorTypeComponent}/reset-default', [FuzzyConfigController::class, 'resetDefault'])->name('admin.fuzzy-config.reset-default');
+    Route::post('/fuzzy-config/{motorTypeComponent}/toggle', [FuzzyConfigController::class, 'toggle'])->name('admin.fuzzy-config.toggle');
+    Route::delete('/fuzzy-config/{motorTypeComponent}', [FuzzyConfigController::class, 'destroy'])->name('admin.fuzzy-config.destroy');
+
+    // Fuzzy Logic (normalized, v2)
+    Route::prefix('fuzzy')->name('admin.fuzzy.')->group(function () {
+        Route::get('/', [FuzzyLogicController::class, 'index'])->name('index');
+        Route::get('/audit', [FuzzyLogicController::class, 'audit'])->name('audit');
+
+        Route::get('/components', [FuzzyLogicController::class, 'getComponents'])->name('components');
+        Route::post('/components', [FuzzyLogicController::class, 'storeComponent'])->name('components.store');
+        Route::patch('/components/{component}/toggle', [FuzzyLogicController::class, 'toggleComponent'])->name('components.toggle');
+        Route::delete('/components/{component}', [FuzzyLogicController::class, 'deleteComponent'])->name('components.delete');
+
+        Route::patch('/components/{component}/threshold', [FuzzyLogicController::class, 'saveThreshold'])->name('threshold.save');
+        Route::patch('/components/{component}/membership', [FuzzyLogicController::class, 'saveMembership'])->name('membership.save');
+
+        Route::post('/components/{component}/rules', [FuzzyLogicController::class, 'storeRule'])->name('rules.store');
+        Route::patch('/rules/{rule}', [FuzzyLogicController::class, 'updateRule'])->name('rules.update');
+        Route::delete('/rules/{rule}', [FuzzyLogicController::class, 'deleteRule'])->name('rules.delete');
+
+        Route::post('/components/{component}/test', [FuzzyLogicController::class, 'test'])->name('test');
+        Route::post('/chart-data', [FuzzyLogicController::class, 'chartData'])->name('chart');
+    });
     
     // Notification Management Routes
     Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications');

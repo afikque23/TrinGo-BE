@@ -61,6 +61,13 @@ class ServiceInterval extends Model
                 ['service_name' => 'Ganti Oli Gardan', 'service_type' => 'gear_oil_change', 'interval_km' => 7000, 'description' => 'Ganti oli transmisi'],
                 ['service_name' => 'Servis Besar', 'service_type' => 'major_service', 'interval_km' => 15000, 'description' => 'Servis menyeluruh kendaraan sport'],
             ],
+            'adventure' => [
+                ['service_name' => 'Ganti Oli', 'service_type' => 'oil_change', 'interval_km' => 3000, 'description' => 'Ganti oli mesin adventure'],
+                ['service_name' => 'Cek Rem', 'service_type' => 'brake_check', 'interval_km' => 4000, 'description' => 'Pemeriksaan sistem rem'],
+                ['service_name' => 'Cek Rantai', 'service_type' => 'chain_check', 'interval_km' => 2500, 'description' => 'Pemeriksaan dan pelumasan rantai'],
+                ['service_name' => 'Tune Up Mesin', 'service_type' => 'engine_tune_up', 'interval_km' => 6000, 'description' => 'Penyetelan mesin dan pemeriksaan komponen'],
+                ['service_name' => 'Servis Besar', 'service_type' => 'major_service', 'interval_km' => 15000, 'description' => 'Servis menyeluruh kendaraan adventure'],
+            ],
         ];
 
         return $intervals[$tipeMotor] ?? $intervals['matic'];

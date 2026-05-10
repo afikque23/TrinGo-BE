@@ -30,7 +30,7 @@ class UpdateVehicleRequest extends FormRequest
             'make' => ['nullable', 'string', 'max:100'],
             'model' => ['nullable', 'string', 'max:100'],
             'year' => ['nullable', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'tipe_motor' => ['sometimes', 'required', 'in:matic,manual,sport'],
+            'tipe_motor' => ['sometimes', 'required', 'in:matic,manual,sport,adventure'],
             'vin' => ['nullable', 'string', 'max:64', Rule::unique('vehicles')->ignore($vehicleId)],
             'odometer' => ['nullable', 'integer', 'min:0'],
             'license_plate' => ['nullable', 'string', 'max:20'],

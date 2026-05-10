@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             ReminderOptionSeeder::class,
             NotificationCategorySeeder::class,
             NotificationTemplateSeeder::class,
+            FuzzyLogicSeeder::class,
         ]);
 
         // Create a default user for quick login (mobile/testing)
@@ -46,3 +47,4 @@ class DatabaseSeeder extends Seeder
         $this->command->info('All seeders completed successfully!');
     }
 }
+
