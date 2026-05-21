@@ -22,6 +22,7 @@ class TemplateController extends Controller
         $brand = (string) $request->query('brand', 'all');
         // Default to all-time so admin sees all user/admin tips.
         $range = (string) $request->query('range', 'all');
+        $search = Tip::normalizeKeyword((string) $request->query('q', ''));
 
         $rangeStart = null;
         if ($range === '7d') {
@@ -43,6 +44,10 @@ class TemplateController extends Controller
 
         if ($status !== '' && $status !== 'all') {
             $tipsQuery->where('status', $status);
+        }
+
+        if ($search !== '') {
+            $tipsQuery->search($search);
         }
 
         if ($rangeStart !== null) {
@@ -94,6 +99,7 @@ class TemplateController extends Controller
                 'status' => $status,
                 'brand' => $brand,
                 'range' => $range,
+                'q' => $search,
             ],
             'brandOptions' => $brandOptions,
         ]);

@@ -410,43 +410,6 @@
         </div>
     </div>
 
-    <!-- Riwayat Perubahan -->
-    <div class="bg-[#111111] border border-[#1E2939] rounded-[14px] p-5">
-        <div class="flex items-center justify-between gap-3">
-            <h2 class="text-base font-semibold text-white" style="font-family: Arial, sans-serif;">Riwayat Perubahan</h2>
-            <button type="button" class="h-[30px] px-3 border border-[#1E2939] rounded-[10px] text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;" @click="showAllAudits = !showAllAudits" x-text="showAllAudits ? 'Ringkas' : 'Lihat Semua'"></button>
-        </div>
-
-        <div class="mt-4 overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead class="text-[#4A5565] border-b border-[#1E2939]">
-                    <tr>
-                        <th class="text-left py-2 pr-4 text-xs uppercase tracking-wider" style="font-family: Arial, sans-serif;">Waktu</th>
-                        <th class="text-left py-2 pr-4 text-xs uppercase tracking-wider" style="font-family: Arial, sans-serif;">Admin</th>
-                        <th class="text-left py-2 pr-4 text-xs uppercase tracking-wider" style="font-family: Arial, sans-serif;">Komponen</th>
-                        <th class="text-left py-2 pr-4 text-xs uppercase tracking-wider" style="font-family: Arial, sans-serif;">Yang Diubah</th>
-                        <th class="text-left py-2 text-xs uppercase tracking-wider" style="font-family: Arial, sans-serif;">Perubahan</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-[#1E2939]/50">
-                    <template x-for="a in visibleAudits" :key="a.id">
-                        <tr>
-                            <td class="py-3 pr-4 text-[#4A5565]" style="font-family: Arial, sans-serif;" x-text="formatTs(a.created_at)"></td>
-                            <td class="py-3 pr-4 text-[#6A7282]" style="font-family: Arial, sans-serif;" x-text="a.admin_email ?? '-'" ></td>
-                            <td class="py-3 pr-4" style="font-family: Arial, sans-serif;">
-                                <span class="inline-flex items-center px-2 py-1 text-xs rounded bg-[#1E2939] text-[#99A1AF]" x-text="a.component_label ?? '-'"> </span>
-                            </td>
-                            <td class="py-3 pr-4 text-[#99A1AF]" style="font-family: Arial, sans-serif;" x-text="a.changed_field"></td>
-                            <td class="py-3 text-[#99A1AF]" style="font-family: Arial, sans-serif;" x-text="formatChange(a)"></td>
-                        </tr>
-                    </template>
-                    <tr x-show="audits.length === 0">
-                        <td colspan="5" class="py-4 text-sm text-[#99A1AF]" style="font-family: Arial, sans-serif;">Belum ada riwayat.</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
 </div>
 
 <script>
@@ -464,14 +427,12 @@
 
             items: [],
             availableComponents: [],
-            audits: [],
 
             selectedId: null,
             showAddComponent: false,
             saving: false,
             testing: false,
             testResult: null,
-            showAllAudits: false,
 
             currentVarKey: 'distance_since_service_km',
             chartPaths: { low: '', medium: '', high: '' },
@@ -507,11 +468,6 @@
 
             get currentVar() {
                 return this.inputVars.find(v => v.key === this.currentVarKey) || null;
-            },
-
-            get visibleAudits() {
-                if (this.showAllAudits) return this.audits;
-                return this.audits.slice(0, 5);
             },
 
             csrf() {
@@ -562,7 +518,6 @@
                     return it;
                 });
                 this.availableComponents = json.available_components || [];
-                this.audits = json.audits || [];
 
                 if (!this.selectedId || !this.items.some(i => i.id === this.selectedId)) {
                     this.selectedId = this.items[0]?.id ?? null;
@@ -1028,22 +983,6 @@
                 }
             },
 
-            formatTs(ts) {
-                if (!ts) return '-';
-                try {
-                    return new Date(ts).toLocaleString('id-ID');
-                } catch {
-                    return ts;
-                }
-            },
-
-            formatChange(a) {
-                if (!a) return '-';
-                if (a.old_value !== null && a.new_value !== null) {
-                    return `${a.old_value} → ${a.new_value}`;
-                }
-                return '-';
-            },
         };
     }
 </script>

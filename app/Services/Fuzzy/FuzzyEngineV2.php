@@ -14,6 +14,34 @@ class FuzzyEngineV2
     ) {
     }
 
+    private function componentKeyFromName(?string $name, int $fallbackId): string
+    {
+        $name = trim((string) $name);
+
+        $map = [
+            'Oli Mesin' => 'engine_oil',
+            'Ban' => 'tires',
+            'Filter Udara' => 'air_filter',
+            'Busi' => 'spark_plug',
+            'Aki' => 'battery',
+            'Rem' => 'brake',
+            'CVT/Belt' => 'cvt_belt',
+            'CVT / Belt' => 'cvt_belt',
+            'Roller CVT' => 'cvt_roller',
+            'Oli Gardan' => 'final_drive_oil',
+            'Rantai' => 'chain',
+            'Kopling' => 'clutch',
+            'Kampas Kopling' => 'clutch',
+        ];
+
+        if ($name !== '' && array_key_exists($name, $map)) {
+            return $map[$name];
+        }
+
+        $slug = Str::slug($name, '_');
+        return $slug !== '' ? $slug : ('component_' . $fallbackId);
+    }
+
     public function supportsMotorType(string $motorTypeSlug): bool
     {
         $motorTypeSlug = strtolower(trim($motorTypeSlug));
@@ -70,11 +98,7 @@ class FuzzyEngineV2
         ];
 
         foreach (($motorType?->componentConfigs ?? []) as $componentConfig) {
-            $keyBase = (string) ($componentConfig->name ?? 'component');
-            $componentKey = Str::slug($keyBase, '_');
-            if ($componentKey === '') {
-                $componentKey = 'component_' . $componentConfig->id;
-            }
+            $componentKey = $this->componentKeyFromName($componentConfig->name, (int) $componentConfig->id);
 
             $res = $this->engine->calculate($componentConfig, $normalizedInputs);
 
