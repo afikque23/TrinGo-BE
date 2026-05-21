@@ -72,6 +72,11 @@ class TelemetryIngestService
         $satellites = $this->getNumeric($data, ['sat', 'satellites']);
         $hdop = $this->getNumeric($data, ['hdop']);
 
+        $baroOk = $this->getBool($data, ['baro_ok']);
+        $baroRelAltM = $this->getNumeric($data, ['baro_rel_alt_m']);
+        $gradeRatio = $this->getNumeric($data, ['grade']);
+        $gradePct = $this->getNumeric($data, ['grade_pct']);
+
         $telemetryAt = $this->parseTelemetryAt($data);
 
         $matches = Vehicle::query()
@@ -106,6 +111,10 @@ class TelemetryIngestService
             'last_accuracy_meters' => $accuracyMeters,
             'last_satellites' => $satellites !== null ? (int) round($satellites) : null,
             'last_hdop' => $hdop,
+            'last_baro_ok' => $baroOk,
+            'last_baro_rel_alt_m' => $baroRelAltM,
+            'last_grade_ratio' => $gradeRatio,
+            'last_grade_pct' => $gradePct,
             'last_telemetry_at' => $telemetryAt,
             'last_telemetry_received_at' => $receivedAt,
         ])->save();
@@ -116,6 +125,8 @@ class TelemetryIngestService
                 latitude: $latitude,
                 longitude: $longitude,
                 altitude: $altitude,
+                baroRelAltM: $baroRelAltM,
+                gradePct: $gradePct,
                 speedKph: $speedKph,
                 accuracyMeters: $accuracyMeters,
                 recordedAt: $telemetryAt ?? $receivedAt,
@@ -128,6 +139,8 @@ class TelemetryIngestService
         float $latitude,
         float $longitude,
         ?float $altitude,
+        ?float $baroRelAltM,
+        ?float $gradePct,
         ?float $speedKph,
         ?float $accuracyMeters,
         Carbon $recordedAt,
@@ -159,10 +172,44 @@ class TelemetryIngestService
             'latitude' => $latitude,
             'longitude' => $longitude,
             'altitude' => $altitude,
+            'baro_rel_alt_m' => $baroRelAltM,
+            'grade_pct' => $gradePct,
             'speed_kph' => $speedKph !== null ? (int) round($speedKph) : null,
             'accuracy_meters' => $accuracyMeters,
             'recorded_at' => $recordedAt,
         ]);
+    }
+
+    /**
+     * @param array<string,mixed> $data
+     * @param string[] $keys
+     */
+    private function getBool(array $data, array $keys): ?bool
+    {
+        foreach ($keys as $key) {
+            if (!array_key_exists($key, $data)) {
+                continue;
+            }
+
+            $value = $data[$key];
+
+            if (is_bool($value)) {
+                return $value;
+            }
+
+            if (is_int($value) || is_float($value)) {
+                return ((float) $value) !== 0.0;
+            }
+
+            if (is_string($value)) {
+                $parsed = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                if ($parsed !== null) {
+                    return $parsed;
+                }
+            }
+        }
+
+        return null;
     }
 
     private function extractDeviceId(string $topic): ?string
