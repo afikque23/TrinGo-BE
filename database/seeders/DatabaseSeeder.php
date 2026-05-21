@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             NotificationCategorySeeder::class,
             NotificationTemplateSeeder::class,
             FuzzyLogicSeeder::class,
+            TemplatePerawatanSeeder::class,
         ]);
 
         // Create a default user for quick login (mobile/testing)

@@ -30,7 +30,7 @@
 
 @php
     $stats = $stats ?? ['uploaded_today' => 0, 'auto_published' => 0, 'flagged' => 0, 'deleted' => 0];
-    $filters = $filters ?? ['status' => 'all', 'brand' => 'all', 'range' => 'all'];
+    $filters = $filters ?? ['status' => 'all', 'brand' => 'all', 'range' => 'all', 'q' => ''];
 @endphp
 
 <!-- Monitoring Cards -->
@@ -94,34 +94,52 @@
 
 <!-- Filters -->
 <div class="bg-[#111111] border border-[#1E2939] rounded-[14px] p-4 mb-6">
-    <form method="GET" action="{{ route('admin.templates') }}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-            <label class="block text-xs uppercase tracking-wide text-[#6A7282] mb-2" style="font-family: Arial, sans-serif; letter-spacing: 0.6px;">Status Konten</label>
-            <select name="status" onchange="this.form.submit()" class="w-full h-[46px] bg-[#0A0A0A] border border-[#364153] rounded-[10px] px-4 text-white focus:outline-none focus:border-[#6B7C4F]">
-                <option value="all" {{ ($filters['status'] ?? 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
-                <option value="published" {{ ($filters['status'] ?? '') === 'published' ? 'selected' : '' }}>Published</option>
-                <option value="rejected" {{ ($filters['status'] ?? '') === 'rejected' ? 'selected' : '' }}>Flagged</option>
-            </select>
+    <form method="GET" action="{{ route('admin.templates') }}">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-xs uppercase tracking-wide text-[#6A7282] mb-2" style="font-family: Arial, sans-serif; letter-spacing: 0.6px;">Status Konten</label>
+                <select name="status" onchange="this.form.submit()" class="w-full h-[46px] bg-[#0A0A0A] border border-[#364153] rounded-[10px] px-4 text-white focus:outline-none focus:border-[#6B7C4F]">
+                    <option value="all" {{ ($filters['status'] ?? 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
+                    <option value="published" {{ ($filters['status'] ?? '') === 'published' ? 'selected' : '' }}>Published</option>
+                    <option value="rejected" {{ ($filters['status'] ?? '') === 'rejected' ? 'selected' : '' }}>Flagged</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs uppercase tracking-wide text-[#6A7282] mb-2" style="font-family: Arial, sans-serif; letter-spacing: 0.6px;">Motor</label>
+                <select name="brand" onchange="this.form.submit()" class="w-full h-[46px] bg-[#0A0A0A] border border-[#364153] rounded-[10px] px-4 text-white focus:outline-none focus:border-[#6B7C4F]">
+                    <option value="all" {{ ($filters['brand'] ?? 'all') === 'all' ? 'selected' : '' }}>Semua Brand</option>
+                    @foreach(($brandOptions ?? []) as $brandOption)
+                        <option value="{{ $brandOption }}" {{ ($filters['brand'] ?? '') === $brandOption ? 'selected' : '' }}>{{ $brandOption }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs uppercase tracking-wide text-[#6A7282] mb-2" style="font-family: Arial, sans-serif; letter-spacing: 0.6px;">Rentang Tanggal</label>
+                <select name="range" onchange="this.form.submit()" class="w-full h-[46px] bg-[#0A0A0A] border border-[#364153] rounded-[10px] px-4 text-white focus:outline-none focus:border-[#6B7C4F]">
+                    <option value="all" {{ ($filters['range'] ?? 'all') === 'all' ? 'selected' : '' }}>Semua Waktu</option>
+                    <option value="7d" {{ ($filters['range'] ?? '') === '7d' ? 'selected' : '' }}>7 Hari Terakhir</option>
+                    <option value="30d" {{ ($filters['range'] ?? '') === '30d' ? 'selected' : '' }}>30 Hari Terakhir</option>
+                    <option value="90d" {{ ($filters['range'] ?? '') === '90d' ? 'selected' : '' }}>90 Hari Terakhir</option>
+                </select>
+            </div>
         </div>
 
-        <div>
-            <label class="block text-xs uppercase tracking-wide text-[#6A7282] mb-2" style="font-family: Arial, sans-serif; letter-spacing: 0.6px;">Motor</label>
-            <select name="brand" onchange="this.form.submit()" class="w-full h-[46px] bg-[#0A0A0A] border border-[#364153] rounded-[10px] px-4 text-white focus:outline-none focus:border-[#6B7C4F]">
-                <option value="all" {{ ($filters['brand'] ?? 'all') === 'all' ? 'selected' : '' }}>Semua Brand</option>
-                @foreach(($brandOptions ?? []) as $brandOption)
-                    <option value="{{ $brandOption }}" {{ ($filters['brand'] ?? '') === $brandOption ? 'selected' : '' }}>{{ $brandOption }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div>
-            <label class="block text-xs uppercase tracking-wide text-[#6A7282] mb-2" style="font-family: Arial, sans-serif; letter-spacing: 0.6px;">Rentang Tanggal</label>
-            <select name="range" onchange="this.form.submit()" class="w-full h-[46px] bg-[#0A0A0A] border border-[#364153] rounded-[10px] px-4 text-white focus:outline-none focus:border-[#6B7C4F]">
-                <option value="all" {{ ($filters['range'] ?? 'all') === 'all' ? 'selected' : '' }}>Semua Waktu</option>
-                <option value="7d" {{ ($filters['range'] ?? '') === '7d' ? 'selected' : '' }}>7 Hari Terakhir</option>
-                <option value="30d" {{ ($filters['range'] ?? '') === '30d' ? 'selected' : '' }}>30 Hari Terakhir</option>
-                <option value="90d" {{ ($filters['range'] ?? '') === '90d' ? 'selected' : '' }}>90 Hari Terakhir</option>
-            </select>
+        <div class="mt-4">
+            <label class="block text-xs uppercase tracking-wide text-[#6A7282] mb-2" style="font-family: Arial, sans-serif; letter-spacing: 0.6px;">Cari</label>
+            <div class="flex gap-2">
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ $filters['q'] ?? '' }}"
+                    placeholder="Judul / deskripsi / hashtag"
+                    class="w-full h-[46px] bg-[#0A0A0A] border border-[#364153] rounded-[10px] px-4 text-white placeholder-white/40 focus:outline-none focus:border-[#6B7C4F]"
+                />
+                <button type="submit" class="h-[46px] px-4 bg-[#1A1A1A] border border-[#364153] rounded-[10px] text-sm text-white hover:bg-[#2A2A2A] transition-colors" style="font-family: Arial, sans-serif;">
+                    Cari
+                </button>
+            </div>
         </div>
     </form>
 </div>

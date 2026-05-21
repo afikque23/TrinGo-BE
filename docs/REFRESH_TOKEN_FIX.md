@@ -3,6 +3,7 @@
 ## 🔍 Root Cause Analysis
 
 ### Masalah yang terjadi:
+
 ```
 ❌ Token refresh failed: 404
 Response: {"success":false,"message":"User tidak ditemukan"}
@@ -13,15 +14,15 @@ Setiap 30 menit (saat access token expired), Flutter app gagal refresh token den
 ### Penyebab:
 
 1. **Backend Logic Error (FIXED ✅)**
-   - Endpoint refresh token mencari user berdasarkan `email` OR `$request->user()`
-   - Flutter app TIDAK mengirim `email` di request
-   - `$request->user()` return `null` karena access token sudah expired
-   - Akhirnya user tidak ditemukan → 404
+    - Endpoint refresh token mencari user berdasarkan `email` OR `$request->user()`
+    - Flutter app TIDAK mengirim `email` di request
+    - `$request->user()` return `null` karena access token sudah expired
+    - Akhirnya user tidak ditemukan → 404
 
 2. **Token Mismatch di Flutter App**
-   - User ID 14 menyimpan **HASHED token** (64 chars) di local storage
-   - Seharusnya menyimpan **PLAIN TEXT token** (128 chars)
-   - Backend tidak bisa verify hashed token
+    - User ID 14 menyimpan **HASHED token** (64 chars) di local storage
+    - Seharusnya menyimpan **PLAIN TEXT token** (128 chars)
+    - Backend tidak bisa verify hashed token
 
 ---
 
@@ -29,9 +30,21 @@ Setiap 30 menit (saat access token expired), Flutter app gagal refresh token den
 
 ### 1. **Fix Backend Refresh Token Logic**
 
-**File:** `app/Http/Controllers/Api/AuthController.php`
+**Files:**
+
+- `app/Http/Controllers/Api/AuthController.php`
+- `app/Models/User.php`
+
+**Perubahan utama:**
+
+- Backend sekarang mencari user dengan `refresh_token` yang dinormalisasi
+- Dukungan untuk kedua format token:
+    - `128 char` plain refresh token dari Flutter
+    - `64 char` SHA256 hash yang tersimpan di DB
+- Validasi refresh token sekarang menggunakan helper baru di model
 
 **Sebelum:**
+
 ```php
 // Find user by email or from token if authenticated
 $email = $request->input('email');
@@ -43,16 +56,75 @@ if (!$user) {
 ```
 
 **Sesudah:**
+
 ```php
-// Find user by refresh token
-$user = User::where('refresh_token', $request->refresh_token)->first();
+$refreshToken = $request->refresh_token;
+$refreshTokenHash = User::normalizeRefreshToken($refreshToken);
+
+$user = User::where('refresh_token', $refreshTokenHash)
+    ->where('refresh_token_expires_at', '>', now())
+    ->first();
 
 if (!$user) {
     return $this->errorResponse('Refresh token tidak valid. Silakan login kembali.', 401);
 }
 ```
 
+### 2. **Normalisasi dan verifikasi token di model**
+
+**File:** `app/Models/User.php`
+
+**Tambahan:**
+
+```php
+public static function normalizeRefreshToken(string $token): string
+{
+    if (ctype_xdigit($token) && strlen($token) === 64) {
+        return $token;
+    }
+
+    return hash('sha256', $token);
+}
+```
+
+**Verify token:**
+
+```php
+public function verifyRefreshToken(string $token): bool
+{
+    if (!$this->refresh_token || !$this->refresh_token_expires_at) {
+        return false;
+    }
+
+    if ($this->refresh_token_expires_at->isPast()) {
+        return false;
+    }
+
+    $tokenHash = self::normalizeRefreshToken($token);
+    return hash_equals($this->refresh_token, $tokenHash);
+}
+```
+
+### 3. **Alur refresh token yang diperbaiki**
+
+- Request refresh token harus dikirim body `refresh_token`
+- Backend normalisasi token dan lookup user dengan hash yang valid
+- Jika token valid dan belum kadaluarsa:
+    - lama access token dihapus
+    - akses token baru dibuat
+    - refresh token baru diterbitkan (90 hari)
+
+### 4. **Manfaat perbaikan**
+
+- ✅ Mengurangi 401 karena token hashed/format salah
+- ✅ Mendukung persistent login lebih reliable
+- ✅ Tidak lagi bergantung pada `email` atau session lama
+- ✅ Menjaga keamanan: token tetap disimpan sebagai hash di DB
+
+---
+
 **Perubahan:**
+
 - ✅ Cari user berdasarkan `refresh_token` di database
 - ✅ Tidak perlu `email` di request
 - ✅ Tidak perlu authenticated session
@@ -107,12 +179,13 @@ return $this->successResponse([
 
 ### Token Format:
 
-| Location | Format | Length | Example |
-|----------|--------|--------|---------|
-| **Client (Flutter)** | Plain Text | 128 chars | `cfbe22b22123f01ba4bf...` |
-| **Server (Database)** | SHA256 Hash | 64 chars | `ed5c8421c583266aa239...` |
+| Location              | Format      | Length    | Example                   |
+| --------------------- | ----------- | --------- | ------------------------- |
+| **Client (Flutter)**  | Plain Text  | 128 chars | `cfbe22b22123f01ba4bf...` |
+| **Server (Database)** | SHA256 Hash | 64 chars  | `ed5c8421c583266aa239...` |
 
 ### Security:
+
 - Server stores **hashed token** (SHA256)
 - Client stores **plain token**
 - On refresh: Server hashes plain token from client → compares with DB hash
@@ -127,11 +200,13 @@ return $this->successResponse([
 User ID 14 (`aryayusufaagnilfikri@gmail.com`) memiliki token yang salah di Flutter app.
 
 **Current token (WRONG):**
+
 ```
 Stored in Flutter: e313cb645a35bddf11295e3bd69537fa8f15824b... (64 chars - HASHED)
 ```
 
 **Correct token (NEW):**
+
 ```
 Generated: cfbe22b22123f01ba4bfb7f15cf57e94f46cd12801ca609ed01ba9013e5e81eb... (128 chars - PLAIN)
 ```
@@ -154,6 +229,7 @@ php test_refresh_token_fix.php
 ```
 
 **Result:**
+
 ```
 ✅ User found by refresh_token
 ✅ Token verification passed
@@ -164,6 +240,7 @@ php test_refresh_token_fix.php
 ### Flutter App Test (After Login)
 
 **Expected Flow:**
+
 1. Login → Receive `access_token` (30 min) & `refresh_token` (90 days)
 2. Use app normally
 3. After 30 minutes → Access token expires
@@ -172,6 +249,7 @@ php test_refresh_token_fix.php
 6. Continue using app
 
 **Check Logs:**
+
 ```
 I/flutter: 📡 Refreshing token...
 I/flutter: ✅ Token refreshed successfully!
@@ -180,6 +258,7 @@ I/flutter: New refresh token: xxx...
 ```
 
 **No More:**
+
 ```
 ❌ Token refresh failed: 404
 Response: {"success":false,"message":"User tidak ditemukan"}
@@ -192,11 +271,12 @@ Response: {"success":false,"message":"User tidak ditemukan"}
 ### Backend Files Modified:
 
 1. **app/Http/Controllers/Api/AuthController.php**
-   - Method: `refreshToken()`
-   - Change: Find user by `refresh_token` instead of `email`
-   - Remove: `device_id` & `device_name` update logic
+    - Method: `refreshToken()`
+    - Change: Find user by `refresh_token` instead of `email`
+    - Remove: `device_id` & `device_name` update logic
 
 ### Cache Cleared:
+
 ```bash
 php artisan cache:clear
 php artisan config:clear
@@ -204,6 +284,7 @@ php artisan route:clear
 ```
 
 ### Endpoint:
+
 ```
 POST /api/v1/motorcycle/auth/refresh-token
 Authorization: Not required (uses refresh_token to identify user)
@@ -245,30 +326,34 @@ Response (Success):
 ### If refresh still fails after login:
 
 1. **Check Flutter app sends correct token:**
-   ```dart
-   print('Refresh token length: ${refreshToken.length}'); // Should be 128
-   ```
+
+    ```dart
+    print('Refresh token length: ${refreshToken.length}'); // Should be 128
+    ```
 
 2. **Check request body:**
-   ```dart
-   print('Request: ${jsonEncode(body)}'); // Should have 'refresh_token'
-   ```
+
+    ```dart
+    print('Request: ${jsonEncode(body)}'); // Should have 'refresh_token'
+    ```
 
 3. **Check backend logs:**
-   ```bash
-   tail -f storage/logs/laravel.log
-   ```
+
+    ```bash
+    tail -f storage/logs/laravel.log
+    ```
 
 4. **Verify user in database:**
-   ```bash
-   php debug_user_14_tokens.php
-   ```
+    ```bash
+    php debug_user_14_tokens.php
+    ```
 
 ---
 
 ## 📞 Support
 
 Jika masalah masih terjadi setelah login ulang, check:
+
 - Flutter app version
 - API endpoint URL (pastikan ke `/api/v1/motorcycle/auth/refresh-token`)
 - Network connectivity

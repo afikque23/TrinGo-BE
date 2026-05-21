@@ -129,18 +129,11 @@ class FuzzyConfigController extends Controller
             ->orderBy('name')
             ->get(['id', 'key', 'name']);
 
-        $audits = FuzzyConfigAudit::query()
-            ->where('motor_type', $motorType)
-            ->latest('id')
-            ->limit(10)
-            ->get();
-
         return response()->json([
             'motor_types' => self::MOTOR_TYPES,
             'motor_type' => $motorType,
             'items' => $items,
             'available_components' => $availableComponents,
-            'audits' => $audits,
         ]);
     }
 

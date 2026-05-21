@@ -21,21 +21,7 @@ class FuzzyLogicController extends Controller
     public function index(): View
     {
         $motorTypes = MotorType::where('is_active', true)->get();
-        $auditLogs  = FuzzyAuditLog::with('admin')
-            ->latest()
-            ->limit(5)
-            ->get();
-
-        return view('admin.fuzzy.index', compact('motorTypes', 'auditLogs'));
-    }
-
-    public function audit(): View
-    {
-        $auditLogs = FuzzyAuditLog::with('admin')
-            ->latest()
-            ->paginate(30);
-
-        return view('admin.fuzzy.audit', compact('auditLogs'));
+        return view('admin.fuzzy.index', compact('motorTypes'));
     }
 
     public function getComponents(Request $request)

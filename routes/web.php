@@ -43,7 +43,6 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Fuzzy Logic (normalized, v2)
     Route::prefix('fuzzy')->name('admin.fuzzy.')->group(function () {
         Route::get('/', [FuzzyLogicController::class, 'index'])->name('index');
-        Route::get('/audit', [FuzzyLogicController::class, 'audit'])->name('audit');
 
         Route::get('/components', [FuzzyLogicController::class, 'getComponents'])->name('components');
         Route::post('/components', [FuzzyLogicController::class, 'storeComponent'])->name('components.store');

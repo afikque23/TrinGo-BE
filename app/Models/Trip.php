@@ -14,9 +14,11 @@ class Trip extends Model
 
     protected $fillable = [
         'vehicle_id',
+        'status',
         'started_by',
         'start_at',
         'end_at',
+        'duration_minutes',
         'distance_meters',
         'start_odometer',
         'end_odometer',

@@ -527,42 +527,6 @@
     </div>
   </template>
 
-  {{-- ══ SECTION 6 — Audit Log ══ --}}
-  <div class="fz-card"> {{-- Section 6 Audit --}}
-    <div class="flex items-center justify-between mb-5">
-      <h3 class="fz-section-title">Riwayat Perubahan</h3>
-      <a href="{{ route('admin.fuzzy.audit') }}" class="btn-subtle">Lihat Semua</a>
-    </div>
-    <div class="overflow-x-auto">
-      <table class="audit-table w-full">
-        <thead>
-          <tr>
-            @foreach(['Waktu','Admin','Komponen','Yang Diubah','Perubahan'] as $h)
-            <th class="text-left">{{ $h }}</th>
-            @endforeach
-          </tr>
-        </thead>
-        <tbody>
-          @foreach($auditLogs as $log)
-          <tr class="hover:bg-white/[0.02] transition-colors">
-            <td class="text-[#4a5565] whitespace-nowrap">{{ $log->created_at->format('d M Y, H:i') }}</td>
-            <td class="text-[#6a7282]">{{ $log->admin->email ?? '-' }}</td>
-            <td><span class="text-xs text-[#99a1af] bg-[#1e2939] px-2 py-0.5 rounded">{{ $log->component_name }} ({{ $log->motor_type }})</span></td>
-            <td class="text-[#99a1af]">{{ $log->field_changed }}</td>
-            <td>
-              <div class="flex items-center gap-1.5">
-                <span class="text-[#4a5565]">{{ $log->old_value ?? '-' }}</span>
-                <span class="text-[#1e2939]">→</span>
-                <span class="text-[#d1d5dc]">{{ $log->new_value ?? '-' }}</span>
-              </div>
-            </td>
-          </tr>
-          @endforeach
-        </tbody>
-      </table>
-    </div>
-  </div>
-
   @include('admin.fuzzy._modal_add_comp')
   @include('admin.fuzzy._modal_rule')
   @include('admin.fuzzy._dialog_delete')

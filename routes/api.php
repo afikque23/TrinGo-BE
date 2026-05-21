@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\NotificationPreferenceController;
 use App\Http\Controllers\Api\ReminderOptionController;
 use App\Http\Controllers\Api\ServiceTypeController;
 use App\Http\Controllers\Api\MaintenanceRecommendationController;
+use App\Http\Controllers\Api\MotorTypeController;
+use App\Http\Controllers\Api\RecommendationController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VehicleController;
@@ -77,6 +79,10 @@ Route::get('/files/avatars/{filename}', [FileController::class, 'serveAvatar'])
 // ============================================================================
 
 Route::middleware(['auth:sanctum,web'])->group(function () {
+    // Fuzzy master data (for Mobile App)
+    Route::get('/motor-types', [MotorTypeController::class, 'index']);
+    Route::get('/motor-types/{slug}/components', [MotorTypeController::class, 'components']);
+
     // Master Data - Reminder Options
     Route::get('/reminder-options', [ReminderOptionController::class, 'index']);
     
@@ -86,6 +92,19 @@ Route::middleware(['auth:sanctum,web'])->group(function () {
     Route::get('/vehicles/primary/usage-pattern', [VehicleController::class, 'getUsagePattern']);
     Route::get('/vehicles/primary/maintenance-recommendations', [MaintenanceRecommendationController::class, 'primary']);
     Route::get('/vehicles/{vehicle}/maintenance-recommendations', [MaintenanceRecommendationController::class, 'show']);
+
+    // AI Recommendation endpoints for Mobile UI (3 separate screens)
+    Route::prefix('motors/{motorId}')->group(function () {
+        Route::get('/home-insight', [RecommendationController::class, 'homeInsight']);
+        Route::get('/service-recommendation', [RecommendationController::class, 'serviceRecommendation']);
+        Route::get('/scores', [RecommendationController::class, 'scores']);
+
+        // Tracking endpoints
+        Route::post('/tracking/start', [\App\Http\Controllers\Api\TrackingController::class, 'start']);
+        Route::post('/tracking/stop', [\App\Http\Controllers\Api\TrackingController::class, 'stop']);
+        Route::get('/tracking/status', [\App\Http\Controllers\Api\TrackingController::class, 'status']);
+    });
+
     Route::post('/vehicles/{id}/set-primary', [VehicleController::class, 'setPrimary']);
     Route::apiResource('vehicles', VehicleController::class);
 

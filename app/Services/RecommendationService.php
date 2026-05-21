@@ -4,18 +4,19 @@ namespace App\Services;
 
 use App\Models\AiRecommendationCache;
 use App\Models\Vehicle;
-use App\Services\Ai\GeminiClient;
 use App\Services\Fuzzy\FuzzyEngine;
 use App\Services\Fuzzy\FuzzyEngineV2;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
 class RecommendationService
 {
+    private const CACHE_MAX_AGE_DAYS = 3;
+
     public function __construct(
         private readonly FuzzyEngine $fuzzyEngine,
         private readonly FuzzyEngineV2 $fuzzyEngineV2,
-        private readonly GeminiClient $geminiClient,
+        private readonly GeminiService $gemini,
+        private readonly GeminiPromptBuilder $promptBuilder,
     ) {
     }
 
@@ -28,6 +29,11 @@ class RecommendationService
         $fuzzy = $useV2
             ? $this->fuzzyEngineV2->evaluateMotorType($motorType, $inputs)
             : $this->fuzzyEngine->evaluateMotorType($motorType, $inputs);
+
+        if ($useV2 && empty($fuzzy['scores'] ?? [])) {
+            $useV2 = false;
+            $fuzzy = $this->fuzzyEngine->evaluateMotorType($motorType, $inputs);
+        }
         $scores = $fuzzy['scores'];
         $statuses = $fuzzy['statuses'];
         $thresholds = $fuzzy['thresholds'];
@@ -52,9 +58,8 @@ class RecommendationService
         $generatedAt = $cache?->generated_at;
 
         if ($shouldCallGemini) {
-            $prompt = $this->buildGeminiPrompt(
+            $prompt = $this->promptBuilder->build(
                 motorType: $motorType,
-                vehicle: $vehicle,
                 inputs: $inputs,
                 scores: $scores,
                 statuses: $statuses,
@@ -63,31 +68,62 @@ class RecommendationService
             $promptHash = hash('sha256', $prompt);
 
             try {
-                $res = $this->geminiClient->generate($prompt);
-                $parsed = $this->parseGeminiSections($res['text'] ?? '');
-                $sections = $parsed ?: $this->fallbackSections($scores, $statuses);
+                $result = $this->gemini->generateRecommendation(
+                    motorType: $motorType,
+                    inputs: $inputs,
+                    scores: $scores,
+                    statuses: $statuses,
+                    thresholds: $thresholds,
+                );
 
-                AiRecommendationCache::updateOrCreate([
-                    'user_id' => $userId,
-                    'vehicle_id' => $vehicle->id,
-                ], [
-                    'motor_type' => $motorType,
-                    'inputs' => $inputs,
-                    'scores' => $this->roundScores($scores),
-                    'statuses' => $statuses,
-                    'config_hash' => $configHash,
-                    'scores_hash' => $scoresHash,
-                    'prompt_hash' => $promptHash,
-                    'model' => $res['model'] ?? null,
-                    'sections' => $sections,
-                    'generated_at' => now(),
-                ]);
-                $usedCache = false;
-                $generatedAt = now();
+                if (is_array($result)) {
+                    $sections = $result;
+
+                    AiRecommendationCache::updateOrCreate([
+                        'user_id' => $userId,
+                        'vehicle_id' => $vehicle->id,
+                    ], [
+                        'motor_type' => $motorType,
+                        'inputs' => $inputs,
+                        'scores' => $this->roundScores($scores),
+                        'statuses' => $statuses,
+                        'config_hash' => $configHash,
+                        'scores_hash' => $scoresHash,
+                        'prompt_hash' => $promptHash,
+                        'model' => config('services.gemini.model'),
+                        'sections' => $sections,
+                        'generated_at' => now(),
+                    ]);
+
+                    $usedCache = false;
+                    $generatedAt = now();
+                } else {
+                    // Gemini failed: prefer existing cache; otherwise fallback.
+                    if (!$sections) {
+                        $sections = $this->gemini->generateFallback(
+                            $scores,
+                            $statuses,
+                            (float) ($inputs['intensity_km_per_day'] ?? 0),
+                        );
+                        $usedCache = false;
+                        $generatedAt = $generatedAt ?? now();
+                    } else {
+                        $usedCache = true;
+                    }
+                }
             } catch (\Throwable $e) {
                 Log::error('Gemini call failed: ' . $e->getMessage());
-                $sections = $sections ?: $this->fallbackSections($scores, $statuses);
-                $usedCache = (bool) $cache;
+                if (!$sections) {
+                    $sections = $this->gemini->generateFallback(
+                        $scores,
+                        $statuses,
+                        (float) ($inputs['intensity_km_per_day'] ?? 0),
+                    );
+                    $usedCache = false;
+                    $generatedAt = $generatedAt ?? now();
+                } else {
+                    $usedCache = true;
+                }
             }
         }
 
@@ -101,6 +137,35 @@ class RecommendationService
             'sections' => $sections,
             'used_cache' => $usedCache,
             'generated_at' => $generatedAt,
+        ];
+    }
+
+    /**
+     * Compute fuzzy scores/statuses without calling Gemini.
+     * Intended for fast UI refresh endpoints.
+     */
+    public function getVehicleFuzzySnapshot(Vehicle $vehicle): array
+    {
+        $inputs = $this->buildInputsFromVehicle($vehicle);
+
+        $motorType = strtolower($vehicle->tipe_motor ?? '');
+        $useV2 = $this->fuzzyEngineV2->supportsMotorType($motorType);
+        $fuzzy = $useV2
+            ? $this->fuzzyEngineV2->evaluateMotorType($motorType, $inputs)
+            : $this->fuzzyEngine->evaluateMotorType($motorType, $inputs);
+
+        if ($useV2 && empty($fuzzy['scores'] ?? [])) {
+            $useV2 = false;
+            $fuzzy = $this->fuzzyEngine->evaluateMotorType($motorType, $inputs);
+        }
+
+        return [
+            'vehicle_id' => $vehicle->id,
+            'motor_type' => $motorType,
+            'inputs' => $inputs,
+            'component_scores' => $this->roundScores($fuzzy['scores'] ?? []),
+            'component_statuses' => $fuzzy['statuses'] ?? [],
+            'thresholds' => $fuzzy['thresholds'] ?? [],
         ];
     }
 
@@ -164,6 +229,10 @@ class RecommendationService
             return true;
         }
 
+        if ($cache->generated_at && $cache->generated_at->lt(now()->subDays(self::CACHE_MAX_AGE_DAYS))) {
+            return true;
+        }
+
         if (($cache->config_hash ?? '') !== $configHash) {
             return true;
         }
@@ -197,114 +266,4 @@ class RecommendationService
         return $out;
     }
 
-    public function buildGeminiPrompt(
-        string $motorType,
-        Vehicle $vehicle,
-        array $inputs,
-        array $scores,
-        array $statuses,
-        array $thresholds,
-    ): string {
-        $lines = [];
-        $lines[] = 'Kamu adalah asisten perawatan motor.';
-        $lines[] = '';
-        $lines[] = 'Konteks motor:';
-        $lines[] = '- Tipe motor: ' . $motorType;
-        $lines[] = '- Odometer saat ini: ' . ((int) ($inputs['odometer'] ?? 0)) . ' km';
-        $lines[] = '- Jarak sejak servis terakhir: ' . round((float) ($inputs['distance_since_service_km'] ?? 0), 1) . ' km';
-        $lines[] = '- Durasi sejak servis terakhir: ' . round((float) ($inputs['duration_since_service_days'] ?? 0), 0) . ' hari';
-        $lines[] = '- Kecepatan rata-rata (30 hari): ' . round((float) ($inputs['avg_speed_kph'] ?? 0), 1) . ' km/jam';
-        $lines[] = '- Intensitas pakai (rata-rata 30 hari): ' . round((float) ($inputs['intensity_km_per_day'] ?? 0), 1) . ' km/hari';
-        $lines[] = '';
-        $lines[] = 'Skor kondisi per komponen (0-100, makin tinggi makin baik) + status:';
-
-        $sortedKeys = array_keys($scores);
-        sort($sortedKeys);
-        foreach ($sortedKeys as $key) {
-            $score = round((float) $scores[$key], 1);
-            $status = $statuses[$key] ?? 'normal';
-            $warn = Arr::get($thresholds, "$key.warn");
-            $critical = Arr::get($thresholds, "$key.critical");
-
-            $meta = ["status={$status}"];
-            if (is_numeric($warn)) {
-                $meta[] = 'warn<=' . (int) $warn;
-            }
-            if (is_numeric($critical)) {
-                $meta[] = 'critical<=' . (int) $critical;
-            }
-
-            $lines[] = "- {$key}: {$score} (" . implode(', ', $meta) . ')';
-        }
-
-        $lines[] = '';
-        $lines[] = 'Instruksi keluaran:';
-        $lines[] = '1) Balas dalam JSON valid (tanpa markdown, tanpa backtick).';
-        $lines[] = '2) Bahasa Indonesia ringkas, jelas, dan ramah.';
-        $lines[] = '3) Jangan menyebut nama sistem internal atau model AI.';
-        $lines[] = '4) Hindari klaim pasti; gunakan bahasa rekomendasi.';
-        $lines[] = '5) Maksimal 3 kalimat per section.';
-        $lines[] = '';
-        $lines[] = 'Keluarkan struktur JSON berikut:';
-        $lines[] = '{';
-        $lines[] = '  "wawasan_pintar": "...",';
-        $lines[] = '  "home_penggunaan_moderat": "...",';
-        $lines[] = '  "home_rekomendasi": "...",';
-        $lines[] = '  "service_ringkasan_pola": "...",';
-        $lines[] = '  "rekomendasi_komponen": [';
-        $lines[] = '    {"komponen": "...", "prioritas": "critical|warning|normal", "saran": "..."}';
-        $lines[] = '  ]';
-        $lines[] = '}';
-
-        return implode("\n", $lines);
-    }
-
-    private function parseGeminiSections(?string $text): ?array
-    {
-        $text = trim((string) $text);
-        if ($text === '') {
-            return null;
-        }
-
-        $json = json_decode($text, true);
-        if (is_array($json)) {
-            return $json;
-        }
-
-        $start = strpos($text, '{');
-        $end = strrpos($text, '}');
-        if ($start === false || $end === false || $end <= $start) {
-            return null;
-        }
-        $slice = substr($text, $start, $end - $start + 1);
-        $json = json_decode($slice, true);
-        return is_array($json) ? $json : null;
-    }
-
-    private function fallbackSections(array $scores, array $statuses): array
-    {
-        $critical = array_keys(array_filter($statuses, fn ($s) => $s === 'critical'));
-        $warning = array_keys(array_filter($statuses, fn ($s) => $s === 'warning'));
-
-        $wawasan = 'Pantau kondisi komponen secara berkala untuk menjaga kenyamanan dan keamanan berkendara.';
-        if (count($critical) > 0) {
-            $wawasan = 'Ada komponen yang perlu segera dicek untuk menjaga keamanan berkendara.';
-        } elseif (count($warning) > 0) {
-            $wawasan = 'Beberapa komponen mendekati waktu perawatan; rencanakan pengecekan dalam waktu dekat.';
-        }
-
-        return [
-            'wawasan_pintar' => $wawasan,
-            'home_penggunaan_moderat' => 'Sesuaikan gaya berkendara dan lakukan pemeriksaan rutin agar kondisi motor tetap prima.',
-            'home_rekomendasi' => 'Prioritaskan komponen berstatus darurat terlebih dahulu, lalu susul komponen yang mendekati waktu perawatan.',
-            'service_ringkasan_pola' => 'Ringkasan pola penggunaan dihitung dari jarak tempuh, intensitas, dan kecepatan rata-rata beberapa waktu terakhir.',
-            'rekomendasi_komponen' => array_values(array_map(function ($k) use ($statuses) {
-                return [
-                    'komponen' => $k,
-                    'prioritas' => $statuses[$k] ?? 'normal',
-                    'saran' => 'Lakukan inspeksi dan servis sesuai kebutuhan.',
-                ];
-            }, array_merge($critical, $warning))),
-        ];
-    }
 }

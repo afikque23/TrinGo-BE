@@ -17,6 +17,10 @@ API untuk fitur Tips Perawatan Motor telah selesai diimplementasikan berdasarkan
 - `2026_03_14_000007_create_tip_bookmarks_table.php` - Table untuk tracking bookmarks
 - `2026_03_14_000008_create_tip_shares_table.php` - Table untuk tracking shares
 
+### Database Migrations (Recommendation Signals)
+
+- `2026_05_13_000001_create_tip_search_logs_table.php` - Table untuk menyimpan riwayat keyword search (signal rekomendasi)
+
 ### Models (7 files)
 
 - `app/Models/Tip.php` - Model utama dengan relationships dan scopes
@@ -26,6 +30,10 @@ API untuk fitur Tips Perawatan Motor telah selesai diimplementasikan berdasarkan
 - `app/Models/TipLike.php` - Model untuk likes
 - `app/Models/TipBookmark.php` - Model untuk bookmarks
 - `app/Models/TipShare.php` - Model untuk shares
+
+### Models (Recommendation Signals)
+
+- `app/Models/TipSearchLog.php` - Model untuk log keyword search (user/device)
 
 ### Request Validation (5 files)
 
@@ -70,6 +78,8 @@ POST   /api/v1/motorcycle/tips/{id}/like        - Like/unlike tip
 POST   /api/v1/motorcycle/tips/{id}/bookmark    - Bookmark/unbookmark tip
 POST   /api/v1/motorcycle/tips/{id}/share       - Track share
 POST   /api/v1/motorcycle/tips/{id}/use-template - Create schedule from tip template
+
+Note: Endpoint list `GET /tips` dan `GET /public/tips` mendukung `sort_by=recommended` untuk rekomendasi personal (jika tersedia identity user/device).
 ```
 
 ## 📝 Features Implemented
@@ -97,6 +107,10 @@ POST   /api/v1/motorcycle/tips/{id}/use-template - Create schedule from tip temp
 - ✅ Popular (by views + likes)
 - ✅ Rating
 - ✅ Relevance
+
+### 3. Sorting (Personalized)
+
+- ✅ Recommended (personalized) via `sort_by=recommended`
 
 ### 4. Interactions
 
@@ -258,6 +272,70 @@ Content-Type: application/json
 
 - Counter disimpan di table `tips` untuk performance
 - Increment/decrement menggunakan query atomic
+
+## 🤖 Personalized Recommendation (Hybrid Recommender)
+
+Fitur rekomendasi ini meniru pola platform seperti YouTube/TikTok/Netflix dalam versi sederhana untuk halaman Tips & Trick.
+
+### Data Signals yang Dipakai
+
+- **Content-based**: kemiripan tag (relasi `tip_tag_pivot`)
+- **Implicit feedback**:
+    - Like -> menaikkan bobot tag (+2)
+    - Bookmark/Simpan -> menaikkan bobot tag (+3)
+- **Search intent**: keyword terakhir yang pernah dicari user/device (tabel `tip_search_logs`)
+- **Global ranking**: popularitas (likes/bookmarks/views) + recency (konten lebih baru)
+- **Diversification**: konten yang sudah di-like/bookmark diberi penalti agar tidak itu-itu saja
+
+### Cara Memakai (Client)
+
+1. Pastikan header `X-Device-ID` selalu dikirim (untuk guest mode) atau gunakan token (untuk user login).
+
+2. Panggil endpoint list tips dengan `sort_by=recommended`:
+
+```http
+GET /api/v1/motorcycle/tips?sort_by=recommended&limit=10
+Authorization: Bearer {token}
+X-Device-ID: {deviceId}
+```
+
+Atau untuk public browsing:
+
+```http
+GET /api/v1/motorcycle/public/tips?sort_by=recommended&limit=10
+X-Device-ID: {deviceId}
+```
+
+Jika tidak ada identity (tidak login dan tidak mengirim `X-Device-ID`), server akan fallback ke `popular`.
+
+### Log Search Keyword
+
+Saat client mengirim filter `search=...` pada endpoint list tips, backend akan otomatis menyimpan keyword ke `tip_search_logs` (dengan dedupe 10 menit).
+
+Contoh:
+
+```http
+GET /api/v1/motorcycle/tips?search=oli&sort_by=recommended
+Authorization: Bearer {token}
+X-Device-ID: {deviceId}
+```
+
+### Ringkasan Skoring (Untuk Laporan)
+
+Secara konsep, tiap konten `i` diberi skor untuk user/device `u`:
+
+$$
+Score(u,i)=TagScore(u,i)+SearchScore(u,i)+0.8\cdot Popularity(i)+0.3\cdot Recency(i)-PenaltySeen(u,i)
+$$
+
+Keterangan ringkas:
+
+- `TagScore`: jumlah bobot tag yang cocok dari histori like/bookmark
+- `SearchScore`: boost jika title/description/hashtags cocok keyword terakhir
+- `Popularity`: fungsi log dari `likes_count`, `bookmarks_count`, `views_count`
+- `Recency`: boost untuk konten terbaru
+- `PenaltySeen`: penalti jika sudah di-like / bookmark
+
 - Success percentage dihitung on-the-fly via accessor
 
 ### 4. Soft Deletes

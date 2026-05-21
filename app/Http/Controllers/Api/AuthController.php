@@ -241,15 +241,20 @@ class AuthController extends Controller
     public function refreshToken(RefreshTokenRequest $request): JsonResponse
     {
         try {
-            // Find user by refresh token (hash it first since it's stored hashed in DB)
-            $user = User::where('refresh_token', hash('sha256', $request->refresh_token))->first();
+            $refreshToken = $request->refresh_token;
+            $refreshTokenHash = User::normalizeRefreshToken($refreshToken);
+
+            // Find user by normalized refresh token hash
+            $user = User::where('refresh_token', $refreshTokenHash)
+                ->where('refresh_token_expires_at', '>', now())
+                ->first();
 
             if (!$user) {
                 return $this->errorResponse('Refresh token tidak valid. Silakan login kembali.', 401);
             }
 
-            // Verify refresh token is not expired
-            if (!$user->verifyRefreshToken($request->refresh_token)) {
+            // Verify refresh token is not expired and matches current stored secret
+            if (!$user->verifyRefreshToken($refreshToken)) {
                 return $this->errorResponse('Refresh token sudah kadaluarsa. Silakan login kembali.', 401);
             }
 

@@ -78,6 +78,18 @@ class User extends Authenticatable
     }
 
     /**
+     * Normalize refresh token into the stored hash value.
+     */
+    public static function normalizeRefreshToken(string $token): string
+    {
+        if (ctype_xdigit($token) && strlen($token) === 64) {
+            return $token;
+        }
+
+        return hash('sha256', $token);
+    }
+
+    /**
      * Verify refresh token
      */
     public function verifyRefreshToken(string $token): bool
@@ -90,7 +102,8 @@ class User extends Authenticatable
             return false;
         }
 
-        return hash_equals($this->refresh_token, hash('sha256', $token));
+        $tokenHash = self::normalizeRefreshToken($token);
+        return hash_equals($this->refresh_token, $tokenHash);
     }
 
     /**

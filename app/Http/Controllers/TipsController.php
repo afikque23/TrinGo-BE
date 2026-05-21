@@ -19,16 +19,177 @@ use App\Models\TipLike;
 use App\Models\TipBookmark;
 use App\Models\TipShare;
 use App\Models\TipRating;
+use App\Models\TipSearchLog;
 use App\Models\ServiceSchedule;
 use App\Models\Vehicle;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 
 class TipsController extends Controller
 {
     use ApiResponse;
+
+    /**
+     * Apply personalized recommendation sorting to a tips query.
+     *
+     * Signals used:
+     * - User/device implicit feedback: like (+2) & bookmark (+3) -> tag weights
+     * - Recent search keywords
+     * - Popularity and recency
+     */
+    private function applyRecommendedSorting(Builder $query, Request $request): Builder
+    {
+        $userId = $request->user()?->id;
+        $deviceId = $request->header('X-Device-ID');
+
+        // Fallback: if we have no identity, just use popular.
+        if (!$userId && (!$deviceId || trim((string) $deviceId) === '')) {
+            return $query->sortBy('popular');
+        }
+
+        // -------------------------
+        // 1) Build user tag weights
+        // -------------------------
+        $likeTagCountsQuery = DB::table('tip_likes')
+            ->join('tip_tag_pivot', 'tip_likes.tip_id', '=', 'tip_tag_pivot.tip_id');
+        $bookmarkTagCountsQuery = DB::table('tip_bookmarks')
+            ->join('tip_tag_pivot', 'tip_bookmarks.tip_id', '=', 'tip_tag_pivot.tip_id');
+
+        if ($userId) {
+            $likeTagCountsQuery->where('tip_likes.user_id', $userId);
+            $bookmarkTagCountsQuery->where('tip_bookmarks.user_id', $userId);
+        } else {
+            $likeTagCountsQuery->where('tip_likes.device_id', $deviceId);
+            $bookmarkTagCountsQuery->where('tip_bookmarks.device_id', $deviceId);
+        }
+
+        $likeTagCounts = $likeTagCountsQuery
+            ->select('tip_tag_pivot.tip_tag_id', DB::raw('COUNT(*) as c'))
+            ->groupBy('tip_tag_pivot.tip_tag_id')
+            ->pluck('c', 'tip_tag_id')
+            ->all();
+
+        $bookmarkTagCounts = $bookmarkTagCountsQuery
+            ->select('tip_tag_pivot.tip_tag_id', DB::raw('COUNT(*) as c'))
+            ->groupBy('tip_tag_pivot.tip_tag_id')
+            ->pluck('c', 'tip_tag_id')
+            ->all();
+
+        $tagWeights = [];
+        foreach ($likeTagCounts as $tagId => $count) {
+            $tagWeights[(int) $tagId] = ($tagWeights[(int) $tagId] ?? 0) + ((int) $count * 2);
+        }
+        foreach ($bookmarkTagCounts as $tagId => $count) {
+            $tagWeights[(int) $tagId] = ($tagWeights[(int) $tagId] ?? 0) + ((int) $count * 3);
+        }
+
+        arsort($tagWeights);
+        $tagWeights = array_slice($tagWeights, 0, 12, true);
+
+        // -------------------------
+        // 2) Recent search keywords
+        // -------------------------
+        $keywordQuery = TipSearchLog::query()->orderByDesc('created_at');
+        if ($userId) {
+            $keywordQuery->where('user_id', $userId);
+        } else {
+            $keywordQuery->whereNull('user_id')->where('device_id', $deviceId);
+        }
+
+        $keywords = $keywordQuery
+            ->where('created_at', '>=', now()->subDays(30))
+            ->limit(8)
+            ->pluck('keyword')
+            ->filter(fn ($k) => is_string($k) && $k !== '')
+            ->unique()
+            ->values()
+            ->take(4)
+            ->all();
+
+        // -------------------------
+        // 3) Compose scoring formula
+        // -------------------------
+        $bindings = [];
+        $scoreParts = [];
+
+        // Tag score from a subquery to avoid ONLY_FULL_GROUP_BY issues.
+        if (!empty($tagWeights)) {
+            $tagExprParts = [];
+            $tagBindings = [];
+            foreach ($tagWeights as $tagId => $weight) {
+                $tagExprParts[] = 'SUM(CASE WHEN tpp.tip_tag_id = ? THEN ? ELSE 0 END)';
+                $tagBindings[] = (int) $tagId;
+                $tagBindings[] = (int) $weight;
+            }
+
+            $tagExpr = implode(' + ', $tagExprParts);
+            $tagScoreSub = DB::table('tip_tag_pivot as tpp')
+                ->select('tpp.tip_id')
+                ->selectRaw($tagExpr . ' AS tag_score', $tagBindings)
+                ->whereIn('tpp.tip_tag_id', array_keys($tagWeights))
+                ->groupBy('tpp.tip_id');
+
+            $query->leftJoinSub($tagScoreSub, 'tag_scores', function ($join) {
+                $join->on('tag_scores.tip_id', '=', 'tips.id');
+            });
+
+            $scoreParts[] = '(COALESCE(tag_scores.tag_score, 0) * 1.0)';
+        }
+
+        // Search score: boost items matching recent search keywords.
+        foreach ($keywords as $keyword) {
+            $kwLike = '%' . mb_strtolower($keyword) . '%';
+            $scoreParts[] = '(' .
+                'CASE WHEN LOWER(tips.title) LIKE ? THEN 2 ELSE 0 END + ' .
+                'CASE WHEN LOWER(tips.description) LIKE ? THEN 1 ELSE 0 END + ' .
+                'CASE WHEN LOWER(CAST(tips.hashtags AS CHAR)) LIKE ? THEN 1 ELSE 0 END'
+            . ')';
+            $bindings[] = $kwLike;
+            $bindings[] = $kwLike;
+            $bindings[] = $kwLike;
+        }
+
+        // Popularity score.
+        $scoreParts[] = '((LOG(1 + tips.likes_count) * 1.0) + (LOG(1 + tips.bookmarks_count) * 1.5) + (LOG(1 + tips.views_count) * 0.2)) * 0.8';
+
+        // Recency score.
+        $scoreParts[] = '(1 / (1 + TIMESTAMPDIFF(DAY, tips.created_at, NOW()))) * 0.3';
+
+        // Penalty if already interacted.
+        if ($userId) {
+            $query->leftJoin('tip_likes as my_likes', function ($join) use ($userId) {
+                $join->on('my_likes.tip_id', '=', 'tips.id')
+                    ->where('my_likes.user_id', '=', $userId);
+            });
+            $query->leftJoin('tip_bookmarks as my_bookmarks', function ($join) use ($userId) {
+                $join->on('my_bookmarks.tip_id', '=', 'tips.id')
+                    ->where('my_bookmarks.user_id', '=', $userId);
+            });
+        } else {
+            $query->leftJoin('tip_likes as my_likes', function ($join) use ($deviceId) {
+                $join->on('my_likes.tip_id', '=', 'tips.id')
+                    ->where('my_likes.device_id', '=', $deviceId);
+            });
+            $query->leftJoin('tip_bookmarks as my_bookmarks', function ($join) use ($deviceId) {
+                $join->on('my_bookmarks.tip_id', '=', 'tips.id')
+                    ->where('my_bookmarks.device_id', '=', $deviceId);
+            });
+        }
+
+        $scoreParts[] = '-(CASE WHEN my_likes.id IS NULL THEN 0 ELSE 5 END)';
+        $scoreParts[] = '-(CASE WHEN my_bookmarks.id IS NULL THEN 0 ELSE 7 END)';
+
+        $scoreExpr = empty($scoreParts) ? '0' : implode(' + ', $scoreParts);
+
+        return $query
+            ->select('tips.*')
+            ->selectRaw($scoreExpr . ' AS reco_score', $bindings)
+            ->orderByDesc('reco_score')
+            ->orderByDesc('tips.created_at');
+    }
 
     /**
      * List tips/templates owned by the authenticated user.
@@ -42,6 +203,7 @@ class TipsController extends Controller
             ->where('user_id', $user->id);
 
         if ($request->filled('search')) {
+            TipSearchLog::logKeyword($user->id, $request->header('X-Device-ID'), (string) $request->search, 'tips_my');
             $query->search($request->search);
         }
 
@@ -82,7 +244,11 @@ class TipsController extends Controller
         }
 
         $sortBy = $request->input('sort_by', 'latest');
-        $query->sortBy($sortBy);
+        if ($sortBy === 'recommended') {
+            $this->applyRecommendedSorting($query, $request);
+        } else {
+            $query->sortBy($sortBy);
+        }
 
         $perPage = min($request->input('limit', 10), 50);
         $tips = $query->paginate($perPage);
@@ -117,6 +283,7 @@ class TipsController extends Controller
 
         // Apply filters
         if ($request->filled('search')) {
+            TipSearchLog::logKeyword($request->user()?->id, $request->header('X-Device-ID'), (string) $request->search, 'tips_index');
             $query->search($request->search);
         }
 
@@ -166,7 +333,11 @@ class TipsController extends Controller
 
         // Apply sorting
         $sortBy = $request->input('sort_by', 'latest');
-        $query->sortBy($sortBy);
+        if ($sortBy === 'recommended') {
+            $this->applyRecommendedSorting($query, $request);
+        } else {
+            $query->sortBy($sortBy);
+        }
 
         // Pagination
         $perPage = min($request->input('limit', 10), 50);
