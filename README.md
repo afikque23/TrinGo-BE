@@ -29,48 +29,56 @@ TringGo-BE adalah backend server berbasis **Laravel** untuk aplikasi manajemen s
 Jika tim pengembang (`arya` / `aji`) ingin menjalankan project ini di lokal, ikuti langkah berikut:
 
 1. **Clone repository & pindah ke branch masing-masing:**
-   ```bash
-   git clone https://github.com/afikque23/TrinGo-BE.git
-   cd TrinGo-BE
-   git checkout <nama-branch-kamu> # (contoh: git checkout arya)
-   ```
+
+    ```bash
+    git clone https://github.com/afikque23/TrinGo-BE.git
+    cd TrinGo-BE
+    git checkout <nama-branch-kamu> # (contoh: git checkout arya)
+    ```
 
 2. **Install dependencies:**
-   ```bash
-   composer install
-   ```
+
+    ```bash
+    composer install
+    ```
 
 3. **Duplikat file environment dan konfigurasikan:**
-   ```bash
-   cp .env.example .env
-   ```
-   > 💡 **Info:** Buka file `.env` dan pastikan Anda mengisi kredensial database (`DB_*`) dan kredensial broker MQTT (`MQTT_*`) dengan benar.
+
+    ```bash
+    cp .env.example .env
+    ```
+
+    > 💡 **Info:** Buka file `.env` dan pastikan Anda mengisi kredensial database (`DB_*`) dan kredensial broker MQTT (`MQTT_*`) dengan benar.
 
 4. **Generate Application Key:**
-   ```bash
-   php artisan key:generate
-   ```
+
+    ```bash
+    php artisan key:generate
+    ```
 
 5. **Jalankan Migrasi Database:**
-   ```bash
-   php artisan migrate
-   ```
-   *(Gunakan perintah `php artisan migrate --seed` jika membutuhkan dummy data)*
+
+    ```bash
+    php artisan migrate
+    ```
+
+    _(Gunakan perintah `php artisan migrate --seed` jika membutuhkan dummy data)_
 
 6. **Jalankan Server Lokal:**
-   ```bash
-   php artisan serve
-   ```
+    ```bash
+    php artisan serve
+    ```
 
 ## 📚 Dokumentasi Ekstra
 
 Anda bisa membaca kumpulan panduan teknis yang lebih komprehensif pada folder `docs/`, di antaranya:
+
 - [📖 Tracking API Integration Guide](docs/FLUTTER_TRACKING_API.md)
 - [📖 Authentication & Token Rotation](docs/TOKEN_ROTATION_IMPLEMENTATION_COMPLETE.md)
 - [📖 Push Notification FCM Guide](docs/FCM_INTEGRATION_COMPLETE.md)
 
-*Note: Anda bisa meng-import Postman Collection yang juga tersedia di dalam direktori `docs/` untuk keperluan uji coba endpoint API.*
+_Note: Anda bisa meng-import Postman Collection yang juga tersedia di dalam direktori `docs/` untuk keperluan uji coba endpoint API._
 
 ---
-*Developed with ❤️ by the TrinGo Team.*
-  
+
+_Developed with ❤️ by the TrinGo Team._
