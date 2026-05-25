@@ -103,6 +103,7 @@ Route::middleware(['auth:sanctum,web'])->group(function () {
         Route::post('/tracking/start', [\App\Http\Controllers\Api\TrackingController::class, 'start']);
         Route::post('/tracking/stop', [\App\Http\Controllers\Api\TrackingController::class, 'stop']);
         Route::get('/tracking/status', [\App\Http\Controllers\Api\TrackingController::class, 'status']);
+        Route::get('/tracking/last-location', [\App\Http\Controllers\Api\TrackingController::class, 'lastLocation']);
     });
 
     Route::post('/vehicles/{id}/set-primary', [VehicleController::class, 'setPrimary']);
