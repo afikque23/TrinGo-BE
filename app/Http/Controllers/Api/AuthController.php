@@ -47,7 +47,7 @@ class AuthController extends Controller
             $otp = OtpVerification::createOtp(
                 $user->email,
                 'email_verification',
-                10
+                (int) config('otp.expiry_minutes', 10)
             );
 
             // Send OTP via email
@@ -56,8 +56,7 @@ class AuthController extends Controller
             } catch (\Exception $mailError) {
                 Log::warning('Email sending failed: ' . $mailError->getMessage());
             }
-            
-            // For development, return OTP in response (REMOVE IN PRODUCTION!)
+
             $responseData = [
                 'user' => [
                     'id' => $user->id,
@@ -65,12 +64,15 @@ class AuthController extends Controller
                     'email' => $user->email,
                     'phone' => $user->phone,
                 ],
-                'otp' => $otp->otp, // REMOVE THIS IN PRODUCTION!
                 'expires_at' => $otp->expires_at,
             ];
 
+            if (config('otp.expose_in_response', false)) {
+                $responseData['otp'] = $otp->otp;
+            }
+
             return $this->createdResponse($responseData, 'Registrasi berhasil. Kode OTP telah dikirim ke email Anda.');
-            
+
         } catch (\Exception $e) {
             Log::error('Registration error: ' . $e->getMessage());
             return $this->errorResponse('Registrasi gagal. Silakan coba lagi.', 500);
@@ -99,7 +101,7 @@ class AuthController extends Controller
             // If email verification, update user
             if ($request->type === 'email_verification') {
                 $user = User::where('email', $request->email)->first();
-                
+
                 if ($user) {
                     $user->update([
                         'email_verified_at' => now(),
@@ -130,7 +132,7 @@ class AuthController extends Controller
             }
 
             return $this->successResponse(null, 'OTP berhasil diverifikasi');
-            
+
         } catch (\Exception $e) {
             Log::error('OTP verification error: ' . $e->getMessage());
             return $this->errorResponse('Verifikasi OTP gagal', 500);
@@ -152,7 +154,7 @@ class AuthController extends Controller
             $otp = OtpVerification::createOtp(
                 $request->email,
                 $request->type,
-                10
+                (int) config('otp.expiry_minutes', 10)
             );
 
             // Send OTP via email
@@ -163,12 +165,16 @@ class AuthController extends Controller
                 Log::warning('Email sending failed: ' . $mailError->getMessage());
             }
 
-            // For development (REMOVE IN PRODUCTION!)
-            return $this->successResponse([
-                'otp' => $otp->otp, // REMOVE THIS IN PRODUCTION!
+            $data = [
                 'expires_at' => $otp->expires_at,
-            ], 'Kode OTP baru telah dikirim ke email Anda');
-            
+            ];
+
+            if (config('otp.expose_in_response', false)) {
+                $data['otp'] = $otp->otp;
+            }
+
+            return $this->successResponse($data, 'Kode OTP baru telah dikirim ke email Anda');
+
         } catch (\Exception $e) {
             Log::error('Resend OTP error: ' . $e->getMessage());
             return $this->errorResponse('Gagal mengirim ulang OTP', 500);
@@ -196,12 +202,28 @@ class AuthController extends Controller
             // Check if email is verified
             if (!$user->email_verified_at) {
                 // Generate OTP
-                $otp = OtpVerification::createOtp($user->email, 'email_verification', 10);
-                
-                return $this->errorResponse('Email belum diverifikasi. Kode OTP telah dikirim ke email Anda.', 403, [
+                $otp = OtpVerification::createOtp(
+                    $user->email,
+                    'email_verification',
+                    (int) config('otp.expiry_minutes', 10)
+                );
+
+                // Send OTP via email
+                try {
+                    Mail::to($user->email)->send(new \App\Mail\OtpMail($otp->otp, 'email_verification', $user->name));
+                } catch (\Exception $mailError) {
+                    Log::warning('Email sending failed: ' . $mailError->getMessage());
+                }
+
+                $meta = [
                     'requires_verification' => true,
-                    'otp' => $otp->otp, // REMOVE IN PRODUCTION!
-                ]);
+                ];
+
+                if (config('otp.expose_in_response', false)) {
+                    $meta['otp'] = $otp->otp;
+                }
+
+                return $this->errorResponse('Email belum diverifikasi. Kode OTP telah dikirim ke email Anda.', 403, $meta);
             }
 
             // Update last login
@@ -228,7 +250,7 @@ class AuthController extends Controller
                 'token_type' => 'Bearer',
                 'expires_in' => 1800, // 30 minutes in seconds
             ], 'Login berhasil');
-            
+
         } catch (\Exception $e) {
             Log::error('Login error: ' . $e->getMessage());
             return $this->errorResponse('Login gagal', 500);
@@ -287,13 +309,13 @@ class AuthController extends Controller
     {
         try {
             $user = $request->user();
-            
+
             // Delete all access tokens
             $user->tokens()->delete();
-            
+
             // Revoke refresh token
             $user->revokeRefreshToken();
-            
+
             return $this->successResponse(null, 'Logout berhasil');
         } catch (\Exception $e) {
             Log::error('Logout error: ' . $e->getMessage());
@@ -308,7 +330,7 @@ class AuthController extends Controller
     {
         try {
             $user = $request->user();
-            
+
             return $this->successResponse(
                 new ProfileResource($user),
                 'Data user berhasil diambil'
@@ -331,7 +353,7 @@ class AuthController extends Controller
             $otp = OtpVerification::createOtp(
                 $request->email,
                 'password_reset',
-                10
+                (int) config('otp.expiry_minutes', 10)
             );
 
             // Send OTP via email
@@ -341,12 +363,16 @@ class AuthController extends Controller
                 Log::warning('Email sending failed: ' . $mailError->getMessage());
             }
 
-            // For development (REMOVE IN PRODUCTION!)
-            return $this->successResponse([
-                'otp' => $otp->otp, // REMOVE THIS IN PRODUCTION!
+            $data = [
                 'expires_at' => $otp->expires_at,
-            ], 'Kode OTP untuk reset password telah dikirim ke email Anda');
-            
+            ];
+
+            if (config('otp.expose_in_response', false)) {
+                $data['otp'] = $otp->otp;
+            }
+
+            return $this->successResponse($data, 'Kode OTP untuk reset password telah dikirim ke email Anda');
+
         } catch (\Exception $e) {
             Log::error('Forgot password error: ' . $e->getMessage());
             return $this->errorResponse('Gagal mengirim kode OTP', 500);
@@ -383,7 +409,7 @@ class AuthController extends Controller
             $user->tokens()->delete();
 
             return $this->successResponse(null, 'Password berhasil direset. Silakan login dengan password baru Anda.');
-            
+
         } catch (\Exception $e) {
             Log::error('Reset password error: ' . $e->getMessage());
             return $this->errorResponse('Reset password gagal', 500);
@@ -417,7 +443,7 @@ class AuthController extends Controller
             $user->tokens()->where('id', '!=', $request->user()->currentAccessToken()->id)->delete();
 
             return $this->successResponse(null, 'Password berhasil diubah');
-            
+
         } catch (\Exception $e) {
             Log::error('Change password error: ' . $e->getMessage());
             return $this->errorResponse('Gagal mengubah password', 500);
