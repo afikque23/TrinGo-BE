@@ -14,13 +14,24 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-gray-950 text-gray-100 font-sans antialiased">
-    <div class="flex min-h-screen">
+    <div x-data="{ sidebarOpen: false }" class="flex min-h-screen">
+        <!-- Sidebar Backdrop for Mobile -->
+        <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false" class="fixed inset-0 z-40 bg-black/60 lg:hidden transition-opacity duration-300"></div>
+
         <!-- Sidebar -->
-        <aside class="fixed left-0 top-0 w-64 h-screen bg-[#111111] border-r border-[#1E2939] flex flex-col">
+        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'" class="fixed left-0 top-0 z-50 w-64 h-screen bg-[#111111] border-r border-[#1E2939] flex flex-col transition-transform duration-300 transform -translate-x-full lg:translate-x-0">
             <!-- Header -->
-            <div class="px-6 py-5 border-b border-[#1E2939]">
-                <h1 class="text-lg font-bold text-white" style="font-family: Arial, sans-serif;">MotoTracker</h1>
-                <p class="text-xs text-[#6A7282] mt-0.5 uppercase tracking-wider" style="font-family: Arial, sans-serif;">ADMIN PANEL</p>
+            <div class="px-6 py-5 border-b border-[#1E2939] flex items-center justify-between">
+                <div>
+                    <h1 class="text-lg font-bold text-white" style="font-family: Arial, sans-serif;">MotoTracker</h1>
+                    <p class="text-xs text-[#6A7282] mt-0.5 uppercase tracking-wider" style="font-family: Arial, sans-serif;">ADMIN PANEL</p>
+                </div>
+                <!-- Close button for mobile -->
+                <button @click="sidebarOpen = false" class="text-gray-400 hover:text-white lg:hidden focus:outline-none" title="Close Sidebar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
             </div>
 
             <!-- Navigation -->
@@ -106,19 +117,26 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 ml-64 overflow-auto bg-[#0a0a0a]">
+        <main class="flex-1 lg:ml-64 overflow-auto bg-[#0a0a0a]">
             <!-- Top Bar -->
-            <header class="fixed top-0 left-64 right-0 bg-[#111111] border-b border-[#1E2939] px-8 py-4 z-40">
+            <header class="fixed top-0 left-0 lg:left-64 right-0 bg-[#111111] border-b border-[#1E2939] px-4 sm:px-8 py-4 z-40">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-2xl font-semibold text-white">@yield('page-title', 'Dashboard')</h2>
+                    <div class="flex items-center gap-3">
+                        <button @click="sidebarOpen = !sidebarOpen" class="text-gray-400 hover:text-white lg:hidden focus:outline-none" title="Toggle Sidebar">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                        <h2 class="text-xl sm:text-2xl font-semibold text-white">@yield('page-title', 'Dashboard')</h2>
+                    </div>
                     <div class="flex items-center gap-4">
-                        <span class="text-sm text-gray-400">{{ now()->format('l, d F Y') }}</span>
+                        <span class="text-sm text-gray-400 hidden sm:inline">{{ now()->format('l, d F Y') }}</span>
                     </div>
                 </div>
             </header>
 
             <!-- Page Content -->
-            <div class="p-8 pt-[89px]">
+            <div class="p-4 sm:p-8 pt-[89px]">
                 @if (session('success'))
                     <div class="bg-green-500/10 border border-green-500/50 text-green-400 px-4 py-3 rounded-lg mb-6">
                         {{ session('success') }}
