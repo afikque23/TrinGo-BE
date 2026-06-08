@@ -171,12 +171,12 @@
   </template>
 
   {{-- ── Page Header ── --}}
-  <div class="flex items-start justify-between mb-2">
+  <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-2">
     <div>
-      <h2 class="text-[#e2e8f0] text-2xl font-bold mb-1">Konfigurasi Fuzzy Logic</h2>
+      <h2 class="text-[#e2e8f0] text-xl sm:text-2xl font-bold mb-1">Konfigurasi Fuzzy Logic</h2>
       <p class="text-[#6a7282] text-sm">Atur parameter sistem rekomendasi perawatan motor</p>
     </div>
-    <button @click="saveAll()" class="btn-olive h-10 px-5">
+    <button @click="saveAll()" class="btn-olive h-10 px-5 shrink-0">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
       <span>Simpan Semua Perubahan</span>
       <span x-show="hasChanges" class="w-2 h-2 rounded-full bg-yellow-400"></span>
@@ -193,17 +193,19 @@
       </button>
     </div>
 
-    {{-- Motor Tabs --}}
-    <div class="flex gap-1 bg-[#0a0a0a] border border-gray-800 rounded-lg p-1 w-fit mb-5">
-      @foreach($motorTypes as $mt)
-      <button
-        :class="activeTab === {{ $mt->id }} ? 'bg-[#6b7c4f] text-white font-medium' : 'text-gray-400 hover:text-gray-300'"
-        @click="switchTab({{ $mt->id }})"
-        class="relative px-4 py-1.5 rounded-md text-sm transition-colors"
-        style="font-family: Arial, sans-serif;">
-        {{ $mt->name }}
-      </button>
-      @endforeach
+    {{-- Motor Tabs (scrollable on mobile) --}}
+    <div class="overflow-x-auto mb-5">
+      <div class="flex gap-1 bg-[#0a0a0a] border border-gray-800 rounded-lg p-1 w-max min-w-full sm:w-fit">
+        @foreach($motorTypes as $mt)
+        <button
+          :class="activeTab === {{ $mt->id }} ? 'bg-[#6b7c4f] text-white font-medium' : 'text-gray-400 hover:text-gray-300'"
+          @click="switchTab({{ $mt->id }})"
+          class="relative px-4 py-1.5 rounded-md text-sm transition-colors whitespace-nowrap"
+          style="font-family: Arial, sans-serif;">
+          {{ $mt->name }}
+        </button>
+        @endforeach
+      </div>
     </div>
 
     {{-- Component Badges --}}
@@ -284,7 +286,7 @@
         <button @click="resetThreshold()" class="btn-subtle">Reset ke Default</button>
       </div>
 
-      <div class="grid grid-cols-3 gap-4 mb-4">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
         <div>
           <label class="block text-xs text-[#6a7282] mb-2 uppercase tracking-widest">Warn</label>
           <div class="flex items-center gap-2">
@@ -350,7 +352,7 @@
         </template>
       </div>
 
-      <div class="grid grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="space-y-4">
           <template x-for="lbl in ['low','medium','high']" :key="lbl">
             <div>
@@ -451,7 +453,7 @@
   <template x-if="selectedComp">
     <div class="fz-card"> {{-- Section 5 Test --}}
       <h3 class="fz-section-title mb-5">Test Konfigurasi</h3>
-      <div class="grid grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-3">
             <template x-for="v in allVars" :key="v.key">

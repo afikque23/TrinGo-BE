@@ -1,9 +1,7 @@
 <!-- Service Types Tab Content -->
 
-<!-- (Info card will be rendered beside the Add button below) -->
-
 <!-- Info + Action Row -->
-<div class="flex items-center justify-between gap-4 mb-4">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
     <div class="flex-1 bg-[#0A0A0A] border border-[#1E2939] rounded-[10px] p-4">
         <div class="flex items-start gap-3">
             <div class="flex-shrink-0 mt-0.5">
@@ -19,7 +17,7 @@
     </div>
 
     <div class="flex-shrink-0">
-        <button @click="showAddServiceModal = true" class="h-9 px-4 bg-[#6B7C4F] text-white text-sm rounded-[10px] hover:bg-[#5A6A40] transition-colors flex items-center gap-2" style="font-family: Arial, sans-serif;">
+        <button @click="showAddServiceModal = true" class="w-full sm:w-auto h-9 px-4 bg-[#6B7C4F] text-white text-sm rounded-[10px] hover:bg-[#5A6A40] transition-colors flex items-center justify-center gap-2" style="font-family: Arial, sans-serif;">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -28,8 +26,60 @@
     </div>
 </div>
 
-<!-- Table Container -->
-<div class="mt-4 bg-[#111111] border border-[#1E2939] rounded-[14px] p-px overflow-hidden">
+<!-- Mobile Card View -->
+<div class="block md:hidden space-y-3">
+    @forelse($serviceTypes as $type)
+    <div class="bg-[#111111] border border-[#1E2939] rounded-[14px] p-4">
+        <div class="flex items-start justify-between gap-3 mb-3">
+            <div class="flex items-center gap-2 min-w-0">
+                <svg class="w-3.5 h-4 text-[#4A5565] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+                <span class="text-sm font-medium text-white truncate" style="font-family: Arial, sans-serif;">{{ $type->name }}</span>
+            </div>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+                <div class="w-2 h-2 rounded-full {{ $type->is_active ? 'bg-[#6B7C4F]' : 'bg-[#4A5565]' }}"></div>
+                <span class="text-xs text-[#D1D5DC]" style="font-family: Arial, sans-serif;">{{ $type->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+            </div>
+        </div>
+        <p class="text-xs text-[#99A1AF] mb-3" style="font-family: Arial, sans-serif;">{{ $type->description ?? '-' }}</p>
+        <div class="grid grid-cols-2 gap-2 mb-3">
+            <div class="bg-[#0A0A0A] rounded-[8px] px-3 py-2">
+                <p class="text-[10px] text-[#4A5565] uppercase tracking-wider mb-0.5" style="font-family: Arial, sans-serif;">Digunakan</p>
+                <p class="text-xs text-[#D1D5DC]" style="font-family: Arial, sans-serif;">{{ $type->services_count }} service</p>
+            </div>
+            <div class="bg-[#0A0A0A] rounded-[8px] px-3 py-2">
+                <p class="text-[10px] text-[#4A5565] uppercase tracking-wider mb-0.5" style="font-family: Arial, sans-serif;">Tanggal Dibuat</p>
+                <p class="text-xs text-[#D1D5DC]" style="font-family: Arial, sans-serif;">{{ $type->created_at->format('d M Y') }}</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button @click="openEditService({{ json_encode($type) }})" class="flex-1 h-9 bg-[#1A1A1A] rounded-[8px] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center gap-1.5" title="Edit">
+                <svg class="w-3.5 h-3.5 text-[#D1D5DC]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.17" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                <span class="text-xs text-[#D1D5DC]" style="font-family: Arial, sans-serif;">Edit</span>
+            </button>
+            <form action="{{ route('admin.filters.service-types.toggle-status', $type->id) }}" method="POST" class="flex-1">
+                @csrf
+                @method('PATCH')
+                <button type="submit" class="w-full h-9 rounded-[8px] hover:opacity-80 transition-all flex items-center justify-center gap-1.5 {{ $type->is_active ? 'bg-[#6B7C4F]' : 'bg-[#FB2C36]' }}" title="Toggle Status">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.17" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <span class="text-xs text-white" style="font-family: Arial, sans-serif;">{{ $type->is_active ? 'Nonaktifkan' : 'Aktifkan' }}</span>
+                </button>
+            </form>
+            <button @click="openDeleteService({{ json_encode($type) }})" class="h-9 px-3 bg-[#FB2C36] rounded-[8px] hover:bg-[#E01B25] transition-colors flex items-center justify-center" title="Delete">
+                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.17" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+        </div>
+    </div>
+    @empty
+    <div class="bg-[#111111] border border-[#1E2939] rounded-[14px] px-4 py-8 text-center">
+        <p class="text-sm text-[#99A1AF]" style="font-family: Arial, sans-serif;">Belum ada jenis service yang ditambahkan.</p>
+    </div>
+    @endforelse
+</div>
+
+<!-- Desktop Table View -->
+<div class="hidden md:block bg-[#111111] border border-[#1E2939] rounded-[14px] p-px overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full table-fixed">
             <colgroup>
@@ -51,21 +101,11 @@
                             <span class="text-xs font-normal uppercase tracking-wider text-[#99A1AF]" style="font-family: Arial, sans-serif;">Nama Jenis Service</span>
                         </div>
                     </th>
-                    <th class="px-4 py-5 text-left">
-                        <span class="text-xs font-normal uppercase tracking-wider text-[#99A1AF]" style="font-family: Arial, sans-serif;">Deskripsi</span>
-                    </th>
-                    <th class="px-4 py-5 text-center">
-                        <span class="text-xs font-normal uppercase tracking-wider text-[#99A1AF]" style="font-family: Arial, sans-serif;">Digunakan</span>
-                    </th>
-                    <th class="px-4 py-5 text-left">
-                        <span class="text-xs font-normal uppercase tracking-wider text-[#99A1AF]" style="font-family: Arial, sans-serif;">Status</span>
-                    </th>
-                    <th class="px-4 py-5 text-left">
-                        <span class="text-xs font-normal uppercase tracking-wider text-[#99A1AF]" style="font-family: Arial, sans-serif;">Tanggal Dibuat</span>
-                    </th>
-                    <th class="px-4 py-5 text-center">
-                        <span class="text-xs font-normal uppercase tracking-wider text-[#99A1AF]" style="font-family: Arial, sans-serif;">Aksi</span>
-                    </th>
+                    <th class="px-4 py-5 text-left"><span class="text-xs font-normal uppercase tracking-wider text-[#99A1AF]" style="font-family: Arial, sans-serif;">Deskripsi</span></th>
+                    <th class="px-4 py-5 text-center"><span class="text-xs font-normal uppercase tracking-wider text-[#99A1AF]" style="font-family: Arial, sans-serif;">Digunakan</span></th>
+                    <th class="px-4 py-5 text-left"><span class="text-xs font-normal uppercase tracking-wider text-[#99A1AF]" style="font-family: Arial, sans-serif;">Status</span></th>
+                    <th class="px-4 py-5 text-left"><span class="text-xs font-normal uppercase tracking-wider text-[#99A1AF]" style="font-family: Arial, sans-serif;">Tanggal Dibuat</span></th>
+                    <th class="px-4 py-5 text-center"><span class="text-xs font-normal uppercase tracking-wider text-[#99A1AF]" style="font-family: Arial, sans-serif;">Aksi</span></th>
                 </tr>
             </thead>
 

@@ -69,9 +69,10 @@
 <!-- Charts Section -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
     <!-- Aktivitas Pengguna Mingguan -->
-    <div class="lg:col-span-2 bg-[#111111] border border-[#1E2939] rounded-[14px] p-[21px]">
+    <div class="lg:col-span-2 bg-[#111111] border border-[#1E2939] rounded-[14px] p-4 sm:p-[21px] overflow-hidden">
         <h3 class="text-base font-bold text-white mb-4" style="font-family: Arial, sans-serif;">Aktivitas Pengguna Mingguan</h3>
-        <div class="flex items-end justify-between gap-2 h-48">
+        <div class="w-full overflow-x-auto pb-2">
+            <div class="flex items-end justify-between gap-2 h-48 min-w-[320px]">
             <div class="flex flex-col items-center flex-1 gap-2">
                 <div class="w-full h-0 bg-[#6B7C4F] rounded-t"></div>
                 <span class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">Sen</span>
@@ -99,6 +100,7 @@
             <div class="flex flex-col items-center flex-1 gap-2">
                 <div class="w-full h-0 bg-[#6B7C4F] rounded-t"></div>
                 <span class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">Min</span>
+            </div>
             </div>
         </div>
     </div>
@@ -137,9 +139,10 @@
 </div>
 
 <!-- Pertumbuhan Tips Perawatan -->
-<div class="bg-[#111111] border border-[#1E2939] rounded-[14px] p-[21px]">
+<div class="bg-[#111111] border border-[#1E2939] rounded-[14px] p-4 sm:p-[21px] overflow-hidden">
     <h3 class="text-base font-bold text-white mb-4" style="font-family: Arial, sans-serif;">Pertumbuhan Tips Perawatan</h3>
-    <div class="flex items-end justify-between gap-3 h-48">
+    <div class="w-full overflow-x-auto pb-2">
+        <div class="flex items-end justify-between gap-3 h-48 min-w-[400px]">
         <div class="flex flex-col items-center flex-1 gap-2">
             <div class="w-full h-0 bg-[#6B7C4F] rounded-t"></div>
             <span class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">Minggu 1</span>
@@ -167,6 +170,7 @@
         <div class="flex flex-col items-center flex-1 gap-2">
             <div class="w-full h-0 bg-[#6B7C4F] rounded-t"></div>
             <span class="text-xs text-[#6A7282]" style="font-family: Arial, sans-serif;">Minggu 7</span>
+        </div>
         </div>
     </div>
 </div>
