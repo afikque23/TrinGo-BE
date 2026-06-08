@@ -22,6 +22,8 @@ class Vehicle extends Model
         'model',
         'year',
         'tipe_motor',
+        'kapasitas_cc',
+        'transmisi',
         'vin',
         'odometer',
         'license_plate',
@@ -35,9 +37,19 @@ class Vehicle extends Model
         'last_accuracy_meters',
         'last_satellites',
         'last_hdop',
+        'last_baro_ok',
+        'last_baro_rel_alt_m',
+        'last_grade_ratio',
+        'last_grade_pct',
         'last_telemetry_at',
         'last_telemetry_received_at',
         'is_primary',
+        // Parameter default untuk kalkulasi jadwal service
+        'default_beban',
+        'default_penumpang',
+        'default_gaya_berkendara',
+        'default_kondisi_jalan',
+        'default_medan',
     ];
 
     protected $casts = [
@@ -51,9 +63,14 @@ class Vehicle extends Model
         'last_accuracy_meters' => 'float',
         'last_satellites' => 'integer',
         'last_hdop' => 'float',
+        'last_baro_ok' => 'boolean',
+        'last_baro_rel_alt_m' => 'float',
+        'last_grade_ratio' => 'float',
+        'last_grade_pct' => 'float',
         'last_telemetry_at' => 'datetime',
         'last_telemetry_received_at' => 'datetime',
         'is_primary' => 'boolean',
+        'default_penumpang' => 'boolean',
     ];
 
     /**

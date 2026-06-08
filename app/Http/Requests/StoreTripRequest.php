@@ -22,22 +22,38 @@ class StoreTripRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'vehicle_id' => 'required|integer|exists:vehicles,id',
-            'start_time' => 'required|date',
-            'end_time' => 'nullable|date|after:start_time',
+            'vehicle_id'     => 'required|integer|exists:vehicles,id',
+            'start_time'     => 'required|date',
+            'end_time'       => 'nullable|date|after:start_time',
             'total_distance' => 'required|numeric|min:0',
-            'duration' => 'nullable|integer|min:0',
-            'average_speed' => 'nullable|numeric|min:0',
-            'max_speed' => 'nullable|numeric|min:0',
-            'status' => 'required|string|in:active,completed,paused',
-            'notes' => 'nullable|string|max:1000',
-            'points' => 'required|array|min:1',
-            'points.*.latitude' => 'required|numeric|between:-90,90',
-            'points.*.longitude' => 'required|numeric|between:-180,180',
-            'points.*.speed' => 'nullable|numeric|min:0',
-            'points.*.altitude' => 'nullable|numeric',
-            'points.*.accuracy' => 'nullable|numeric|min:0',
-            'points.*.timestamp' => 'required|date',
+            'duration'       => 'nullable|integer|min:0',
+            'average_speed'  => 'nullable|numeric|min:0',
+            'max_speed'      => 'nullable|numeric|min:0',
+            'status'         => 'required|string|in:active,completed,paused',
+            'notes'          => 'nullable|string|max:1000',
+            // Sumber data
+            'source'         => 'nullable|string|in:gps,manual',
+            // Parameter konteks (opsional, auto-detect jika dari GPS)
+            'kondisi_lalu_lintas' => 'nullable|in:macet,sedang,lancar',
+            'medan'               => 'nullable|in:datar,berbukit,campuran',
+            'gaya_berkendara'     => 'nullable|in:pelan,normal,agresif',
+            // Parameter manual
+            'beban'               => 'nullable|in:ringan,sedang,berat',
+            'ada_penumpang'       => 'nullable|boolean',
+            // Data sensor GPS tambahan
+            'elevation_gain'          => 'nullable|integer|min:0',
+            'idle_time_minutes'       => 'nullable|integer|min:0',
+            'rough_road_count'        => 'nullable|integer|min:0',
+            'hard_acceleration_count' => 'nullable|integer|min:0',
+            'hard_braking_count'      => 'nullable|integer|min:0',
+            // Trip points
+            'points'              => 'required|array|min:1',
+            'points.*.latitude'   => 'required|numeric|between:-90,90',
+            'points.*.longitude'  => 'required|numeric|between:-180,180',
+            'points.*.speed'      => 'nullable|numeric|min:0',
+            'points.*.altitude'   => 'nullable|numeric',
+            'points.*.accuracy'   => 'nullable|numeric|min:0',
+            'points.*.timestamp'  => 'required|date',
         ];
     }
 
@@ -63,7 +79,12 @@ class StoreTripRequest extends FormRequest
             'points.*.latitude.between' => 'Latitude must be between -90 and 90',
             'points.*.longitude.required' => 'Longitude is required for all points',
             'points.*.longitude.between' => 'Longitude must be between -180 and 180',
-            'points.*.timestamp.required' => 'Timestamp is required for all points',
+            'points.*.timestamp.required'    => 'Timestamp is required for all points',
+            'source.in'                       => 'Source must be gps or manual',
+            'kondisi_lalu_lintas.in'          => 'Kondisi lalu lintas harus: macet, sedang, atau lancar',
+            'medan.in'                        => 'Medan harus: datar, berbukit, atau campuran',
+            'gaya_berkendara.in'              => 'Gaya berkendara harus: pelan, normal, atau agresif',
+            'beban.in'                        => 'Beban harus: ringan, sedang, atau berat',
         ];
     }
 }

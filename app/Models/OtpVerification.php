@@ -31,9 +31,11 @@ class OtpVerification extends Model
      */
     public function isValid(): bool
     {
-        return !$this->is_used 
+        $maxAttempts = (int) config('otp.max_attempts', 5);
+
+        return !$this->is_used
             && $this->expires_at->isFuture()
-            && $this->attempts < 5;
+            && $this->attempts < $maxAttempts;
     }
 
     /**
@@ -88,16 +90,17 @@ class OtpVerification extends Model
     public static function verifyOtp(string $identifier, string $otp, string $type): ?self
     {
         $otpRecord = self::where('identifier', $identifier)
-            ->where('otp', $otp)
             ->where('type', $type)
             ->where('is_used', false)
+            ->orderByDesc('id')
             ->first();
 
-        if (!$otpRecord) {
+        if (!$otpRecord || !$otpRecord->isValid()) {
             return null;
         }
 
-        if (!$otpRecord->isValid()) {
+        if (!hash_equals((string) $otpRecord->otp, (string) $otp)) {
+            $otpRecord->incrementAttempts();
             return null;
         }
 

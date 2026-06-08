@@ -117,17 +117,55 @@ class TripController extends Controller
             /** @var \Illuminate\Contracts\Auth\Guard $auth */
             $auth = auth();
             $user = $auth->user();
+
+            // ─── Auto-detect parameter dari GPS atau fallback ke default vehicle ───
+            $source = $validated['source'] ?? 'gps';
+            $avgSpeed = $validated['average_speed'] ?? null;
+            $elevationGain = $validated['elevation_gain'] ?? null;
+
+            // Gunakan nilai dari request jika ada, jika tidak auto-detect dari GPS
+            $kondisiLaluLintas = $validated['kondisi_lalu_lintas']
+                ?? Trip::detectKondisiLaluLintas($avgSpeed)
+                ?? $vehicle->default_kondisi_jalan
+                ?? 'sedang';
+
+            $medan = $validated['medan']
+                ?? Trip::detectMedan($elevationGain)
+                ?? $vehicle->default_medan
+                ?? 'datar';
+
+            $gayaBerkendara = $validated['gaya_berkendara']
+                ?? Trip::detectGayaBerkendara($avgSpeed)
+                ?? $vehicle->default_gaya_berkendara
+                ?? 'normal';
+
+            $beban = $validated['beban'] ?? $vehicle->default_beban ?? 'ringan';
+            $adaPenumpang = $validated['ada_penumpang'] ?? $vehicle->default_penumpang ?? false;
+
             $trip = Trip::create([
-                'vehicle_id' => $validated['vehicle_id'],
-                'started_by' => $user?->id ?? null, // null for guest mode
-                'start_at' => $validated['start_time'],
-                'end_at' => $validated['end_time'] ?? null,
-                'distance_meters' => $distanceMeters,
-                'start_odometer' => $startOdometer,
-                'end_odometer' => $endOdometer,
-                'avg_speed_kph' => $validated['average_speed'] ?? null,
-                'max_speed_kph' => $validated['max_speed'] ?? null,
-                'notes' => $validated['notes'] ?? null,
+                'vehicle_id'              => $validated['vehicle_id'],
+                'started_by'              => $user?->id ?? null,
+                'start_at'                => $validated['start_time'],
+                'end_at'                  => $validated['end_time'] ?? null,
+                'distance_meters'         => $distanceMeters,
+                'start_odometer'          => $startOdometer,
+                'end_odometer'            => $endOdometer,
+                'avg_speed_kph'           => $avgSpeed,
+                'max_speed_kph'           => $validated['max_speed'] ?? null,
+                'notes'                   => $validated['notes'] ?? null,
+                // Parameter baru
+                'source'                  => $source,
+                'kondisi_lalu_lintas'     => $kondisiLaluLintas,
+                'medan'                   => $medan,
+                'gaya_berkendara'         => $gayaBerkendara,
+                'beban'                   => $beban,
+                'ada_penumpang'           => $adaPenumpang,
+                'elevation_gain'          => $elevationGain,
+                'idle_time_minutes'       => $validated['idle_time_minutes'] ?? null,
+                'rough_road_count'        => $validated['rough_road_count'] ?? 0,
+                'hard_acceleration_count' => $validated['hard_acceleration_count'] ?? 0,
+                'hard_braking_count'      => $validated['hard_braking_count'] ?? 0,
+                'is_calibrated'           => false,
             ]);
 
             // Create trip points
@@ -147,6 +185,10 @@ class TripController extends Controller
             // *** AUTO-UPDATE VEHICLE ODOMETER ***
             // Only update if trip status is "completed"
             if ($validated['status'] === 'completed') {
+                // Hitung service score factor berdasarkan parameter konteks
+                $trip->service_score_factor = $trip->calculateServiceScoreFactor();
+                $trip->save();
+
                 $vehicle->update([
                     'odometer' => $endOdometer,
                 ]);
@@ -209,15 +251,57 @@ class TripController extends Controller
     }
 
     /**
-     * Update an existing trip
+     * Kalibrasi / update parameter konteks perjalanan yang sudah selesai.
+     * User bisa override kondisi yang di-detect otomatis oleh GPS.
      */
     public function update(Request $request, $id): JsonResponse
     {
-        // TODO: Implement trip update logic if needed
-        return response()->json([
-            'success' => false,
-            'message' => 'Trip update not implemented yet',
-        ], 501);
+        $request->validate([
+            'kondisi_lalu_lintas' => 'nullable|in:macet,sedang,lancar',
+            'medan'               => 'nullable|in:datar,berbukit,campuran',
+            'gaya_berkendara'     => 'nullable|in:pelan,normal,agresif',
+            'beban'               => 'nullable|in:ringan,sedang,berat',
+            'ada_penumpang'       => 'nullable|boolean',
+            'notes'               => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            $trip = Trip::findOrFail($id);
+
+            // Update hanya field yang dikirim
+            $updateData = array_filter([
+                'kondisi_lalu_lintas' => $request->input('kondisi_lalu_lintas'),
+                'medan'               => $request->input('medan'),
+                'gaya_berkendara'     => $request->input('gaya_berkendara'),
+                'beban'               => $request->input('beban'),
+                'ada_penumpang'       => $request->input('ada_penumpang'),
+                'notes'               => $request->input('notes'),
+            ], fn($v) => $v !== null);
+
+            if (!empty($updateData)) {
+                $updateData['is_calibrated'] = true;
+                $trip->update($updateData);
+
+                // Recalculate service score factor setelah kalibrasi
+                $trip->service_score_factor = $trip->fresh()->calculateServiceScoreFactor();
+                $trip->save();
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Perjalanan berhasil dikalibrasi',
+                'data' => new TripResource($trip->fresh(['vehicle', 'points'])),
+                'service_score_factor' => $trip->service_score_factor,
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error calibrating trip: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengkalibrasi perjalanan',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**

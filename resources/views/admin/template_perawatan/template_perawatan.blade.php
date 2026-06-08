@@ -23,8 +23,8 @@
 @endpush
 
 @section('content')
-<div class="mb-6">
-    <h1 class="text-3xl font-bold text-white mb-2" style="font-family: Arial, sans-serif;">Monitoring Tips Perawatan</h1>
+<div class="mb-4 sm:mb-6">
+    <h1 class="text-xl sm:text-3xl font-bold text-white mb-1 sm:mb-2" style="font-family: Arial, sans-serif;">Monitoring Tips Perawatan</h1>
     <p class="text-sm text-[#99A1AF]" style="font-family: Arial, sans-serif;">Supervisi tips perawatan yang dipublikasikan otomatis</p>
 </div>
 
@@ -34,7 +34,7 @@
 @endphp
 
 <!-- Monitoring Cards -->
-<div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-6">
     <div class="bg-[#111111] border border-[#1E2939] rounded-[14px] p-6">
         <div class="flex items-center justify-between">
             <div>
@@ -156,7 +156,8 @@
 
 <!-- Table -->
 <div class="bg-[#111111] border border-[#1E2939] rounded-[14px] overflow-hidden">
-    <table class="w-full">
+    <div class="overflow-x-auto">
+    <table class="w-full min-w-[700px]">
         <!-- Table Header -->
         <thead>
             <tr class="border-b border-[#1E2939]">
@@ -232,6 +233,7 @@
             @endforelse
         </tbody>
     </table>
+    </div>
 </div>
 
 @if(method_exists($tips, 'links'))

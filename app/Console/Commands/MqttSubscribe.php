@@ -145,8 +145,7 @@ class MqttSubscribe extends Command
                             $this->telemetry->ingest($topic, $payload, $decodedForIngest, $receivedAt);
 
                             if ($this->output->isVerbose()) {
-                                $preview = substr($payload, 0, 200);
-                                $this->line("[{$topic}] qos={$receivedQos} retained=" . ($retained ? '1' : '0') . ' payload=' . $preview);
+                                $this->line("[{$topic}] qos={$receivedQos} retained=" . ($retained ? '1' : '0') . " payload=\n" . $payload);
                             }
                         } catch (\Throwable $e) {
                             Log::error('MQTT message handling failed: ' . $e->getMessage(), [

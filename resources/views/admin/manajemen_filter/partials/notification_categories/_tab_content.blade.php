@@ -1,12 +1,12 @@
 <!-- Notification Categories Table -->
 <div class="flex flex-col gap-4">
     <!-- Header with Add Button -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
             <h3 class="text-lg font-bold text-white mb-1" style="font-family: Arial, sans-serif;">Kategori Notifikasi</h3>
             <p class="text-sm text-[#99A1AF]" style="font-family: Arial, sans-serif;">Kelola kategori untuk sistem notifikasi aplikasi (Servis, Perjalanan, Peringatan, Rekomendasi)</p>
         </div>
-        <button @click="showAddCategoryModal = true" class="h-11 px-4 bg-[#6B7C4F] text-white text-base rounded-[10px] hover:bg-[#5A6A40] transition-colors flex items-center gap-2" style="font-family: Arial, sans-serif;">
+        <button @click="showAddCategoryModal = true" class="w-full sm:w-auto h-11 px-4 bg-[#6B7C4F] text-white text-sm rounded-[10px] hover:bg-[#5A6A40] transition-colors flex items-center justify-center gap-2" style="font-family: Arial, sans-serif;">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -14,8 +14,73 @@
         </button>
     </div>
 
-    <!-- Table -->
-    <div class="bg-[#111111] border border-[#1E2939] rounded-[14px] overflow-hidden">
+    <!-- Mobile Card View -->
+    <div class="block md:hidden space-y-3">
+        @forelse($notificationCategories as $category)
+        <div class="bg-[#111111] border border-[#1E2939] rounded-[14px] p-4">
+            <div class="flex items-start justify-between gap-3 mb-3">
+                <div class="flex items-center gap-2 min-w-0">
+                    @if($category->icon)
+                    <span class="text-lg flex-shrink-0">{{ $category->icon }}</span>
+                    @endif
+                    <span class="text-sm font-medium text-white truncate" style="font-family: Arial, sans-serif;">{{ $category->name }}</span>
+                </div>
+                <form action="{{ route('admin.filters.notification-categories.toggle-status', $category) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-colors flex-shrink-0 {{ $category->is_active ? 'bg-[#6B7C4F]/20 text-[#6B7C4F]' : 'bg-[#364153]/20 text-[#6A7282]' }}" style="font-family: Arial, sans-serif;">
+                        {{ $category->is_active ? 'Aktif' : 'Nonaktif' }}
+                    </button>
+                </form>
+            </div>
+            <div class="grid grid-cols-2 gap-2 mb-3">
+                <div class="bg-[#0A0A0A] rounded-[8px] px-3 py-2">
+                    <p class="text-[10px] text-[#4A5565] uppercase tracking-wider mb-0.5" style="font-family: Arial, sans-serif;">Key</p>
+                    <code class="text-xs text-[#6A7282] break-all" style="font-family: Consolas, monospace;">{{ $category->key }}</code>
+                </div>
+                <div class="bg-[#0A0A0A] rounded-[8px] px-3 py-2">
+                    <p class="text-[10px] text-[#4A5565] uppercase tracking-wider mb-0.5" style="font-family: Arial, sans-serif;">Urutan</p>
+                    <p class="text-xs text-white" style="font-family: Arial, sans-serif;">{{ $category->sort_order }}</p>
+                </div>
+                @if($category->color)
+                <div class="bg-[#0A0A0A] rounded-[8px] px-3 py-2 col-span-2">
+                    <p class="text-[10px] text-[#4A5565] uppercase tracking-wider mb-1" style="font-family: Arial, sans-serif;">Color</p>
+                    <div class="flex items-center gap-2">
+                        <div class="w-5 h-5 rounded border border-[#364153] flex-shrink-0" style="background-color: {{ $category->color }}"></div>
+                        <span class="text-xs text-[#99A1AF]" style="font-family: Consolas, monospace;">{{ $category->color }}</span>
+                    </div>
+                </div>
+                @endif
+            </div>
+            <div class="flex items-center gap-2">
+                <button @click="openEditCategory({{ json_encode($category) }})" class="flex-1 h-9 bg-[#1A1A1A] border border-[#364153] rounded-[8px] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center gap-1.5" title="Edit">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.17" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    <span class="text-xs text-white" style="font-family: Arial, sans-serif;">Edit</span>
+                </button>
+                <button @click="openDeleteCategory({{ json_encode($category) }})" class="h-9 px-3 bg-[#FB2C36] rounded-[8px] hover:bg-[#E01B25] transition-colors flex items-center justify-center" title="Delete">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.17" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+            </div>
+        </div>
+        @empty
+        <div class="bg-[#111111] border border-[#1E2939] rounded-[14px] px-6 py-12 text-center">
+            <div class="flex flex-col items-center gap-3">
+                <svg class="w-12 h-12 text-[#364153]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+                <div>
+                    <p class="text-sm text-[#99A1AF] mb-1" style="font-family: Arial, sans-serif;">Belum ada kategori notifikasi</p>
+                    <button @click="showAddCategoryModal = true" class="text-sm text-[#6B7C4F] hover:text-[#5A6A40] transition-colors" style="font-family: Arial, sans-serif;">
+                        Tambah kategori pertama
+                    </button>
+                </div>
+            </div>
+        </div>
+        @endforelse
+    </div>
+
+    <!-- Desktop Table View -->
+    <div class="hidden md:block bg-[#111111] border border-[#1E2939] rounded-[14px] overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead>
@@ -45,30 +110,12 @@
                                     <div class="absolute left-0 top-full mt-2 w-72 bg-[#0A0A0A] border border-[#364153] rounded-lg p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                                         <p class="text-xs text-white font-medium mb-2" style="font-family: Arial, sans-serif;">Icon Yang Tersedia</p>
                                         <div class="space-y-1.5 text-xs text-[#99A1AF]" style="font-family: Arial, sans-serif;">
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-[#6B7C4F]">🔧</span>
-                                                <span>Servis/Maintenance</span>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-[#6B7C4F]">🛣️</span>
-                                                <span>Trip/Perjalanan</span>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-[#6B7C4F]">⚠️</span>
-                                                <span>Peringatan/Warning</span>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-[#6B7C4F]">💡</span>
-                                                <span>Rekomendasi/Saran</span>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-[#6B7C4F]">📢</span>
-                                                <span>Pengumuman/Announcement</span>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-[#6B7C4F]">✅</span>
-                                                <span>Selesai/Completed</span>
-                                            </div>
+                                            <div class="flex items-center gap-2"><span class="text-[#6B7C4F]">🔧</span><span>Servis/Maintenance</span></div>
+                                            <div class="flex items-center gap-2"><span class="text-[#6B7C4F]">🛣️</span><span>Trip/Perjalanan</span></div>
+                                            <div class="flex items-center gap-2"><span class="text-[#6B7C4F]">⚠️</span><span>Peringatan/Warning</span></div>
+                                            <div class="flex items-center gap-2"><span class="text-[#6B7C4F]">💡</span><span>Rekomendasi/Saran</span></div>
+                                            <div class="flex items-center gap-2"><span class="text-[#6B7C4F]">📢</span><span>Pengumuman/Announcement</span></div>
+                                            <div class="flex items-center gap-2"><span class="text-[#6B7C4F]">✅</span><span>Selesai/Completed</span></div>
                                         </div>
                                         <p class="text-xs text-[#6A7282] mt-2 pt-2 border-t border-[#1E2939]" style="font-family: Arial, sans-serif;">Anda bisa menggunakan emoji Unicode atau nama icon</p>
                                     </div>

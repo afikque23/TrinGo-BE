@@ -21,6 +21,8 @@ class TripPointResource extends JsonResource
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'altitude' => $this->altitude,
+            'baro_rel_alt_m' => $this->baro_rel_alt_m,
+            'grade_pct' => $this->grade_pct,
             'speed_kph' => $this->speed_kph,
             'accuracy_meters' => $this->accuracy_meters,
             'recorded_at' => $this->recorded_at?->toIso8601String(),

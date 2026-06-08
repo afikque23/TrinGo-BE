@@ -39,7 +39,13 @@ return [
 
         'smtp' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_SCHEME'),
+            // Backward-compatible with common .env keys (MAIL_ENCRYPTION=tls/ssl).
+            // Symfony Mailer supports schemes: smtp, smtps.
+            // - tls => STARTTLS over smtp (scheme should be smtp)
+            // - ssl => implicit TLS (scheme should be smtps)
+            'scheme' => env('MAIL_SCHEME') ?: (
+                env('MAIL_ENCRYPTION') === 'ssl' ? 'smtps' : 'smtp'
+            ),
             'url' => env('MAIL_URL'),
             'host' => env('MAIL_HOST', '127.0.0.1'),
             'port' => env('MAIL_PORT', 2525),
