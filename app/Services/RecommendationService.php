@@ -195,7 +195,7 @@ class RecommendationService
         $from = now()->subDays(30);
         $trips = $vehicle->trips()
             ->where('start_at', '>=', $from)
-            ->get(['distance_meters', 'avg_speed_kph', 'elevation_gain']);
+            ->get(['distance_meters', 'avg_speed_kph', 'elevation_gain', 'ambient_temp_avg']);
 
         $totalDistanceKm = (float) ($trips->sum('distance_meters') / 1000);
         $intensityKmPerDay = $totalDistanceKm > 0 ? round($totalDistanceKm / 30, 1) : 0.0;
@@ -223,7 +223,10 @@ class RecommendationService
             'avg_speed_kph' => $avgSpeedKph,
             'intensity_km_per_day' => $intensityKmPerDay,
             'elevation_gain_m' => $elevationGainM,
-            'ambient_temp_c' => 28.0, // Default for now, as not in DB
+            'ambient_temp_c'   => round(
+                $trips->whereNotNull('ambient_temp_avg')->avg('ambient_temp_avg') ?? 28.0,
+                1
+            ),
         ];
     }
 
