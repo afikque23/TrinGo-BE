@@ -39,7 +39,6 @@ class AuthController extends Controller
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'phone' => $request->phone,
                 'password' => Hash::make($request->password),
             ]);
 
@@ -62,7 +61,6 @@ class AuthController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                    'phone' => $user->phone,
                 ],
                 'expires_at' => $otp->expires_at,
             ];

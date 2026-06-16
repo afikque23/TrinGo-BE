@@ -24,6 +24,8 @@ const VAR_LABELS = {
     durasi: "Durasi Sejak Servis (hari)",
     kecepatan: "Kecepatan Rata-rata (km/h)",
     intensitas: "Intensitas Pakai (km/hari)",
+    suhu: "Suhu Lingkungan (°C)",
+    ketinggian: "Akumulasi Kenaikan Ketinggian (m)",
 };
 
 const ALL_VARS = [
@@ -31,6 +33,8 @@ const ALL_VARS = [
     { key: "durasi", label: VAR_LABELS.durasi, unit: "hari" },
     { key: "kecepatan", label: VAR_LABELS.kecepatan, unit: "km/h" },
     { key: "intensitas", label: VAR_LABELS.intensitas, unit: "km/hari" },
+    { key: "suhu", label: VAR_LABELS.suhu, unit: "°C" },
+    { key: "ketinggian", label: VAR_LABELS.ketinggian, unit: "m" },
 ];
 
 function fuzzyAdmin() {
@@ -86,7 +90,7 @@ function fuzzyAdmin() {
         deleteTarget: null,
 
         // Test
-        testInputs: { jarak: 1200, durasi: 50, kecepatan: 45, intensitas: 20 },
+        testInputs: { jarak: 1200, durasi: 50, kecepatan: 45, intensitas: 20, suhu: 28, ketinggian: 150 },
         testResult: null,
 
         // Chart

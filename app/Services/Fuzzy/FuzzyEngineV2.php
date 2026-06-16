@@ -95,6 +95,8 @@ class FuzzyEngineV2
             'durasi' => (float) ($inputs['duration_since_service_days'] ?? 0),
             'kecepatan' => (float) ($inputs['avg_speed_kph'] ?? 0),
             'intensitas' => (float) ($inputs['intensity_km_per_day'] ?? 0),
+            'suhu' => (float) ($inputs['ambient_temp_c'] ?? 28.0),
+            'ketinggian' => (float) ($inputs['elevation_gain_m'] ?? 0),
         ];
 
         foreach (($motorType?->componentConfigs ?? []) as $componentConfig) {
