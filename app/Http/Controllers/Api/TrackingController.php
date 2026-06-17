@@ -134,16 +134,6 @@ class TrackingController extends Controller
         }
         $elevationGainM = (int) round($elevationGainM);
 
-        // Hitung rata-rata suhu dari temp_c (BMP280)
-        $temps = $points->whereNotNull('temp_c')->pluck('temp_c');
-        $ambientTempAvg = $temps->isNotEmpty()
-            ? round($temps->avg(), 2)
-            : null;
-
-        // Hitung idle_time_minutes (titik dengan speed < 2 km/h)
-        $idlePoints = $points->filter(fn($p) => $p->speed_kph !== null && $p->speed_kph < 2)->count();
-        $idleTimeMinutes = (int) round($idlePoints * 5 / 60); // asumsi interval 5 detik per titik
-
         $startOdometer = $trip->start_odometer ?? ($vehicle->odometer ?? 0);
         $distanceKm = round($totalDistanceMeters / 1000, 2);
         $endOdometer = (int) ($startOdometer + $distanceKm);
@@ -158,8 +148,6 @@ class TrackingController extends Controller
             'avg_speed_kph' => $avgSpeedKph,
             'max_speed_kph' => $maxSpeedKph,
             'elevation_gain' => $elevationGainM,
-            'ambient_temp_avg' => $ambientTempAvg,
-            'idle_time_minutes' => $idleTimeMinutes,
         ]);
 
         // Update vehicle odometer
@@ -171,14 +159,12 @@ class TrackingController extends Controller
             'message' => 'Tracking stopped successfully',
             'trip' => $trip->fresh(),
             'summary' => [
-                'distance_km'       => $distanceKm,
-                'duration_minutes'  => $durationMinutes,
-                'avg_speed_kph'     => $avgSpeedKph,
-                'max_speed_kph'     => $maxSpeedKph,
-                'elevation_gain_m'  => $elevationGainM,
-                'ambient_temp_avg'  => $ambientTempAvg,
-                'idle_time_minutes' => $idleTimeMinutes,
-                'new_odometer'      => $endOdometer,
+                'distance_km'      => $distanceKm,
+                'duration_minutes' => $durationMinutes,
+                'avg_speed_kph'    => $avgSpeedKph,
+                'max_speed_kph'    => $maxSpeedKph,
+                'elevation_gain_m' => $elevationGainM,
+                'new_odometer'     => $endOdometer,
             ],
         ], 200);
     }
@@ -210,21 +196,20 @@ class TrackingController extends Controller
         };
 
         return response()->json([
-            'latitude'         => $vehicle->last_latitude  ? (float) $vehicle->last_latitude  : null,
-            'longitude'        => $vehicle->last_longitude ? (float) $vehicle->last_longitude : null,
-            'speed_kph'        => $vehicle->last_speed_kph,
-            'heading_deg'      => $vehicle->last_heading_deg,
-            'altitude'         => $vehicle->last_altitude,
-            'accuracy_meters'  => $vehicle->last_accuracy_meters,
-            'baro_rel_alt_m'   => $vehicle->last_baro_rel_alt_m,
-            'temperature_c'    => $vehicle->last_temp_c,
-            'grade_pct'        => $vehicle->last_grade_pct,
-            'telemetry_at'     => $vehicle->last_telemetry_at
+            'latitude'        => $vehicle->last_latitude  ? (float) $vehicle->last_latitude  : null,
+            'longitude'       => $vehicle->last_longitude ? (float) $vehicle->last_longitude : null,
+            'speed_kph'       => $vehicle->last_speed_kph,
+            'heading_deg'     => $vehicle->last_heading_deg,
+            'altitude'        => $vehicle->last_altitude,
+            'accuracy_meters' => $vehicle->last_accuracy_meters,
+            'baro_rel_alt_m'  => $vehicle->last_baro_rel_alt_m,
+            'grade_pct'       => $vehicle->last_grade_pct,
+            'telemetry_at'    => $vehicle->last_telemetry_at
                                     ? $vehicle->last_telemetry_at->toISOString()
                                     : null,
-            'received_at'      => $lastReceived ? $lastReceived->toISOString() : null,
-            'iot_status'       => $iotStatus,
-            'seconds_ago'      => $secondsAgo,
+            'received_at'     => $lastReceived ? $lastReceived->toISOString() : null,
+            'iot_status'      => $iotStatus,
+            'seconds_ago'     => $secondsAgo,
         ], 200);
     }
 

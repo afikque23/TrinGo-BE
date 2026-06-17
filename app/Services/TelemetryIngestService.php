@@ -76,7 +76,6 @@ class TelemetryIngestService
         $baroRelAltM = $this->getNumeric($data, ['baro_rel_alt_m']);
         $gradeRatio = $this->getNumeric($data, ['grade']);
         $gradePct = $this->getNumeric($data, ['grade_pct']);
-        $tempC = $this->getNumeric($data, ['temperature_c', 'temp_c', 'temperature']);
 
         $telemetryAt = $this->parseTelemetryAt($data);
 
@@ -116,7 +115,6 @@ class TelemetryIngestService
             'last_baro_rel_alt_m' => $baroRelAltM,
             'last_grade_ratio' => $gradeRatio,
             'last_grade_pct' => $gradePct,
-            'last_temp_c' => $tempC,
             'last_telemetry_at' => $telemetryAt,
             'last_telemetry_received_at' => $receivedAt,
         ])->save();
@@ -129,7 +127,6 @@ class TelemetryIngestService
                 altitude: $altitude,
                 baroRelAltM: $baroRelAltM,
                 gradePct: $gradePct,
-                tempC: $tempC,
                 speedKph: $speedKph,
                 accuracyMeters: $accuracyMeters,
                 recordedAt: $telemetryAt ?? $receivedAt,
@@ -144,7 +141,6 @@ class TelemetryIngestService
         ?float $altitude,
         ?float $baroRelAltM,
         ?float $gradePct,
-        ?float $tempC,
         ?float $speedKph,
         ?float $accuracyMeters,
         Carbon $recordedAt,
@@ -176,7 +172,6 @@ class TelemetryIngestService
             'altitude' => $altitude,
             'baro_rel_alt_m' => $baroRelAltM,
             'grade_pct' => $gradePct,
-            'temp_c' => $tempC,
             'speed_kph' => $speedKph !== null ? (int) round($speedKph) : null,
             'accuracy_meters' => $accuracyMeters,
             'recorded_at' => $recordedAt,
