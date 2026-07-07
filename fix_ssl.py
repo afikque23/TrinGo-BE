@@ -5,7 +5,7 @@ hostname = "203.194.115.228"
 username = "root"
 
 print("=====================================================")
-print(" MENGGANTI KREDENSIAL ADMIN TRINGGO ")
+print(" MEMPERBAIKI INSTALASI SSL (HTTPS) ")
 print("=====================================================")
 password = getpass.getpass(prompt="Masukkan Password ROOT VPS Anda: ")
 
@@ -21,24 +21,17 @@ try:
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(hostname, username=username, password=password, disabled_algorithms={'pubkeys': ['rsa-sha2-256', 'rsa-sha2-512']})
     
-    print("\n[+] Mengubah Email dan Password Admin di database VPS...")
-    php_code = """
-    $user = \\App\\Models\\User::where('role', 'admin')->first();
-    if($user) {
-        $user->email = 'tugasakhir@tringgo.com';
-        $user->password = \\Illuminate\\Support\\Facades\\Hash::make('nengmolencantik');
-        $user->save();
-        echo "BERHASIL DIUBAH!\\n";
-    } else {
-        echo "TIDAK DITEMUKAN!\\n";
-    }
-    """
-    ssh_exec(client, f"cd /var/www/motorcycle_management && php artisan tinker << 'EOF'{php_code}\\nEOF")
+    print("\n[+] Menghapus domain yang tidak valid dari Nginx...")
+    ssh_exec(client, 'sed -i "s/server_name tringgo.site www.tringgo.site vps.tringgo.site/server_name tringgo.site www.tringgo.site/g" /etc/nginx/sites-available/tringgo')
+    ssh_exec(client, "systemctl reload nginx")
+    
+    print("\n[+] Meminta ulang sertifikat SSL hanya untuk domain utama...")
+    # Hanya request untuk tringgo.site dan www.tringgo.site
+    ssh_exec(client, "certbot --nginx -d tringgo.site -d www.tringgo.site --non-interactive --agree-tos -m admin@tringgo.site --redirect")
     
     print("\n=====================================================")
-    print(" 🎉 KREDENSIAL ADMIN BERHASIL DIGANTI! 🎉")
-    print(" Email Baru   : tugasakhir@tringgo.com")
-    print(" Password Baru: nengmolencantik")
+    print(" 🎉 PERBAIKAN SSL SELESAI! 🎉")
+    print(" Silakan cek ulang website https://tringgo.site")
     print("=====================================================")
     
 except Exception as e:

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Login Admin - MotoTracker</title>
+    <title>Login Admin - Tringgo</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         /* Small overrides to match provided design */
@@ -23,7 +23,7 @@
                         <div class="w-8 h-8 border-[2.66667px] border-white rounded"></div>
                     </div>
                     <h1 class="text-[24px] font-bold">Admin Panel</h1>
-                    <p class="text-[14px] text-[#99A1AF]">MotoTracker Management System</p>
+                    <p class="text-[14px] text-[#99A1AF]">Tringgo Management System</p>
                 </div>
 
                 <!-- Card -->
@@ -67,7 +67,6 @@
 
                             <div class="flex items-center justify-between mt-2">
                                 <label class="flex items-center gap-2 text-[#99A1AF]"><input type="checkbox" name="remember" class="w-4 h-4 bg-[#0A0A0A]"/> Ingat saya</label>
-                                <a href="#" class="text-[#6B7C4F]">Lupa password?</a>
                             </div>
 
                             <button type="submit" class="w-full h-[48px] bg-[#6B7C4F] rounded-[10px] flex items-center justify-center gap-2 text-white font-medium mt-2">
@@ -76,7 +75,7 @@
                             </button>
                         </form>
 
-                        <div class="mt-6 text-[12px] text-[#4A5565] text-center">© 2026 MotoTracker. All rights reserved.</div>
+                        <div class="mt-6 text-[12px] text-[#4A5565] text-center">© 2026 Tringgo. All rights reserved.</div>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,42 @@
+graph LR
+    subgraph L1 [Layer 1: Perangkat IoT]
+        direction TB
+        ESP[ESP32 Microcontroller]
+        GPS[GPS NEO-7M]
+        BMP[Sensor BMP280]
+        GPS -- Data Koordinat Lokasi --> ESP
+        BMP -- Data Suhu & Tekanan --> ESP
+    end
+
+    subgraph L2 [Layer 2: Perantara Pesan]
+        MQTT((MQTT Broker))
+    end
+
+    subgraph L3 [Layer 3: Server Backend]
+        direction TB
+        LARAVEL[Laravel 12 API]
+        DB[(MySQL Database)]
+        FUZZY[Fuzzy Logic Mamdani]
+        GEMINI[Gemini API]
+        FCM[Firebase Cloud Messaging]
+        
+        LARAVEL <--> |Simpan/Ambil Data Query| DB
+        LARAVEL <--> |I/O Derajat Keanggotaan| FUZZY
+        LARAVEL <--> |Request/Response Prompt REST| GEMINI
+        LARAVEL --> |Trigger Pesan Push HTTP| FCM
+    end
+
+    subgraph L4 [Layer 4: Aplikasi Mobile]
+        FLUTTER[Flutter App]
+    end
+
+    ESP -- Publish Telemetri \n(Protokol MQTT) --> MQTT
+    MQTT -- Subscribe Telemetri \n(Protokol MQTT) --> LARAVEL
+    FCM -- Push Notification \n(Protokol Firebase) --> FLUTTER
+    FLUTTER -- Request API \n(HTTPS/REST) --> LARAVEL
+    LARAVEL -- Response API \n(JSON) --> FLUTTER
+
+    style L1 fill:#ffebee,stroke:#ef5350,stroke-width:2px,color:#000
+    style L2 fill:#e3f2fd,stroke:#42a5f5,stroke-width:2px,color:#000
+    style L3 fill:#e8f5e9,stroke:#66bb6a,stroke-width:2px,color:#000
+    style L4 fill:#fff3e0,stroke:#ffa726,stroke-width:2px,color:#000
