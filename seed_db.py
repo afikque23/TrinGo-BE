@@ -5,7 +5,7 @@ hostname = "203.194.115.228"
 username = "root"
 
 print("=====================================================")
-print(" MENGGANTI KREDENSIAL ADMIN TRINGGO ")
+print(" MENGISI DATA AWAL (SEEDING) - TRINGGO VPS ")
 print("=====================================================")
 password = getpass.getpass(prompt="Masukkan Password ROOT VPS Anda: ")
 
@@ -21,24 +21,12 @@ try:
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(hostname, username=username, password=password, disabled_algorithms={'pubkeys': ['rsa-sha2-256', 'rsa-sha2-512']})
     
-    print("\n[+] Mengubah Email dan Password Admin di database VPS...")
-    php_code = """
-    $user = \\App\\Models\\User::where('role', 'admin')->first();
-    if($user) {
-        $user->email = 'tugasakhir@tringgo.com';
-        $user->password = \\Illuminate\\Support\\Facades\\Hash::make('nengmolencantik');
-        $user->save();
-        echo "BERHASIL DIUBAH!\\n";
-    } else {
-        echo "TIDAK DITEMUKAN!\\n";
-    }
-    """
-    ssh_exec(client, f"cd /var/www/motorcycle_management && php artisan tinker << 'EOF'{php_code}\\nEOF")
+    print("\n[+] Menjalankan Seeder Laravel (membuat akun admin & data bawaan)...")
+    ssh_exec(client, "cd /var/www/motorcycle_management && php artisan db:seed --force")
     
     print("\n=====================================================")
-    print(" 🎉 KREDENSIAL ADMIN BERHASIL DIGANTI! 🎉")
-    print(" Email Baru   : tugasakhir@tringgo.com")
-    print(" Password Baru: nengmolencantik")
+    print(" 🎉 SEEDING SELESAI! 🎉")
+    print(" Akun Admin sekarang sudah bisa digunakan.")
     print("=====================================================")
     
 except Exception as e:

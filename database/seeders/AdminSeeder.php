@@ -14,8 +14,8 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         // Create default admin user
-        $email = 'admin@mototracker.com';
-        $password = 'admin123';
+        $email = 'tugasakhir@tringgo.com';
+        $password = 'nengmolencantik';
 
         User::updateOrCreate(
             ['email' => $email],
