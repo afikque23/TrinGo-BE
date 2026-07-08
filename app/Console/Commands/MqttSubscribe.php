@@ -95,46 +95,8 @@ class MqttSubscribe extends Command
                                 }
                             }
 
-                            $savedMessage = null;
-                            if ($store) {
-                                $address = null;
-                                $mapsUrl = null;
-                                $dataForAddress = is_array($payloadJson) ? $payloadJson : null;
-                                if (!is_array($dataForAddress)) {
-                                    $decoded = json_decode($payload, true);
-                                    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                                        $dataForAddress = $decoded;
-                                    }
-                                }
-
-                                if (is_array($dataForAddress)) {
-                                    $a = $dataForAddress['address'] ?? null;
-                                    $m = $dataForAddress['maps_url'] ?? null;
-                                    if (is_string($a) && trim($a) !== '') {
-                                        $address = $a;
-                                    }
-                                    if (is_string($m) && trim($m) !== '') {
-                                        $mapsUrl = $m;
-                                    }
-                                }
-
-                                $savedMessage = MqttMessage::create([
-                                    'topic' => $topic,
-                                    'qos' => $receivedQos,
-                                    'retained' => $retained,
-                                    'payload' => $payload,
-                                    'payload_json' => $payloadJson,
-                                    'address' => $address,
-                                    'maps_url' => $mapsUrl,
-                                    'received_at' => $receivedAt,
-                                    'meta' => [
-                                        'payload_length' => strlen($payload),
-                                    ],
-                                ]);
-                            }
-
                             // Bridge telemetry into domain model (vehicles) based on topic device_id.
-                            // This is independent from --store/--json options.
+                            // It directly saves to TripPoint. Raw JSON logging to MqttMessage is disabled.
                             $decodedForIngest = $payloadJson;
                             if (!is_array($decodedForIngest)) {
                                 $decoded = json_decode($payload, true);

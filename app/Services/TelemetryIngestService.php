@@ -36,36 +36,45 @@ class TelemetryIngestService
             return;
         }
 
-        // If device reports it has no GPS fix, skip updating last location.
+        $hasFixBool = null;
         if (array_key_exists('has_fix', $data)) {
             $hasFix = $data['has_fix'];
             $hasFixBool = is_bool($hasFix)
                 ? $hasFix
                 : (is_int($hasFix) || is_float($hasFix) ? ((float) $hasFix) !== 0.0 : filter_var($hasFix, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE));
-
-            if ($hasFixBool === false) {
-                return;
-            }
         }
 
         $latitude = $this->getNumeric($data, ['lat', 'latitude']);
         $longitude = $this->getNumeric($data, ['lng', 'lon', 'longitude']);
-
-        if ($latitude === null || $longitude === null) {
-            return;
-        }
-
-        if ($latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180) {
-            Log::warning('Telemetry ignored due to invalid coordinates.', [
-                'topic' => $topic,
-                'device_id' => $deviceId,
-                'latitude' => $latitude,
-                'longitude' => $longitude,
-            ]);
-            return;
-        }
-
         $speedKph = $this->getSpeedKph($data);
+        $estDistanceM = $this->getNumeric($data, ['est_distance_m']);
+        $mpuIsMoving = $this->getBool($data, ['mpu_is_moving']);
+        $mpuGForce = $this->getNumeric($data, ['mpu_g_force']);
+
+        if ($hasFixBool === false) {
+            $latitude = null;
+            $longitude = null;
+        } else {
+            if ($latitude === null || $longitude === null) {
+                return;
+            }
+
+            if ($latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180) {
+                Log::warning('Telemetry ignored due to invalid coordinates.', [
+                    'topic' => $topic,
+                    'device_id' => $deviceId,
+                    'latitude' => $latitude,
+                    'longitude' => $longitude,
+                ]);
+                return;
+            }
+
+            // Double validation logic to fix GPS drift
+            if ($speedKph > 2.0 && $mpuIsMoving === false) {
+                $speedKph = 0.0;
+            }
+        }
+
         $headingDeg = $this->getNumeric($data, ['heading', 'course', 'course_deg', 'heading_deg']);
         $altitude = $this->getNumeric($data, ['alt', 'altitude']);
         $accuracyMeters = $this->getNumeric($data, ['accuracy', 'accuracy_meters', 'acc']);
@@ -130,20 +139,28 @@ class TelemetryIngestService
                 speedKph: $speedKph,
                 accuracyMeters: $accuracyMeters,
                 recordedAt: $telemetryAt ?? $receivedAt,
+                hasFix: $hasFixBool,
+                estDistanceM: $estDistanceM,
+                mpuIsMoving: $mpuIsMoving,
+                mpuGForce: $mpuGForce,
             );
         }
     }
 
     private function appendTripPoint(
         Vehicle $vehicle,
-        float $latitude,
-        float $longitude,
+        ?float $latitude,
+        ?float $longitude,
         ?float $altitude,
         ?float $baroRelAltM,
         ?float $gradePct,
         ?float $speedKph,
         ?float $accuracyMeters,
         Carbon $recordedAt,
+        ?bool $hasFix = null,
+        ?float $estDistanceM = null,
+        ?bool $mpuIsMoving = null,
+        ?float $mpuGForce = null,
     ): void {
         $trip = Trip::query()
             ->where('vehicle_id', $vehicle->id)
@@ -169,12 +186,16 @@ class TelemetryIngestService
         TripPoint::create([
             'trip_id' => $trip->id,
             'sequence' => $nextSequence,
+            'has_fix' => $hasFix,
             'latitude' => $latitude,
             'longitude' => $longitude,
             'altitude' => $altitude,
             'baro_rel_alt_m' => $baroRelAltM,
             'grade_pct' => $gradePct,
             'speed_kph' => $speedKph !== null ? (int) round($speedKph) : null,
+            'est_distance_m' => $estDistanceM,
+            'mpu_is_moving' => $mpuIsMoving,
+            'mpu_g_force' => $mpuGForce,
             'accuracy_meters' => $accuracyMeters,
             'recorded_at' => $recordedAt,
         ]);
