@@ -37,7 +37,6 @@ class ServiceSummaryService
             'vehicle' => [
                 'id' => $vehicle->id,
                 'title' => $vehicle->title,
-                'license_plate' => $vehicle->license_plate,
             ],
             'total_services' => $totalServices,
             'total_cost' => (float) $totalCost,

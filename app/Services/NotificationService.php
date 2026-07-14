@@ -384,10 +384,8 @@ class NotificationService
         if ($vehicle) {
             $vehicleName = $vehicle->title ?? trim(($vehicle->make ?? '') . ' ' . ($vehicle->model ?? ''));
             $defaults['vehicle_name'] = $vehicleName ?: 'Motor Anda';
-            $defaults['vehicle_plate'] = $vehicle->license_plate ?? '-';
             $defaults['vehicle_type'] = $vehicle->tipe_motor ?? '-';
             $defaults['current_km'] = number_format($vehicle->odometer ?? 0);
-            $defaults['vehicle_color'] = $vehicle->color ?? '-';
             $defaults['vehicle_year'] = (string) ($vehicle->year ?? '-');
         }
 
