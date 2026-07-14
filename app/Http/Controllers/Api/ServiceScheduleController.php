@@ -300,7 +300,6 @@ class ServiceScheduleController extends Controller
                 'make' => $primaryVehicle->make,
                 'model' => $primaryVehicle->model,
                 'current_odometer' => $primaryVehicle->odometer ?? 0,
-                'license_plate' => $primaryVehicle->license_plate,
             ],
             'schedules' => $sortedResults,
             'summary' => [

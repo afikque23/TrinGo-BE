@@ -26,8 +26,6 @@ class Vehicle extends Model
         'transmisi',
         'vin',
         'odometer',
-        'license_plate',
-        'color',
         'photo_url',
         'last_latitude',
         'last_longitude',
@@ -44,12 +42,6 @@ class Vehicle extends Model
         'last_telemetry_at',
         'last_telemetry_received_at',
         'is_primary',
-        // Parameter default untuk kalkulasi jadwal service
-        'default_beban',
-        'default_penumpang',
-        'default_gaya_berkendara',
-        'default_kondisi_jalan',
-        'default_medan',
     ];
 
     protected $casts = [
@@ -70,7 +62,6 @@ class Vehicle extends Model
         'last_telemetry_at' => 'datetime',
         'last_telemetry_received_at' => 'datetime',
         'is_primary' => 'boolean',
-        'default_penumpang' => 'boolean',
     ];
 
     /**

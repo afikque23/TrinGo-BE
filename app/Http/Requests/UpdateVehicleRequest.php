@@ -33,8 +33,6 @@ class UpdateVehicleRequest extends FormRequest
             'tipe_motor' => ['sometimes', 'required', 'in:matic,manual,sport,adventure'],
             'vin' => ['nullable', 'string', 'max:64', Rule::unique('vehicles')->ignore($vehicleId)],
             'odometer' => ['nullable', 'integer', 'min:0'],
-            'license_plate' => ['nullable', 'string', 'max:20'],
-            'color' => ['nullable', 'string', 'max:50'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'], // Max 5MB
         ];
     }
@@ -61,10 +59,6 @@ class UpdateVehicleRequest extends FormRequest
             'photo.max'                       => 'Ukuran gambar maksimal 5MB',
             'kapasitas_cc.in'                 => 'Kapasitas CC harus salah satu: <125, 125-250, atau >250',
             'transmisi.in'                    => 'Transmisi harus manual atau cvt',
-            'default_beban.in'                => 'Beban default harus: ringan, sedang, atau berat',
-            'default_gaya_berkendara.in'      => 'Gaya berkendara default harus: pelan, normal, atau agresif',
-            'default_kondisi_jalan.in'        => 'Kondisi jalan default harus: macet, sedang, atau lancar',
-            'default_medan.in'                => 'Medan default harus: datar, berbukit, atau campuran',
         ];
     }
 }

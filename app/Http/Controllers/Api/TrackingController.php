@@ -116,7 +116,24 @@ class TrackingController extends Controller
 
         $avgSpeedKph = $countSpeed > 0 ? round($sumSpeed / $countSpeed, 2) : null;
         $maxSpeedKph = $maxSpeedKph > 0 ? $maxSpeedKph : null;
-        
+
+        // Hitung elevation_gain dari baro_rel_alt_m (BMP280) — total kenaikan elevasi
+        $elevationGainM = 0;
+        $lastAlt = null;
+        foreach ($points as $point) {
+            $alt = $point->baro_rel_alt_m;
+            if ($alt !== null && $lastAlt !== null) {
+                $delta = $alt - $lastAlt;
+                if ($delta > 0) {
+                    $elevationGainM += $delta; // hanya akumulasi kenaikan
+                }
+            }
+            if ($alt !== null) {
+                $lastAlt = $alt;
+            }
+        }
+        $elevationGainM = (int) round($elevationGainM);
+
         $startOdometer = $trip->start_odometer ?? ($vehicle->odometer ?? 0);
         $distanceKm = round($totalDistanceMeters / 1000, 2);
         $endOdometer = (int) ($startOdometer + $distanceKm);
@@ -130,6 +147,7 @@ class TrackingController extends Controller
             'end_odometer' => $endOdometer,
             'avg_speed_kph' => $avgSpeedKph,
             'max_speed_kph' => $maxSpeedKph,
+            'elevation_gain' => $elevationGainM,
         ]);
 
         // Update vehicle odometer
@@ -139,7 +157,15 @@ class TrackingController extends Controller
 
         return response()->json([
             'message' => 'Tracking stopped successfully',
-            'trip' => $trip
+            'trip' => $trip->fresh(),
+            'summary' => [
+                'distance_km'      => $distanceKm,
+                'duration_minutes' => $durationMinutes,
+                'avg_speed_kph'    => $avgSpeedKph,
+                'max_speed_kph'    => $maxSpeedKph,
+                'elevation_gain_m' => $elevationGainM,
+                'new_odometer'     => $endOdometer,
+            ],
         ], 200);
     }
 
@@ -159,14 +185,31 @@ class TrackingController extends Controller
     {
         $vehicle = Vehicle::where('id', $motorId)->where('user_id', $request->user()->id)->firstOrFail();
 
+        // Hitung status IoT online/offline berdasarkan last_telemetry_received_at
+        $lastReceived = $vehicle->last_telemetry_received_at;
+        $secondsAgo = $lastReceived ? now()->diffInSeconds($lastReceived) : null;
+        $iotStatus = match(true) {
+            $secondsAgo === null      => 'unknown',
+            $secondsAgo <= 15        => 'online',
+            $secondsAgo <= 60        => 'unstable',
+            default                  => 'offline',
+        };
+
         return response()->json([
-            'latitude' => $vehicle->last_latitude ? (float) $vehicle->last_latitude : null,
-            'longitude' => $vehicle->last_longitude ? (float) $vehicle->last_longitude : null,
-            'speed_kph' => $vehicle->last_speed_kph,
-            'heading_deg' => $vehicle->last_heading_deg,
-            'altitude' => $vehicle->last_altitude,
+            'latitude'        => $vehicle->last_latitude  ? (float) $vehicle->last_latitude  : null,
+            'longitude'       => $vehicle->last_longitude ? (float) $vehicle->last_longitude : null,
+            'speed_kph'       => $vehicle->last_speed_kph,
+            'heading_deg'     => $vehicle->last_heading_deg,
+            'altitude'        => $vehicle->last_altitude,
             'accuracy_meters' => $vehicle->last_accuracy_meters,
-            'telemetry_at' => $vehicle->last_telemetry_at ? $vehicle->last_telemetry_at->toISOString() : null,
+            'baro_rel_alt_m'  => $vehicle->last_baro_rel_alt_m,
+            'grade_pct'       => $vehicle->last_grade_pct,
+            'telemetry_at'    => $vehicle->last_telemetry_at
+                                    ? $vehicle->last_telemetry_at->toISOString()
+                                    : null,
+            'received_at'     => $lastReceived ? $lastReceived->toISOString() : null,
+            'iot_status'      => $iotStatus,
+            'seconds_ago'     => $secondsAgo,
         ], 200);
     }
 

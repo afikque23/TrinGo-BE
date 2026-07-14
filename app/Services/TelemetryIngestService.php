@@ -162,23 +162,21 @@ class TelemetryIngestService
         ?bool $mpuIsMoving = null,
         ?float $mpuGForce = null,
     ): void {
+        // Pattern B: hanya simpan trip_points jika ada trip AKTIF yang dimulai oleh user.
+        // Tidak auto-start trip — trip harus dimulai via tombol START di mobile.
         $trip = Trip::query()
             ->where('vehicle_id', $vehicle->id)
+            ->where('status', 'active')
             ->whereNull('end_at')
             ->orderByDesc('id')
             ->first();
 
         if (!$trip) {
-            // Auto-start a trip so incoming telemetry can be stored as trip history.
-            $trip = Trip::query()->create([
+            // Tidak ada trip aktif — skip, jangan simpan trip_points.
+            Log::debug('TelemetryIngest: no active trip for vehicle, skipping trip_point.', [
                 'vehicle_id' => $vehicle->id,
-                'started_by' => $vehicle->user_id,
-                'start_at' => $recordedAt,
-                'end_at' => null,
-                'distance_meters' => 0,
-                'start_odometer' => $vehicle->odometer ?? 0,
-                'notes' => 'Auto-started from MQTT telemetry',
             ]);
+            return;
         }
 
         $lastPoint = TripPoint::query()

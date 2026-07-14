@@ -223,7 +223,7 @@ class RecommendationService
             'avg_speed_kph' => $avgSpeedKph,
             'intensity_km_per_day' => $intensityKmPerDay,
             'elevation_gain_m' => $elevationGainM,
-            'ambient_temp_c' => 28.0, // Default for now, as not in DB
+            'ambient_temp_c' => 28.0, // Default — parameter suhu tidak dipakai di sistem ini
         ];
     }
 

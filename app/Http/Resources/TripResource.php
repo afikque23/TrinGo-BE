@@ -22,7 +22,6 @@ class TripResource extends JsonResource
                 'title' => $this->vehicle->title,
                 'make' => $this->vehicle->make,
                 'model' => $this->vehicle->model,
-                'license_plate' => $this->vehicle->license_plate,
             ],
             'started_by' => $this->started_by,
             'start_at' => $this->start_at?->toIso8601String(),
