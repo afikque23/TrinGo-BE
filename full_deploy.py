@@ -105,7 +105,7 @@ try:
 APP_ENV=production
 APP_KEY=
 APP_DEBUG=false
-APP_URL=http://tringgo.site
+APP_URL=https://tringgo.site
 
 LOG_CHANNEL=stack
 LOG_DEPRECATIONS_CHANNEL=null
@@ -125,11 +125,24 @@ QUEUE_CONNECTION=database
 SESSION_DRIVER=file
 SESSION_LIFETIME=120
 
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=motorcycleappnotification@gmail.com
+MAIL_PASSWORD=jslhtlwqftlusbix
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=motorcycleapptification@gmail.com
+MAIL_FROM_NAME="${{APP_NAME}}"
+
 MQTT_HOST=127.0.0.1
 MQTT_PORT=1883
 MQTT_USERNAME=tringgo_mqtt
 MQTT_PASSWORD={mqtt_pass}
 MQTT_TOPICS=vehicle/+/telemetry
+
+GEMINI_API_KEY=AIzaSyAtPITeOK6sSSM4sk1YGLjw7gCHs-ztQZA
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MAX_OUTPUT_TOKENS=64
 """
     # write env
     sftp = client.open_sftp()
@@ -141,7 +154,7 @@ MQTT_TOPICS=vehicle/+/telemetry
     print("\n[+] Menjalankan perintah instalasi Laravel...")
     ssh_exec(client, f"cd {remote_base} && composer install --no-interaction --no-dev --optimize-autoloader", print_output=False)
     ssh_exec(client, f"cd {remote_base} && php artisan key:generate", print_output=False)
-    ssh_exec(client, f"cd {remote_base} && php artisan migrate --force", print_output=False)
+    ssh_exec(client, f"cd {remote_base} && php artisan migrate --force", print_output=True)
     ssh_exec(client, f"cd {remote_base} && php artisan storage:link", print_output=False)
     
     print("\n[+] Mengatur hak akses keamanan (Permissions)...")

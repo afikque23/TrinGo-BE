@@ -11,7 +11,7 @@ DB_DATABASE="motorcyclemanagement"
 DB_USER="tringgo_db"
 DB_PASSWORD=$(openssl rand -base64 12 | tr -dc 'a-zA-Z0-9')
 MQTT_USER="tringgo_mqtt"
-MQTT_PASSWORD=$(openssl rand -base64 12 | tr -dc 'a-zA-Z0-9')
+MQTT_PASSWORD="erenvsreiner"
 APP_DIR="/var/www/motorcycle_management"
 DOMAIN="vps.tringgo.site"
 IP_SERVER="203.194.115.228"
@@ -33,7 +33,10 @@ apt-get update --allow-releaseinfo-change -y
 apt-get install -y php8.2-fpm php8.2-cli php8.2-mysql php8.2-mbstring php8.2-xml php8.2-curl php8.2-zip php8.2-gd php8.2-bcmath php8.2-intl php8.2-opcache
 
 echo "[+] 3. Konfigurasi Nginx..."
-cat <<EOF > /etc/nginx/sites-available/tringgo
+if [ -f "/etc/nginx/sites-available/tringgo" ] && grep -q "ssl_certificate" "/etc/nginx/sites-available/tringgo"; then
+    echo "[!] Konfigurasi SSL Nginx sudah ada. Melewati penimpaan konfigurasi Nginx agar SSL tidak hilang."
+else
+    cat <<EOF > /etc/nginx/sites-available/tringgo
 server {
     listen 80;
     server_name $DOMAIN $IP_SERVER;
@@ -57,13 +60,15 @@ server {
     }
 }
 EOF
-ln -sf /etc/nginx/sites-available/tringgo /etc/nginx/sites-enabled/
-rm -f /etc/nginx/sites-enabled/default
-systemctl restart nginx
+    ln -sf /etc/nginx/sites-available/tringgo /etc/nginx/sites-enabled/
+    rm -f /etc/nginx/sites-enabled/default
+    systemctl restart nginx
+fi
 
 echo "[+] 4. Konfigurasi MariaDB..."
 mysql -u root -e "CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-mysql -u root -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASSWORD}';"
+mysql -u root -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost';"
+mysql -u root -e "ALTER USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASSWORD}';"
 mysql -u root -e "GRANT ALL PRIVILEGES ON \`${DB_DATABASE}\`.* TO '${DB_USER}'@'localhost';"
 mysql -u root -e "FLUSH PRIVILEGES;"
 

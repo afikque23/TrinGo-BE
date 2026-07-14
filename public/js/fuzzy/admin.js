@@ -20,21 +20,17 @@ const ROUTES = {
 };
 
 const VAR_LABELS = {
-    jarak: "Jarak Sejak Servis (km)",
-    durasi: "Durasi Sejak Servis (hari)",
-    kecepatan: "Kecepatan Rata-rata (km/h)",
-    intensitas: "Intensitas Pakai (km/hari)",
-    suhu: "Suhu Lingkungan (°C)",
-    ketinggian: "Akumulasi Kenaikan Ketinggian (m)",
+    jarak: "Jarak Tempuh (Mileage)",
+    durasi: "Durasi Hari (Days Since)",
+    kecepatan: "Kecepatan Rata-rata",
+    intensitas: "Intensitas Berkendara",
 };
 
 const ALL_VARS = [
     { key: "jarak", label: VAR_LABELS.jarak, unit: "km" },
     { key: "durasi", label: VAR_LABELS.durasi, unit: "hari" },
-    { key: "kecepatan", label: VAR_LABELS.kecepatan, unit: "km/h" },
-    { key: "intensitas", label: VAR_LABELS.intensitas, unit: "km/hari" },
-    { key: "suhu", label: VAR_LABELS.suhu, unit: "°C" },
-    { key: "ketinggian", label: VAR_LABELS.ketinggian, unit: "m" },
+    { key: "kecepatan", label: VAR_LABELS.kecepatan, unit: "km/jam" },
+    { key: "intensitas", label: VAR_LABELS.intensitas, unit: "score" },
 ];
 
 function fuzzyAdmin() {
@@ -90,7 +86,7 @@ function fuzzyAdmin() {
         deleteTarget: null,
 
         // Test
-        testInputs: { jarak: 1200, durasi: 50, kecepatan: 45, intensitas: 20, suhu: 28, ketinggian: 150 },
+        testInputs: { jarak: 1200, durasi: 50, kecepatan: 45, intensitas: 5 },
         testResult: null,
 
         // Chart

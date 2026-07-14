@@ -15,7 +15,11 @@ files_to_upload = [
     "app/Services/RecommendationService.php",
     "public/js/fuzzy/admin.js",
     "resources/views/admin/fuzzy/index.blade.php",
-    "public/db-admin/index.php"
+    "public/db-admin/index.php",
+    "app/Services/TelemetryIngestService.php",
+    "app/Services/Fuzzy/FuzzyEngine.php",
+    "app/Services/Fuzzy/DefaultFuzzyConfig.php",
+    "resources/views/admin/fuzzy_config/edit.blade.php"
 ]
 
 local_base = "c:/laragon/www/motorcycle_management"

@@ -181,7 +181,24 @@ class TelemetryIngestService
             ]);
         }
 
-        $nextSequence = (int) (TripPoint::query()->where('trip_id', $trip->id)->max('sequence') ?? 0) + 1;
+        $lastPoint = TripPoint::query()
+            ->where('trip_id', $trip->id)
+            ->orderByDesc('sequence')
+            ->first();
+
+        $nextSequence = ($lastPoint->sequence ?? 0) + 1;
+
+        $distanceToAdd = 0.0;
+        if ($hasFix === true && $latitude !== null && $longitude !== null && $lastPoint && $lastPoint->latitude !== null && $lastPoint->longitude !== null) {
+            $distanceToAdd = $this->calculateHaversineDistance((float)$lastPoint->latitude, (float)$lastPoint->longitude, $latitude, $longitude);
+        } elseif ($hasFix === false && $estDistanceM !== null && $estDistanceM > 0) {
+            $distanceToAdd = $estDistanceM;
+        }
+
+        if ($distanceToAdd > 0) {
+            $trip->distance_meters = ($trip->distance_meters ?? 0) + (int) round($distanceToAdd);
+            $trip->save();
+        }
 
         TripPoint::create([
             'trip_id' => $trip->id,
@@ -199,6 +216,16 @@ class TelemetryIngestService
             'accuracy_meters' => $accuracyMeters,
             'recorded_at' => $recordedAt,
         ]);
+    }
+
+    private function calculateHaversineDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
+    {
+        $earthRadius = 6371000.0; // in meters
+        $latDelta = deg2rad($lat2 - $lat1);
+        $lonDelta = deg2rad($lon2 - $lon1);
+        $a = sin($latDelta / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * (sin($lonDelta / 2) ** 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        return $earthRadius * $c;
     }
 
     /**
