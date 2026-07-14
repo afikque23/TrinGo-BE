@@ -14,33 +14,33 @@ final class DefaultFuzzyConfig
                 'distance_since_service_km' => [
                     'universe' => [0, 5000],
                     'sets' => [
-                        'low' => ['type' => 'trap', 'params' => [0, 0, 500, 1500]],
+                        'low' => ['type' => 'linDown', 'params' => [1000, 2500]],
                         'medium' => ['type' => 'tri', 'params' => [1000, 2500, 4000]],
-                        'high' => ['type' => 'trap', 'params' => [3000, 4500, 5000, 5000]],
+                        'high' => ['type' => 'linUp', 'params' => [2500, 4000]],
                     ],
                 ],
                 'duration_since_service_days' => [
                     'universe' => [0, 180],
                     'sets' => [
-                        'low' => ['type' => 'trap', 'params' => [0, 0, 7, 30]],
-                        'medium' => ['type' => 'tri', 'params' => [20, 60, 100]],
-                        'high' => ['type' => 'trap', 'params' => [80, 120, 180, 180]],
+                        'low' => ['type' => 'linDown', 'params' => [30, 90]],
+                        'medium' => ['type' => 'tri', 'params' => [30, 90, 150]],
+                        'high' => ['type' => 'linUp', 'params' => [90, 150]],
                     ],
                 ],
                 'avg_speed_kph' => [
                     'universe' => [0, 120],
                     'sets' => [
-                        'low' => ['type' => 'trap', 'params' => [0, 0, 20, 35]],
-                        'medium' => ['type' => 'tri', 'params' => [30, 55, 80]],
-                        'high' => ['type' => 'trap', 'params' => [70, 90, 120, 120]],
+                        'low' => ['type' => 'linDown', 'params' => [20, 60]],
+                        'medium' => ['type' => 'tri', 'params' => [20, 60, 100]],
+                        'high' => ['type' => 'linUp', 'params' => [60, 100]],
                     ],
                 ],
                 'intensity_km_per_day' => [
-                    'universe' => [0, 120],
+                    'universe' => [0, 10],
                     'sets' => [
-                        'low' => ['type' => 'trap', 'params' => [0, 0, 10, 25]],
-                        'medium' => ['type' => 'tri', 'params' => [20, 45, 70]],
-                        'high' => ['type' => 'trap', 'params' => [60, 85, 120, 120]],
+                        'low' => ['type' => 'linDown', 'params' => [2, 5]],
+                        'medium' => ['type' => 'tri', 'params' => [2, 5, 8]],
+                        'high' => ['type' => 'linUp', 'params' => [5, 8]],
                     ],
                 ],
             ],

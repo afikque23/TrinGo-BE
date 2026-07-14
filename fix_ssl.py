@@ -22,7 +22,7 @@ try:
     client.connect(hostname, username=username, password=password, disabled_algorithms={'pubkeys': ['rsa-sha2-256', 'rsa-sha2-512']})
     
     print("\n[+] Menghapus domain yang tidak valid dari Nginx...")
-    ssh_exec(client, 'sed -i "s/server_name tringgo.site www.tringgo.site vps.tringgo.site/server_name tringgo.site www.tringgo.site/g" /etc/nginx/sites-available/tringgo')
+    ssh_exec(client, 'sed -i "s/server_name.*/server_name tringgo.site www.tringgo.site vps.tringgo.site;/g" /etc/nginx/sites-available/tringgo')
     ssh_exec(client, "systemctl reload nginx")
     
     print("\n[+] Meminta ulang sertifikat SSL hanya untuk domain utama...")

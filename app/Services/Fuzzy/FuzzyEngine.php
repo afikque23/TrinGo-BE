@@ -225,10 +225,34 @@ class FuzzyEngine
         $params = $setDef['params'] ?? [];
 
         return match ($type) {
+            'linDown' => $this->linDown($x, (float) ($params[0] ?? 0), (float) ($params[1] ?? 0)),
             'tri' => $this->triangular($x, (float) ($params[0] ?? 0), (float) ($params[1] ?? 0), (float) ($params[2] ?? 0)),
+            'linUp' => $this->linUp($x, (float) ($params[0] ?? 0), (float) ($params[1] ?? 0)),
             'trap' => $this->trapezoidal($x, (float) ($params[0] ?? 0), (float) ($params[1] ?? 0), (float) ($params[2] ?? 0), (float) ($params[3] ?? 0)),
             default => 0.0,
         };
+    }
+
+    private function linDown(float $x, float $a, float $b): float
+    {
+        if ($x <= $a) {
+            return 1.0;
+        }
+        if ($x >= $b) {
+            return 0.0;
+        }
+        return ($b == $a) ? 0.0 : (($b - $x) / ($b - $a));
+    }
+
+    private function linUp(float $x, float $a, float $b): float
+    {
+        if ($x <= $a) {
+            return 0.0;
+        }
+        if ($x >= $b) {
+            return 1.0;
+        }
+        return ($b == $a) ? 0.0 : (($x - $a) / ($b - $a));
     }
 
     private function triangular(float $x, float $a, float $b, float $c): float

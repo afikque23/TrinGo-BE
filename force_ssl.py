@@ -5,7 +5,7 @@ hostname = "203.194.115.228"
 username = "root"
 
 print("=====================================================")
-print(" MENGGANTI PASSWORD DATABASE TRINGGO ")
+print(" FORCE FIX SSL (HTTPS) TRINGGO ")
 print("=====================================================")
 password = getpass.getpass(prompt="Masukkan Password ROOT VPS Anda: ")
 
@@ -21,23 +21,17 @@ try:
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(hostname, username=username, password=password, disabled_algorithms={'pubkeys': ['rsa-sha2-256', 'rsa-sha2-512']})
     
-    # 1. Update MariaDB password
-    print("\n[+] Mengubah password database di sistem MariaDB (MySQL)...")
-    ssh_exec(client, 'mysql -u root -e "ALTER USER \'tringgo_db\'@\'localhost\' IDENTIFIED BY \'praupos1\'; FLUSH PRIVILEGES;"')
+    print("\n[+] Memperbaiki konfigurasi Nginx secara paksa...")
+    # Menghapus baris server_name yang ada dan menggantinya dengan yang benar
+    ssh_exec(client, 'sed -i "/server_name/c\\    server_name tringgo.site www.tringgo.site 203.194.115.228;" /etc/nginx/sites-available/tringgo')
+    ssh_exec(client, "systemctl reload nginx")
     
-    # 2. Update Laravel .env
-    print("\n[+] Menghubungkan ulang website Laravel dengan password baru...")
-    ssh_exec(client, 'sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=praupos1/g" /var/www/motorcycle_management/.env')
-    
-    # 3. Clear laravel cache and restart supervisor
-    print("\n[+] Membersihkan cache dan merestart background worker...")
-    ssh_exec(client, "cd /var/www/motorcycle_management && php artisan config:clear")
-    ssh_exec(client, "systemctl restart supervisor")
+    print("\n[+] Memasang sertifikat SSL yang sudah berhasil didownload ke Nginx...")
+    ssh_exec(client, "certbot install --cert-name tringgo.site --nginx --redirect")
     
     print("\n=====================================================")
-    print(" 🎉 PASSWORD DATABASE BERHASIL DIGANTI! 🎉")
-    print(" Password baru Anda sekarang: praupos1")
-    print(" Anda sudah bisa login di phpMyAdmin dengan password tersebut.")
+    print(" 🎉 PERBAIKAN SSL BENAR-BENAR SELESAI! 🎉")
+    print(" Silakan cek ulang website https://tringgo.site")
     print("=====================================================")
     
 except Exception as e:
