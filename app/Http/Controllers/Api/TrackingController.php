@@ -91,7 +91,55 @@ class TrackingController extends Controller
 
         // Calculate distance and speed from trip points
         $points = TripPoint::where('trip_id', $trip->id)->orderBy('sequence')->get();
+
+        // Fallback: simpan route points dari mobile jika subscriber MQTT tidak menyimpan TripPoints.
+        if ($points->isEmpty()) {
+            $clientRoutePoints = $request->input('client_route_points', []);
+            if (is_array($clientRoutePoints) && !empty($clientRoutePoints)) {
+                $rows = [];
+                $sequence = 1;
+                foreach ($clientRoutePoints as $rawPoint) {
+                    if (!is_array($rawPoint)) {
+                        continue;
+                    }
+
+                    $lat = $this->parseFloat($rawPoint['lat'] ?? $rawPoint['latitude'] ?? null);
+                    $lng = $this->parseFloat($rawPoint['lng'] ?? $rawPoint['longitude'] ?? null);
+                    if ($lat === null || $lng === null) {
+                        continue;
+                    }
+                    if ($lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
+                        continue;
+                    }
+
+                    $speed = $this->parseFloat($rawPoint['speed_kph'] ?? null);
+                    $recordedAt = $this->parseClientTimestamp($rawPoint['recorded_at'] ?? $rawPoint['timestamp'] ?? null);
+
+                    $rows[] = [
+                        'trip_id' => $trip->id,
+                        'sequence' => $sequence++,
+                        'has_fix' => true,
+                        'latitude' => $lat,
+                        'longitude' => $lng,
+                        'speed_kph' => $speed !== null ? (int) round($speed) : null,
+                        'recorded_at' => $recordedAt,
+                        'created_at' => now(),
+                    ];
+                }
+
+                if (!empty($rows)) {
+                    TripPoint::insert($rows);
+                    $points = TripPoint::where('trip_id', $trip->id)->orderBy('sequence')->get();
+                    \Illuminate\Support\Facades\Log::info('TrackingStop: persisted client route points fallback', [
+                        'trip_id' => $trip->id,
+                        'points_count' => count($rows),
+                    ]);
+                }
+            }
+        }
+
         $totalDistanceMeters = 0;
+        $totalEstDistanceMeters = 0; // fallback dari est_distance_m ESP32
         $maxSpeedKph = 0;
         $sumSpeed = 0;
         $countSpeed = 0;
@@ -104,6 +152,10 @@ class TrackingController extends Controller
                     $point->latitude, $point->longitude
                 );
             }
+            // Akumulasi est_distance_m (dikirim ESP32 per interval GPS)
+            if ($point->est_distance_m !== null) {
+                $totalEstDistanceMeters += $point->est_distance_m;
+            }
             if ($point->speed_kph !== null) {
                 $sumSpeed += $point->speed_kph;
                 $countSpeed++;
@@ -114,8 +166,34 @@ class TrackingController extends Controller
             $lastPoint = $point;
         }
 
+        // Jika Haversine 0 (GPS fix tidak konsisten), pakai est_distance_m ESP32
+        if ($totalDistanceMeters == 0 && $totalEstDistanceMeters > 0) {
+            $totalDistanceMeters = $totalEstDistanceMeters;
+        }
+
+        // Ultimate fallback: gunakan client_distance_meters dari mobile jika backend tidak punya TripPoints
+        $clientDistanceMeters = (float) $request->input('client_distance_meters', 0);
+        if ($totalDistanceMeters == 0 && $clientDistanceMeters > 0) {
+            $totalDistanceMeters = $clientDistanceMeters;
+            \Illuminate\Support\Facades\Log::info('TrackingStop: using client-side distance as fallback', [
+                'trip_id' => $trip->id,
+                'client_distance_meters' => $clientDistanceMeters,
+            ]);
+        }
+
+        // Fallback statistik kecepatan dari mobile jika backend tidak punya TripPoints valid.
+        $clientAvgSpeedKph = (float) $request->input('client_avg_speed_kph', 0);
+        $clientMaxSpeedKph = (float) $request->input('client_max_speed_kph', 0);
+
         $avgSpeedKph = $countSpeed > 0 ? round($sumSpeed / $countSpeed, 2) : null;
         $maxSpeedKph = $maxSpeedKph > 0 ? $maxSpeedKph : null;
+
+        if (($avgSpeedKph === null || $avgSpeedKph <= 0) && $clientAvgSpeedKph > 0) {
+            $avgSpeedKph = round($clientAvgSpeedKph, 2);
+        }
+        if (($maxSpeedKph === null || $maxSpeedKph <= 0) && $clientMaxSpeedKph > 0) {
+            $maxSpeedKph = round($clientMaxSpeedKph, 2);
+        }
 
         // Hitung elevation_gain dari baro_rel_alt_m (BMP280) — total kenaikan elevasi
         $elevationGainM = 0;
@@ -165,6 +243,8 @@ class TrackingController extends Controller
                 'max_speed_kph'    => $maxSpeedKph,
                 'elevation_gain_m' => $elevationGainM,
                 'new_odometer'     => $endOdometer,
+                'trip_points_count' => $points->count(),   // info debug
+                'used_client_distance' => ($points->count() === 0 && $clientDistanceMeters > 0),
             ],
         ], 200);
     }
@@ -185,6 +265,11 @@ class TrackingController extends Controller
     {
         $vehicle = Vehicle::where('id', $motorId)->where('user_id', $request->user()->id)->firstOrFail();
 
+        $lat = $vehicle->last_latitude;
+        $lng = $vehicle->last_longitude;
+        $hasCoordinates = $lat !== null && $lng !== null;
+        $gpsReady = $hasCoordinates;
+
         // Hitung status IoT online/offline berdasarkan last_telemetry_received_at
         $lastReceived = $vehicle->last_telemetry_received_at;
         $secondsAgo = $lastReceived ? now()->diffInSeconds($lastReceived) : null;
@@ -196,14 +281,17 @@ class TrackingController extends Controller
         };
 
         return response()->json([
-            'latitude'        => $vehicle->last_latitude  ? (float) $vehicle->last_latitude  : null,
-            'longitude'       => $vehicle->last_longitude ? (float) $vehicle->last_longitude : null,
+            'latitude'        => $hasCoordinates ? (float) $lat : null,
+            'longitude'       => $hasCoordinates ? (float) $lng : null,
             'speed_kph'       => $vehicle->last_speed_kph,
             'heading_deg'     => $vehicle->last_heading_deg,
             'altitude'        => $vehicle->last_altitude,
             'accuracy_meters' => $vehicle->last_accuracy_meters,
+            'satellites'      => $vehicle->last_satellites,
+            'hdop'            => $vehicle->last_hdop,
             'baro_rel_alt_m'  => $vehicle->last_baro_rel_alt_m,
             'grade_pct'       => $vehicle->last_grade_pct,
+            'gps_ready'       => $gpsReady,
             'telemetry_at'    => $vehicle->last_telemetry_at
                                     ? $vehicle->last_telemetry_at->toISOString()
                                     : null,
@@ -227,6 +315,44 @@ class TrackingController extends Controller
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
         return $earthRadius * $c;
+    }
+
+    private function parseFloat($value): ?float
+    {
+        if ($value === null) {
+            return null;
+        }
+        if (is_int($value) || is_float($value)) {
+            return (float) $value;
+        }
+        if (is_string($value) && is_numeric($value)) {
+            return (float) $value;
+        }
+
+        return null;
+    }
+
+    private function parseClientTimestamp($value): Carbon
+    {
+        try {
+            if (is_int($value) || is_float($value)) {
+                $numeric = (float) $value;
+                if ($numeric > 1_000_000_000_000) {
+                    return Carbon::createFromTimestampMs((int) round($numeric));
+                }
+                if ($numeric > 0) {
+                    return Carbon::createFromTimestamp((int) round($numeric));
+                }
+            }
+
+            if (is_string($value) && $value !== '') {
+                return Carbon::parse($value);
+            }
+        } catch (\Throwable) {
+            // fallback below
+        }
+
+        return now();
     }
 }
 

@@ -162,6 +162,15 @@ class TelemetryIngestService
         ?bool $mpuIsMoving = null,
         ?float $mpuGForce = null,
     ): void {
+        // Jangan simpan no-fix telemetry ke trip_points agar rute/jarak tidak tercemar.
+        if ($hasFix === false || $latitude === null || $longitude === null) {
+            Log::debug('TelemetryIngest: skipping trip_point due to GPS no-fix.', [
+                'vehicle_id' => $vehicle->id,
+                'has_fix' => $hasFix,
+            ]);
+            return;
+        }
+
         // Pattern B: hanya simpan trip_points jika ada trip AKTIF yang dimulai oleh user.
         // Tidak auto-start trip — trip harus dimulai via tombol START di mobile.
         $trip = Trip::query()
