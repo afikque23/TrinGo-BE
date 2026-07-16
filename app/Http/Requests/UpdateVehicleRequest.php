@@ -34,6 +34,12 @@ class UpdateVehicleRequest extends FormRequest
             'vin' => ['nullable', 'string', 'max:64', Rule::unique('vehicles')->ignore($vehicleId)],
             'odometer' => ['nullable', 'integer', 'min:0'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'], // Max 5MB
+            // Parameter default untuk kalkulasi jadwal servis
+            'default_beban'           => ['nullable', 'in:ringan,sedang,berat'],
+            'default_penumpang'       => ['nullable', 'boolean'],
+            'default_gaya_berkendara' => ['nullable', 'in:pelan,normal,agresif'],
+            'default_kondisi_jalan'   => ['nullable', 'in:macet,sedang,lancar'],
+            'default_medan'           => ['nullable', 'in:datar,berbukit,campuran'],
         ];
     }
 

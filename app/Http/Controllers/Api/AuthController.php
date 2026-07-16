@@ -35,12 +35,29 @@ class AuthController extends Controller
     public function register(RegisterRequest $request): JsonResponse
     {
         try {
-            // Create user
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-            ]);
+            $email = strtolower(trim((string) $request->email));
+
+            $existingUser = User::where('email', $email)->first();
+
+            if ($existingUser && $existingUser->email_verified_at) {
+                return $this->errorResponse('Email sudah terdaftar. Silakan login.', 422);
+            }
+
+            if ($existingUser) {
+                // Akun pending verifikasi: perbarui profil/password lalu kirim OTP baru.
+                $existingUser->update([
+                    'name' => $request->name,
+                    'password' => Hash::make($request->password),
+                ]);
+                $user = $existingUser;
+            } else {
+                // Create user baru
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $email,
+                    'password' => Hash::make($request->password),
+                ]);
+            }
 
             // Generate OTP for email verification
             $otp = OtpVerification::createOtp(
@@ -69,7 +86,11 @@ class AuthController extends Controller
                 $responseData['otp'] = $otp->otp;
             }
 
-            return $this->createdResponse($responseData, 'Registrasi berhasil. Kode OTP telah dikirim ke email Anda.');
+            $message = $existingUser
+                ? 'Akun belum terverifikasi. Kode OTP baru telah dikirim ke email Anda.'
+                : 'Registrasi berhasil. Kode OTP telah dikirim ke email Anda.';
+
+            return $this->successResponse($responseData, $message, $existingUser ? 200 : 201);
 
         } catch (\Exception $e) {
             Log::error('Registration error: ' . $e->getMessage());
@@ -148,6 +169,16 @@ class AuthController extends Controller
         ]);
 
         try {
+            if ($request->type === 'email_verification') {
+                $user = User::where('email', $request->email)->first();
+                if (!$user) {
+                    return $this->errorResponse('Email tidak ditemukan', 404);
+                }
+                if ($user->email_verified_at) {
+                    return $this->errorResponse('Email sudah diverifikasi. Silakan login.', 400);
+                }
+            }
+
             // Generate new OTP
             $otp = OtpVerification::createOtp(
                 $request->email,

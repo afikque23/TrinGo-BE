@@ -7,8 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Hapus kolom license_plate, color, dan semua parameter default dari tabel vehicles.
-     * Field-field ini dipindahkan ke konteks perjalanan (trip) dan tidak lagi disimpan di level kendaraan.
+     * Hapus kolom license_plate dan color dari tabel vehicles.
+     * Field-field ini tidak digunakan lagi dalam aplikasi.
+     * Catatan: default_beban, default_penumpang, dll. TETAP dipertahankan
+     * karena dibutuhkan untuk kalkulasi jadwal servis.
      */
     public function up(): void
     {
@@ -16,11 +18,6 @@ return new class extends Migration
             $table->dropColumn([
                 'license_plate',
                 'color',
-                'default_beban',
-                'default_penumpang',
-                'default_gaya_berkendara',
-                'default_kondisi_jalan',
-                'default_medan',
             ]);
         });
     }
@@ -33,11 +30,6 @@ return new class extends Migration
         Schema::table('vehicles', function (Blueprint $table) {
             $table->string('license_plate', 20)->nullable()->after('odometer');
             $table->string('color', 50)->nullable()->after('license_plate');
-            $table->enum('default_beban', ['ringan', 'sedang', 'berat'])->default('ringan')->after('transmisi');
-            $table->boolean('default_penumpang')->default(false)->after('default_beban');
-            $table->enum('default_gaya_berkendara', ['pelan', 'normal', 'agresif'])->default('normal')->after('default_penumpang');
-            $table->enum('default_kondisi_jalan', ['macet', 'sedang', 'lancar'])->default('sedang')->after('default_gaya_berkendara');
-            $table->enum('default_medan', ['datar', 'berbukit', 'campuran'])->default('datar')->after('default_kondisi_jalan');
         });
     }
 };
