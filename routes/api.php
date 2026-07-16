@@ -104,7 +104,14 @@ Route::middleware(['auth:sanctum,web'])->group(function () {
         Route::post('/tracking/stop', [\App\Http\Controllers\Api\TrackingController::class, 'stop']);
         Route::get('/tracking/status', [\App\Http\Controllers\Api\TrackingController::class, 'status']);
         Route::get('/tracking/last-location', [\App\Http\Controllers\Api\TrackingController::class, 'lastLocation']);
+
+        // IoT Diagnostic endpoints — untuk debugging koneksi ESP32
+        Route::get('/iot-diagnostic', [\App\Http\Controllers\Api\IotDiagnosticController::class, 'check']);
+        Route::get('/iot-diagnostic/simulate-telemetry', [\App\Http\Controllers\Api\IotDiagnosticController::class, 'simulateTelemetry']);
     });
+
+    // IoT Diagnostic: MQTT broker ping (tidak spesifik motor)
+    Route::get('/iot-diagnostic/ping-mqtt', [\App\Http\Controllers\Api\IotDiagnosticController::class, 'pingMqtt']);
 
     Route::post('/vehicles/{id}/set-primary', [VehicleController::class, 'setPrimary']);
     Route::apiResource('vehicles', VehicleController::class);
