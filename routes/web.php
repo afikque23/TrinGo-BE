@@ -58,6 +58,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
         Route::post('/components/{component}/test', [FuzzyLogicController::class, 'test'])->name('test');
         Route::post('/chart-data', [FuzzyLogicController::class, 'chartData'])->name('chart');
+
+        // Fuzzy Simulator (pengujian BAB 4)
+        Route::get('/simulator', [FuzzyLogicController::class, 'simulator'])->name('simulator');
+        Route::post('/simulator/run', [FuzzyLogicController::class, 'simulatorRun'])->name('simulator.run');
+        Route::post('/simulator/inject-trip', [FuzzyLogicController::class, 'simulatorInjectTrip'])->name('simulator.inject');
+        Route::delete('/simulator/trips/{trip}', [FuzzyLogicController::class, 'simulatorDeleteTrip'])->name('simulator.trip.delete');
     });
     
     // Notification Management Routes

@@ -44,11 +44,8 @@
     @click.self="showAddComp=false"
   >
     {{-- Modal: landscape / horizontal rectangle --}}
-    <div style="background:#111111; border:1px solid #1e2939; border-radius:16px;
-                width:100%; max-width:860px; min-height:340px;
-                box-shadow:0 25px 60px rgba(0,0,0,.85); overflow:hidden;
-                font-family:'Inter',Arial,sans-serif; animation:slideUp .18s ease;
-                display:flex; flex-direction:column;">
+    <div class="bg-[#111111] border border-[#1e2939] rounded-2xl w-full max-w-[860px] shadow-[0_25px_60px_rgba(0,0,0,0.85)] flex flex-col font-['Inter',Arial,sans-serif]"
+         style="animation:slideUp .18s ease; max-height:80vh; overflow:hidden;">
 
       {{-- ══ Header ══ --}}
       <div class="flex items-start justify-between px-6 py-4 border-b border-[#1e2939]">
@@ -64,10 +61,10 @@
       </div>
 
       {{-- ══ Body: dua kolom horizontal ══ --}}
-      <div style="display:flex; flex:1; overflow:hidden;">
+      <div class="flex flex-col md:flex-row overflow-y-auto" style="flex:1; min-height:0;">
 
         {{-- Kolom Kiri --}}
-        <div style="flex:1; padding:20px 24px; display:flex; flex-direction:column; gap:18px; overflow-y:auto;">
+        <div class="flex-1 p-5 md:p-6 flex flex-col gap-[18px] shrink-0">
 
           {{-- Error --}}
           <template x-if="addCompError">
@@ -119,10 +116,11 @@
         </div>
 
         {{-- Divider vertikal --}}
-        <div class="modal-col-divider"></div>
+        <div class="hidden md:block modal-col-divider"></div>
+        <div class="block md:hidden h-px bg-[#1e2939] mx-5 shrink-0"></div>
 
         {{-- Kolom Kanan --}}
-        <div style="flex:1; padding:20px 24px; display:flex; flex-direction:column; gap:18px; overflow-y:auto;">
+        <div class="flex-1 p-5 md:p-6 flex flex-col gap-[18px] shrink-0">
 
           {{-- Threshold --}}
           <div>

@@ -120,8 +120,8 @@
         <!-- Header -->
         <div class="px-6 py-5 border-b border-[#1E2939] flex items-center justify-between">
             <div>
-                <h1 class="text-lg font-bold text-white" style="font-family: Arial, sans-serif;">MotoTracker</h1>
-                <p class="text-xs text-[#6A7282] mt-0.5 uppercase tracking-wider" style="font-family: Arial, sans-serif;">ADMIN PANEL</p>
+                <h1 class="text-2xl font-bold text-white" style="font-family: Arial, sans-serif;">MotoTracker</h1>
+                <p class="text-[10px] text-[#6A7282] mt-0.5 uppercase tracking-wider" style="font-family: Arial, sans-serif;">ADMIN PANEL</p>
             </div>
             <!-- Close button (mobile only) -->
             <button onclick="closeSidebar()" class="mobile-only text-gray-400 hover:text-white focus:outline-none" title="Close Sidebar">

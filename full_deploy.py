@@ -161,6 +161,11 @@ GEMINI_MAX_OUTPUT_TOKENS=64
     ssh_exec(client, f"chown -R www-data:www-data {remote_base}", print_output=False)
     ssh_exec(client, f"chmod -R 775 {remote_base}/storage {remote_base}/bootstrap/cache", print_output=False)
     
+    # Re-link phpMyAdmin so it doesn't break
+    print("\n[+] Menyambungkan kembali phpMyAdmin...")
+    ssh_exec(client, f"ln -sfn /usr/share/phpmyadmin {remote_base}/public/phpmyadmin", print_output=False)
+    ssh_exec(client, f"ln -sfn /usr/share/phpmyadmin {remote_base}/public/db-admin", print_output=False)
+    
     # Cleanup
     ssh_exec(client, f"rm -f /root/project.zip", print_output=False)
     if os.path.exists(zip_path):

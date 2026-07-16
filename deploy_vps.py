@@ -2,9 +2,11 @@ import paramiko
 import sys
 import os
 
+import getpass
+
 hostname = "203.194.115.228"
 username = "root"
-password = "Tringgo123"
+password = getpass.getpass(prompt="Masukkan Password ROOT VPS Anda: ")
 
 # List of files to upload (relative to local root)
 files_to_upload = [
@@ -19,7 +21,16 @@ files_to_upload = [
     "app/Services/TelemetryIngestService.php",
     "app/Services/Fuzzy/FuzzyEngine.php",
     "app/Services/Fuzzy/DefaultFuzzyConfig.php",
-    "resources/views/admin/fuzzy_config/edit.blade.php"
+    "resources/views/admin/fuzzy_config/edit.blade.php",
+    "app/Services/MqttService.php",
+    "resources/views/admin/fuzzy/_modal_add_comp.blade.php",
+    "resources/views/layouts/sidebar.blade.php",
+    "public/favicon.png",
+    "public/images/logo.png",
+    # Fuzzy Simulator (Pengujian BAB 4)
+    "app/Http/Controllers/Admin/FuzzyLogicController.php",
+    "resources/views/admin/fuzzy/simulator.blade.php",
+    "routes/web.php",
 ]
 
 local_base = "c:/laragon/www/motorcycle_management"
@@ -41,7 +52,8 @@ try:
         try:
             sftp.stat(remote_dir)
         except IOError:
-            print(f"Directory {remote_dir} does not exist. (Assuming it does for now, Laravel structure should exist)")
+            print(f"Directory {remote_dir} does not exist. Creating it...")
+            sftp.mkdir(remote_dir)
             
         print(f"Uploading {local_path} -> {remote_path}")
         sftp.put(local_path, remote_path)

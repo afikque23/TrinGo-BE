@@ -1,0 +1,733 @@
+RANCANG BANGUN SISTEM MONITORING PERAWATAN SEPEDA MOTOR DAN REKOMENDASINYA  MENGGUNAKAN TEKNOLOGI IOT BERBASIS MOBILE
+Disusun oleh:
+Aji Saka3.34.23.1.01
+Arya Yusufa Agnil Fikri3.34.23.1.05
+PROGRAM STUDI TEKNIK INFORMATIKA
+JURUSAN TEKNIK ELEKTRO
+POLITEKNIK NEGERI SEMARANG
+2026
+RANCANG BANGUN SISTEM MONITORING PERAWATAN SEPEDA MOTOR DAN REKOMENDASINYA  MENGGUNAKAN TEKNOLOGI IOT BERBASIS MOBILE
+Tugas Akhir ini disusun untuk melengkapi sebagian persyaratan menjadi Ahli Madya
+Disusun oleh:
+Aji Saka3.34.23.1.01
+Arya Yusufa Agnil Fikri3.34.23.1.05
+PROGRAM STUDI TEKNIK INFORMATIKA
+JURUSAN TEKNIK ELEKTRO
+POLITEKNIK NEGERI SEMARANG
+2026
+PERNYATAAN KEASLIAN TUGAS AKHIR
+Nama / NIM / Kelas
+: Aji Saka / 3.34.23.1.01 / IK 3B
+Nama / NIM / Kelas
+: Arya Yusufa Agnil Fikri / 3.34.23.1.05 / IK 3B
+Jurusan
+: Teknik Elektro
+Program Studi
+: Teknik Informatika
+Yang bertanda tangan dibawah ini, saya : 
+Menyatakan dengan sesungguhnya bahwa Tugas Akhir dengan judul “Rancang Bangun Sistem Monitoring Perawatan Sepeda Motor Dan Rekomendasinya  Menggunakan Teknologi IOT berbasis Mobile” yang dibuat untuk melengkapi sebagian persyaratan menjadi Ahli Madya pada Program Studi Teknik Informatika Jurusan Teknik Elektro Politeknik Negeri Semarang, sejauh yang saya ketahui bukan merupakan tiruan atau duplikasi dari Tugas Akhir yang sudah dipublikasi dan atau pernah dipakai untuk mendapatkan gelar Ahli Madya dilingkungan Politeknik Negeri Semarang maupun di perguruan tinggi atau instansi manapun, kecuali bagian yang sumber informasinya dicantumkan sebagaimana mestinya.
+Mahasiswa,
+Mahasiswa,
+Aji Saka
+Arya Yususfa Agnil Fikri
+NIM. 3.34.23.1.01
+NIM. 3.34.23.1.05
+     Semarang, 20 Juli 2026
+HALAMAN PERSETUJUAN
+Tugas Akhir dengan judul “Rancang Bangun Sistem Monitoring Perawatan Sepeda Motor Dan Rekomendasinya  Menggunakan Teknologi IOT berbasis Mobile” dibuat untuk melengkapi sebagian persyaratan menjadi Ahli Madya pada Program Studi Teknik Informatika, Jurusan Teknik Elektro Politeknik Negeri Semarang dan disetujui untuk diajukan dalam sidang ujian Tugas Akhir.
+Semarang, 20 Juli 2026
+Pembimbing I
+Pembimbing II
+Dr. Sukamto, S. KOM., M.T.
+WIKTASARI, S.T., M. KOM.
+NIP. 1
+NIP. 1
+Mengetahui,
+Ketua Program Studi D3 Teknik Informatika
+Idhawati Hestiningsih, S.Kom., M.Kom.
+NIP. 197711192008012013
+HALAMAN PENGESAHAN
+Tugas Akhir dengan judul “Rancang Bangun Sistem Monitoring Perawatan Sepeda Motor Dan Rekomendasinya  Menggunakan Teknologi IOT berbasis Mobile” Telah dipertahankan dalam ujian wawancara dan diterima sebagai syarat untuk menjadi Ahli Madya pada Program Studi Teknik Informatika, Jurusan Teknik Elektro Politeknik Negeri Semarang pada tanggal 20 Juli 2026.
+Tim Penguji
+Penguji I,
+Penguji II,
+Penguji III,
+Dr.Ir. Kurnianingsih, S.T.,M.T.
+Wahyu Sulistiyo, S.T.,M.Kom.
+Nurseno Bayu Aji, S.Kom.,M.Kom.
+NIP. 197904262003122002
+NIP. 197704012005011001
+NIP. 199107302019031010
+Ketua
+Sekretaris,
+Mardiyono, S.Kom, M.Sc.
+Aisyatul Karima, S.Kom., M.Sc.
+NIP. 197403112000121001
+NIP. 198605292019032009
+Mengesahkan,
+Ketua Jurusan Teknik Elektro
+Yusnan Badruzzaman, S.T., M.Kom., NIP. 197503132006041001
+KATA PENGANTAR
+Puji syukur kehadirat Allah SWT yang telah memberikakn rahmat, hidayat serta inayah-Nya, sehingga penulis dapat menyelesaikan Tugas Akhir dengan judul “Rancang Bangun Sistem Monitoring Perawatan Sepeda Motor Dan Rekomendasinya  Menggunakan Teknologi IOT berbasis Mobile”. Tugas Akhir ini disusun untuk melengkapi sebagian persyaratan menjadi Ahli Madya pada Program Studi Teknik Informatika, Jurusan Teknik Elektro, Politeknik Negeri Semarang.
+Dalam penyusunan Tugas Akhir penulis banyak mendapatkan bimbingan dari berbagai pihak sehingga penulisan Tugas Akhir ini berjalan dengan baik. Oleh karena itu penulis ingin mengucapkan terima kasih kepada:
+1.Kedua orang tua dan keluarga yang telah memberikan doa, motivasi, dan dukungan.
+2.BapakProf. Dr. Totok Prasetyo, B.Eng (Hons), M.T., IPU, ACPE., selaku Direktur Politeknik Negeri Semarang.
+3.Bapak Yusnan Badruzzaman, S.T., M.Kom., selaku Ketua JurusanTeknik Elektro Politeknik Negeri Semarang.
+4.Ibu Idhawati Hestiningsih, S.Kom., M.Kom., selaku Ketua Program Studi Teknik Informatika Politeknik Negeri Semarang.
+5.Bapak Sukamto , S.Kom., M.T., selaku Dosen Pembimbing I dan Bapak Suko Tyas Pernanda, M.CS., selaku Dosen Pembimbing II.
+6.Bapak Wahyu Sulistiyo, S.T.,M.Kom., selaku Wali Kelas IK-3B.
+7.Teman-teman Program Studi Teknik Informatika angkatan 2019 yang telah mendukung dan memberikan motivasi sehingga penulis dapat menyelesaikan Tugas Akhir ini.
+8.Seluruh pihak yang telah membatu yang tidak mungkin penulis sebutkan satu persatu.
+Penulis berharap semoga Tugas Akhir ini dapat memeberikan manfaat bagi pembaca pada umumnya dan bagi penulis sendiri pada khususnya.
+Semarang, 20 Juli 2026
+Aji Saka
+Arya Yusufa Agnil Fikri
+ABSTRAK
+Pendakian gunung merupakan aktivitas luar ruang yang membutuhkan perencanaan yang baik karena berkaitan dengan pemilihan jalur, kondisi cuaca, proses pemesanan tiket, pembayaran, serta keselamatan pendaki selama berada di jalur pendakian. Namun, informasi pendakian sering kali masih tersebar pada berbagai sumber, proses booking belum sepenuhnya terintegrasi, rekomendasi jalur belum disesuaikan dengan pengalaman pendaki, dan akses bantuan saat kondisi darurat masih perlu ditingkatkan. Penelitian ini bertujuan untuk merancang dan mengembangkan aplikasi MyHiking sebagai sistem informasi pendakian yang dapat membantu pendaki dalam mencari informasi gunung dan jalur, memperoleh rekomendasi jalur, melakukan booking pendakian, melakukan pembayaran, memantau aktivitas pendakian, memudahkan penjaga jalur untuk memantau posisi terakhir pendaki(Last Known Location), serta berinteraksi dengan chatbot untuk mendapatkan informasi maupun melakukan pemesanan. Sistem ini dikembangkan menggunakan Flutter sebagai aplikasi frontend, Laravel sebagai backend dan pengelolaan API, serta Python Flask untuk layanan chatbot berbasis Gemini API dengan pendekatan Retrieval Augmented Generation (RAG). MyHiking juga menerapkan Decision Support System (DSS) dengan metode TOPSIS untuk menghasilkan rekomendasi jalur berdasarkan pengalaman pendaki, karakteristik jalur, dan kondisi cuaca, serta mengintegrasikan Midtrans Payment Gateway untuk mendukung pembayaran digital. Fitur pelacakan posisi terakhir diimplementasikan dengan menyimpan koordinat GPS pendaki secara berkala ke server, sehingga penjaga jalur dapat melihat lokasi terakhir pendaki melalui dashboard web dan segera mengambil tindakan jika pendaki tidak melakukan check-out sesuai jadwal. Hasil dari pengembangan sistem ini meliputi fitur rekomendasi jalur, detail gunung dan jalur, booking tiket pendakian, pemesanan melalui chatbot, pembayaran digital, offline tracking dan sinkronisasi GPX, panic button untuk kondisi darurat, pengajuan refund, serta monitoring posisi terakhir pendaki oleh admin dan penjaga jalur. Dengan adanya MyHiking, proses pendakia diharapkan menjadi lebih informatif, efisien, terintegrasi, dan aman karena pendaki dapat memperoleh informasi, melakukan pemesanan, menyelesaikan pembayaran, serta mendapatkan bantuan keselamatan dalam satu sistem.
+Kata kunci: MyHiking, Sistem Informasi Pendakian, Chatbot, DSS, TOPSIS, Flutter, Laravel, Gemini API, Last Known Location.
+ABSTRACT
+Mountain climbing is an outdoor activity that requires meticulous planning, as it involves route selection, weather conditions, ticket booking processes, payments, and hiker safety. However, hiking information is often scattered across various sources, booking processes are not fully integrated, route recommendations are not yet tailored to a hiker's experience level, and access to emergency assistance still needs improvement. This research aims to design and develop MyHiking, a hiking information system designed to assist hikers in searching for mountain and route information, obtaining route recommendations, booking hikes, making payments, monitoring hiking activities, enable trail rangers to monitor hikers’ last known locations, and interacting with a chatbot for information and reservations. The system is developed using Flutter for the frontend application, Laravel for the backend and API management, and Python Flask for a chatbot service powered by the Gemini API with a Retrieval Augmented Generation (RAG) approach. MyHiking also implements a Decision Support System (DSS) using the TOPSIS method to generate route recommendations based on hiker experience, route characteristics, and weather conditions, while integrating the Midtrans Payment Gateway to support digital transactions. The last known location tracking feature is implemented by periodically saving the hiker's GPS coordinates to the server, allowing rangers to view the hiker's last known location through the web dashboard and take immediate action if the hiker fails to check out on schedule. The results of this development include features such as route recommendations, mountain and route details, ticket booking, chatbot-based reservations, digital payments, offline tracking with GPX synchronization, a panic button for emergencies, refund requests, and last known location monitoring for admins and park rangers. With MyHiking, the hiking process is expected to become more informative, efficient, integrated, and secure, providing hikers with a comprehensive platform for information, reservations, payments, and safety assistance.
+Keywords: MyHiking, Hiking Information System, Chatbot, DSS, TOPSIS, Flutter, Laravel, Gemini API, Last Known Location.
+BAB I
+PENDAHULUAN
+ Latar Belakang
+Sepeda motor merupakan salah satu moda transportasi utama yang digunakan oleh masyarakat Indonesia karena memiliki tingkat mobilitas yang tinggi serta biaya operasional yang relatif terjangkau. Berdasarkan data Badan Pusat Statistik, jumlah sepeda motor di Indonesia pada tahun 2024 mencapai lebih dari 139 juta unit, yang mencerminkan dominasi kendaraan roda dua dalam sistem transportasi nasional (Badan Pusat Statistik, 2024). Kondisi tersebut menunjukkan tingginya tingkat ketergantungan masyarakat terhadap sepeda motor dalam menunjang aktivitas sehari-hari.
+Dalam praktiknya, masih banyak pengguna yang kurang disiplin dalam melakukan servis berkala, seperti penggantian oli dan pemeriksaan komponen penting lainnya. Hal ini disebabkan oleh keterbatasan dalam memantau penggunaan kendaraan serta masih bergantung pada pencatatan manual atau perkiraan jarak tempuh, sehingga sering terjadi keterlambatan dalam melakukan perawatan. Kondisi tersebut dapat menyebabkan penurunan performa kendaraan serta meningkatkan risiko kerusakan yang berpotensi membahayakan keselamatan pengendara (Munastha, 2019).
+Beberapa penelitian sebelumnya telah mengembangkan sistem monitoring kendaraan berbasis GPS serta sistem pengingat perawatan kendaraan berbasis aplikasi mobile. Sistem berbasis GPS umumnya berfokus pada pelacakan lokasi kendaraan secara real-time, sedangkan sistem pengingat servis membantu pengguna dalam menjadwalkan perawatan kendaraan. Namun demikian, sebagian besar sistem tersebut masih memiliki keterbatasan karena belum mampu mengintegrasikan data penggunaan kendaraan secara otomatis dengan sistem rekomendasi perawatan. Sistem yang ada umumnya masih bergantung pada input manual pengguna, sehingga rekomendasi perawatan yang dihasilkan belum mencerminkan kondisi aktual kendaraan (Angel Caroline Billan & Tata Sutabri, 2024; Raman et al., 2021). Oleh karena itu, diperlukan suatu sistem yang mampu memantau penggunaan kendaraan secara otomatis serta memberikan rekomendasi perawatan berdasarkan data aktual.
+Berdasarkan permasalahan tersebut, penelitian ini mengusulkan rancang bangun sistem monitoring dan rekomendasi perawatan sepeda motor berbasis Internet of Things (IoT) yang terintegrasi dengan aplikasi mobile. Perangkat IoT digunakan untuk memantau penggunaan kendaraan secara otomatis, meliputi jarak tempuh dan aktivitas perjalanan. Data yang terkumpul kemudian diolah pada server untuk menghasilkan rekomendasi perawatan secara real-time dan ditampilkan melalui aplikasi mobile, sehingga pengguna dapat memantau kondisi kendaraan serta menerima notifikasi perawatan secara tepat waktu. Penelitian ini bertujuan untuk meningkatkan efektivitas perawatan kendaraan serta mengurangi risiko kerusakan akibat keterlambatan servis.
+ Perumusan Masalah
+Berdasarkan uraian latar belakang di atas, rumusan masalah dalam penelitian ini adalah sebagai berikut:
+Bagaimana merancang sistem monitoring penggunaan sepeda motor berbasis IoT yang mampu memantau data kendaraan secara otomatis dan real-time?
+Bagaimana merancang sistem rekomendasi perawatan sepeda motor yang dapat mengolah data penggunaan kendaraan secara otomatis berdasarkan kondisi aktual kendaraan?
+Bagaimana merancang antarmuka aplikasi mobile yang dapat menyajikan informasi monitoring dan notifikasi rekomendasi perawatan secara informatif dan mudah digunakan?
+ Manfaat
+1.3.1. Manfaat Teoritis
+Memberikan kontribusi dalam pengembangan ilmu pengetahuan di bidang Internet of Things (IoT), khususnya dalam implementasi sistem monitoring kendaraan secara otomatis.
+Menjadi referensi bagi penelitian selanjutnya yang berkaitan dengan sistem rekomendasi perawatan kendaraan berbasis data penggunaan secara aktual.
+1.3.2. Manfaat Praktis
+Memudahkan pengguna sepeda motor dalam memantau kondisi dan penggunaan kendaraan serta memperoleh rekomendasi perawatan secara otomatis tanpa pencatatan manual.
+Membantu mengurangi risiko kerusakan kendaraan akibat keterlambatan servis melalui pemberian notifikasi perawatan secara tepat waktu.
+ Batasan Masalah
+Batasan  masalah dalam penelitian ini adalah sebagai berikut:
+Sistem hanya memantau parameter eksternal (jarak tempuh dan durasi sejak servis terakhir, kecepatan rata-rata tertimbang 15 hari, intensitas pemakaian, suhu lingkungan rata-rata 15 hari, dan akumulasi kenaikan ketinggian 15 hari) menggunakan sensor IoT, serta belum terintegrasi dengan ECU (Engine Control Unit) motor.
+Logika Fuzzy difungsikan secara preventif untuk memprediksi tingkat keausan komponen (seperti oli dan kampas rem) berdasarkan akumulasi pergerakan, bukan untuk mendiagnosis kerusakan mesin yang bersifat mendadak.
+Pengiriman log data dari perangkat ke server belum mandiri (masih bergantung pada hotspot smartphone pengguna). Sistem juga belum dilengkapi penyimpanan lokal (offline storage) yang memadai saat kendaraan berada di area tanpa sinyal.
+Catu daya untuk menghidupkan purwarupa perangkat keras IoT masih menggunakan power bank eksternal dan belum dihubungkan secara langsung ke sistem kelistrikan (aki) kendaraan.
+Antarmuka aplikasi mobile dikembangkan secara eksklusif hanya untuk pengguna dengan sistem operasi Android.
+Pengujian purwarupa alat hanya difokuskan untuk kendaraan roda dua.Sistem memerlukan koneksi jaringan GSM atau internet agar dapat berfungsi secara optimal.
+Tujuan
+Tujuan dari penelitian ini adalah sebagai berikut:
+Merancang dan membangun sistem monitoring penggunaan sepeda motor berbasis Internet of Things (IoT) yang mampu memantau data kendaraan secara otomatis dan real-time. 
+Merancang dan membangun sistem backend berbasis Laravel yang mampu mengolah data penggunaan kendaraan menjadi rekomendasi perawatan secara otomatis berdasarkan kondisi aktual kendaraan. 
+Merancang dan membangun aplikasi mobile berbasis Flutter yang dapat menyajikan informasi monitoring kendaraan serta notifikasi rekomendasi perawatan secara informatif dan mudah digunakan.
+Sistematika
+Sistematika penulisan pada Tugas Akhir ini dibagi menjadi beberapa bab yangnmeliputi:
+BAB I PENDAHULUAN Bab ini menguraikan latar belakang penelitian yang memuat perumusan masalah, manfaat, dan tujuan penelitian, serta batasan masalah dan sistematika penulisan.
+BAB II TINJAUAN PUSTAKA Bab ini menguraikan landasan teori dan kajian pustaka yang relevan dengan penelitian, meliputi konsep Internet of Things (IoT), sistem monitoring kendaraan berbasis IoT, sistem rekomendasi perawatan kendaraan, serta penelitian terdahulu yang menjadi acuan dalam penelitian ini.
+BAB III KEGIATAN PELAKSANAAN Bab ini menguraikan tahapan pelaksanaan penelitian rancang bangun, meliputi tahap perancangan sistem perangkat keras dan perangkat lunak, tahap pembuatan alat beserta proses pemrograman, serta tahap pengukuran dan pengujian unjuk kerja sistem yang dibangun.
+BAB IV ANALISIS DAN PEMBAHASAN Bab ini menguraikan hasil penelitian rancang bangun yang disajikan dalam bentuk data, tabel, dan grafik, serta analisis dan pembahasan terhadap kinerja sistem secara terpadu.
+BAB V KESIMPULAN Bab ini menguraikan pernyataan singkat dan tepat yang dijabarkan dari hasil analisis dan pembahasan penelitian.
+DAFTAR PUSTAKA Bagian ini memuat seluruh referensi yang digunakan dalam penyusunan laporan Tugas Akhir.
+LAMPIRAN Bagian ini memuat dokumen pendukung penelitian, meliputi kode program, hasil pengujian, dan dokumentasi sistem.
+BAB II
+TINJAUAN PUSTAKA
+2.1. Penelitian Terdahulu
+Bagian ini membahas tentang penelitian yang sebelumnya telah dilakukan oleh peneliti lain serta berkaitan dengan Tugas Akhir yang dibuat tentang sistem monitoring dan rekomendasi perawatan sepeda motor berbasis IoT. Selain itu, terdapat berbagai perbandingan yang telah dibuat peneliti sebelumnya dengan sistem yang dikembangkan dalam penelitian ini. Beberapa teknologi yang ditambahkan ke dalam sistem juga dipaparkan dalam bagian ini.
+Attubel, Siswanto, dan Mukhsim (2020) mengembangkan sistem pemantauan dan pengingat waktu perawatan kendaraan bermotor berbasis IoT. Sistem yang dirancang menggunakan modul GPS untuk mendeteksi lokasi kendaraan secara real-time, modul GSM sebagai penghubung ke server berbasis web, serta modul ACS-712 sebagai sensor arus untuk mendeteksi kondisi mesin menyala atau mati. Lama mesin menyala diakumulasikan secara otomatis sebagai indikator waktu ganti oli, yang kemudian ditampilkan melalui aplikasi Android. Namun, sistem ini belum mampu memperhitungkan faktor kondisi jalan sebagai parameter tambahan dalam menentukan tingkat keausan komponen kendaraan. (Attubel et al., 2020)
+Sibuea, Hadianastuti, dan Fatmawati (2023) merancang aplikasi pengingat waktu servis kendaraan bermotor bagi pelanggan bengkel dengan memanfaatkan teknologi IoT berbasis Android. Sebuah chip berprogram ditanamkan pada kendaraan untuk memperoleh data jarak tempuh dan perhitungan bulan berjalan, yang selanjutnya dikirimkan ke cloud server untuk kemudian mengirim notifikasi ke smartphone pengguna. Rancangan ini juga memungkinkan pelanggan melakukan reservasi servis secara daring. Namun, sistem ini belum mengintegrasikan algoritma pengambilan keputusan untuk menghasilkan rekomendasi perawatan yang adaptif berdasarkan kondisi aktual penggunaan kendaraan. (Sibuea et al., 2023)
+Maesa dan Hartono (2025) merancang dan membangun sistem kontrol dan monitoring keamanan sepeda motor berbasis IoT dengan mengintegrasikan modul GPS Neo-6M, sensor getar SW-420, dan mikrokontroler ESP32. Sistem ini mampu memantau posisi kendaraan secara real-time serta mengirimkan notifikasi instan melalui aplikasi mobile ketika terdeteksi aktivitas mencurigakan. Hasil pengujian menunjukkan akurasi GPS dengan margin kesalahan 24,78 meter di area terbuka, dan 86,7% pengguna menyatakan antarmuka aplikasi jelas dan informatif. Namun, penelitian ini berfokus pada aspek keamanan kendaraan, bukan pada pemantauan penggunaan untuk menghasilkan rekomendasi jadwal perawatan komponen. (Maesa & Hartono, 2025)
+(Ramadhan et al., 2024) melakukan implementasi algoritma logika fuzzy pada alat uji emisi sepeda motor menggunakan mikrokontroler ESP32 dan multi-sensor gas. Alat yang dirancang menerapkan metode Fuzzy Mamdani untuk memproses data dari sensor gas secara real-time guna mengklasifikasikan tingkat kelayakan emisi kendaraan ke dalam kategori rendah, sedang, dan berbahaya. Hasil pengujian menunjukkan bahwa penggabungan beberapa sensor dengan logika Fuzzy mampu menghasilkan keputusan interpretasi performa mesin yang akurat. Namun, penelitian ini berfokus menggunakan logika fuzzy murni untuk mendiagnosis kualitas emisi gas buang secara kuratif, belum memformulasikannya secara preventif untuk menghasilkan rekomendasi jadwal perawatan komponen motor.
+(Auwali et al., 2024) merancang alat kontrol dan pengaman sepeda motor menggunakan ESP32-Cam berbasis Telegram guna meminimalisasi tindak pencurian kendaraan. Sistem ini memanfaatkan teknologi IoT untuk mendeteksi wajah pengguna (face recognition) serta memungkinkan pemilik kendaraan untuk mengendalikan sistem kelistrikan motor secara jarak jauh melalui perintah pada aplikasi pengirim pesan. Hasil pengujian membuktikan bahwa fitur kontrol keamanan dari jarak jauh tersebut mampu berjalan responsif dengan dukungan konektivitas jaringan. Namun, penelitian ini berorientasi murni pada aspek keamanan fisik kendaraan dan belum mengintegrasikannya dengan sistem pemantauan kondisi keausan suku cadang atau komponen internal kendaraan.
+(Ardhana et al., 2023) melakukan implementasi RESTful API pada framework Laravel untuk pengukuran suhu dan kelembaban lingkungan berbasis Internet of Things (IoT). Pengembangan sistem ini dilakukan menggunakan metode Waterfall untuk membangun struktur pemrograman antarmuka aplikasi (API) yang mampu menghubungkan database dengan simulasi perangkat keras penginderaan pada Wokwi. Hasil pengujian menunjukkan bahwa arsitektur komunikasi data RESTful API melalui Laravel mampu berjalan secara efisien dan terstruktur dalam menerima maupun menyajikan data sensor secara real-time. Namun, penelitian tersebut masih terbatas pada penggunaan simulator pengujian secara virtual, dan belum mengimplementasikan logika kecerdasan buatan untuk mengolah data tersebut menjadi rekomendasi tindak lanjut bagi penggunanya.
+(Ubaidillah & Waluyo, 2023) merancang aplikasi layanan perbaikan sepeda motor online berbasis Android dengan memanfaatkan fitur Google Maps. Aplikasi ini dirancang untuk memudahkan para pengendara yang mengalami kerusakan kendaraan secara mendadak di jalan raya agar dapat secara akurat mencari lokasi sekaligus memesan layanan perbaikan dari bengkel terdekat. Berdasarkan hasil pengujian, fitur lokasi (Location Based Service) berhasil mempercepat waktu respons pelayanan dari pihak mekanik bengkel ke lokasi kejadian mogok. Namun, fungsi dan tujuan dari sistem pada aplikasi tersebut bersifat kuratif atau sebagai penanganan ketika kerusakan sudah terlanjur terjadi, bukan memantau kondisi operasional kendaraan untuk mencegah terjadinya kerusakan komponen secara preventif.
+(Kautsar et al., 2023) mengimplementasikan metode logika Fuzzy pada sistem peringatan kondisi air radiator sepeda motor berbasis mikrokontroler. Penelitian ini mengembangkan purwarupa perangkat keras terintegrasi sensor untuk memantau tingkat suhu dan volume air radiator secara langsung guna memberikan peringatan dini agar mesin terhindar dari panas berlebih (overheating). Hasil pengujian membuktikan bahwa penerapan logika Fuzzy sangat efektif dalam mengolah ketidakpastian nilai dari sensor menjadi keputusan peringatan status suhu secara otomatis melalui buzzer dan layar LCD. Namun, sistem peringatan tersebut hanya beroperasi secara lokal pada perangkat keras fisik di kendaraan dan belum terhubung ke dalam infrastruktur komputasi awan (cloud) maupun aplikasi mobile yang memungkinkan pemantauan riwayat keausan secara jarak jauh.
+(Ariyanto et al., 2025) merancang aplikasi mobile berbasis Flutter untuk pemantauan data sensor Internet of Things (IoT) sebagai solusi manajemen suhu dan kelembapan. Sistem yang dirancang menggunakan mikrokontroler ESP32 untuk membaca data lingkungan dan mengirimkannya melalui protokol MQTT menuju basis data MySQL, yang selanjutnya disajikan secara interaktif pada layar ponsel pengguna. Berdasarkan hasil pengujian pengguna, sistem ini dinilai sangat berhasil dalam menyediakan pemantauan real-time serta mengirimkan notifikasi peringatan otomatis dengan sangat cepat ketika parameter melampaui batas. Namun, aplikasi ini difokuskan murni pada manajemen parameter lingkungan pasif dan belum mengimplementasikan logika penunjang keputusan buatan, seperti Fuzzy Logic, untuk memproses variabel dinamis menjadi sebuah sistem rekomendasi prediktif.
+(Pamungkas & Yahya, 2023) mengembangkan sistem Internet of Things (IoT) untuk pemantauan tegangan dan arus aki kendaraan guna meminimalisasi risiko kerusakan operasional secara mendadak. Sistem ini dirancang menggunakan mikrokontroler untuk membaca sensor tegangan yang diolah dengan algoritma analisis kondisi operasional, lalu hasilnya dikirimkan ke dalam database agar pengguna dapat memantau kesehatan baterai secara langsung. Berdasarkan hasil pengujian, sistem terbukti mampu memberikan informasi kondisi kelistrikan kendaraan dengan cepat, akurat, dan efektif dalam mencegah penurunan daya secara tiba-tiba. Namun, penelitian ini secara khusus hanya berfokus pada evaluasi satu komponen statis, yakni aki atau kelistrikan, dan belum memperhitungkan parameter pergerakan dinamis seperti elevasi dan variasi kontur jalan untuk mengevaluasi tingkat keausan komponen mekanis kendaraan.
+(Jayadi & Fitriyadi, 2021) merancang prototipe sistem pengingat perawatan komponen sepeda motor berbasis Arduino dengan menggunakan teknologi notifikasi pesan singkat (SMS Gateway). Penelitian ini bertujuan untuk mengatasi kelalaian pemilik kendaraan dalam merawat atau mengganti suku cadang rutin, seperti oli mesin dan kampas rem, dengan cara mengakumulasikan data penggunaan motor secara lokal melalui hardware. Hasil pengujian membuktikan bahwa sistem ini berhasil memberikan peringatan dini kepada pemilik kendaraan langsung ke ponsel mereka sehingga meminimalkan risiko kerusakan yang lebih fatal. Namun, infrastruktur pengingat pada penelitian tersebut masih menggunakan SMS Gateway konvensional yang membutuhkan biaya pulsa untuk setiap pengiriman pesan, berbeda dengan sistem yang diusulkan ini yang mengandalkan teknologi jaringan seluler internet dan layanan Push Notification yang terintegrasi penuh ke dalam aplikasi ponsel pintar pengguna.
+(Indrayadi et al., 2024) mengembangkan aplikasi layanan perbaikan (home service) sepeda motor berbasis Android menggunakan pendekatan metodologi Clean Architecture. Penelitian ini menghasilkan perangkat lunak yang memfasilitasi pengguna untuk memesan jasa mekanik langsung ke rumah, dengan mengandalkan integrasi pangkalan data MySQL dan notifikasi dari Firebase. Hasil pengujian menunjukkan bahwa aplikasi ini memiliki tingkat keberhasilan fungsional yang sangat tinggi, responsif, dan kode sistem yang mudah dikembangkan di kemudian hari. Namun, fungsionalitas aplikasi pada penelitian tersebut berorientasi murni sebagai media perantara pemesanan jasa bengkel (booking), dan tidak terhubung dengan sensor perangkat keras Internet of Things (IoT) pada motor untuk mendeteksi tingkat keausan suku cadang secara mandiri.
+(Nurulfahmi & Sulistiyowati, 2021) melakukan perancangan alat pengaman dan pelacak kendaraan bermotor menggunakan mikrokontroler berbasis Internet of Things (IoT). Sistem yang dirancang menggunakan modul GPS dan kamera untuk melacak titik koordinat serta memantau kondisi di sekitar sepeda motor, yang datanya kemudian dikirimkan agar dapat diakses oleh pengguna secara jarak jauh melalui layar smartphone. Hasil pengujian menunjukkan bahwa penggunaan GPS berfungsi optimal untuk menemukan titik koordinat motor secara akurat, serta kamera cukup membantu mengenali wajah dari pelaku pencurian. Namun, penelitian ini berfokus murni pada aspek keamanan kendaraan dari tindak kejahatan, dan belum memanfaatkan data riwayat pergerakan kendaraan tersebut untuk keperluan deteksi tingkat keausan suku cadang guna menghasilkan rekomendasi perawatan.
+(Aryatama & Samsugi, 2024) mengembangkan sistem keamanan sepeda motor yang mengintegrasikan mikrokontroler ESP32 dengan antarmuka kontrol pada perangkat Android. Penelitian ini membangun sistem yang menghubungkan aplikasi seluler Android dengan perangkat keras ESP32 melalui protokol komunikasi Bluetooth, di mana Android berperan sebagai media pengirim perintah dan ESP32 meneruskannya untuk mengendalikan sistem kelistrikan motor. Hasil pengujian menunjukkan bahwa aplikasi berbasis Android tersebut dapat digunakan secara efektif oleh pengguna untuk menghidupkan dan mematikan kendaraan, serta mengaktifkan fungsi alarm secara responsif. Namun, fungsionalitas sistem ini masih sebatas intervensi keamanan fisik jarak dekat (lokal) melalui konektivitas Bluetooth, dan belum mengekstraksi data parameter pergerakan operasional kendaraan berbasis Internet of Things (IoT) untuk dikalkulasikan menjadi rekomendasi perawatan komponen secara prediktif.
+(Ruslizar et al., 2022) merancang sistem pemantauan sepeda motor roda dua menggunakan GPS yang dikendalikan oleh papan mikrokontroler dengan memanfaatkan teknologi ponsel Android. Sistem yang dibangun ini mampu mengontrol sistem pengapian mesin kendaraan dari jarak jauh melalui relai (relay) yang terhubung dengan jaringan internet, sehingga dapat difungsikan untuk mematikan laju kendaraan secara paksa ketika terjadi insiden pencurian di tempat parkir. Berdasarkan pengujian, alat ini merespons perintah kontrol dari perangkat seluler ke perangkat keras mesin dengan sangat efisien. Namun, arsitektur pemantauan pada penelitian tersebut masih ditujukan secara eksklusif untuk pencegahan pencurian melalui pemutus daya otomatis, dan belum menerapkan logika kecerdasan buatan seperti logika Fuzzy untuk mendiagnosis jadwal pemeliharaan komponen kendaraan.
+(Gorski et al., 2022) mengembangkan sistem rekomendasi berbasis logika Fuzzy untuk pemrosesan data pemantauan kondisi (condition monitoring) mesin. Penelitian ini menerapkan algoritma cerdas yang dipadukan dengan aturan inferensi untuk menganalisis data kerusakan secara presisi, yang terbukti secara ilmiah mampu memberikan rekomendasi pemeliharaan dengan tingkat akurasi yang tinggi. Namun, domain aplikasi pada penelitian tersebut difokuskan secara eksklusif pada peralatan industri skala besar, seperti gearbox industri. Selain itu, sistem ini belum mengimplementasikan mikrokontroler IoT nirkabel berbasis ESP32 dan tidak memiliki antarmuka aplikasi mobile yang ditujukan untuk pengguna konsumen awam seperti pada sepeda motor.
+(Silhavy et al., 2023) melakukan analisis komparatif mengenai kesesuaian protokol komunikasi MQTT dan REST pada perangkat AIoT (Artificial Intelligence of Things) yang ditenagai oleh mikrokontroler keluarga ESP32. Penelitian ini menguji keandalan transmisi data dari perangkat keras dan membuktikan bahwa protokol MQTT jauh lebih unggul untuk digunakan pada mikrokontroler IoT dengan sumber daya yang terbatas. Namun, penelitian ini bersifat murni sebagai studi komparasi arsitektur protokol jaringan untuk perangkat IoT. Penelitian tersebut belum diimplementasikan menjadi sebuah sistem pemantauan riwayat pergerakan kendaraan yang utuh, dan tidak terintegrasi dengan kecerdasan buatan penghasil rekomendasi perawatan servis melalui aplikasi seluler.
+(Wahyu & Aryanto, 2024) merancang sistem keamanan dan pelacakan kendaraan jarak jauh menggunakan mikrokontroler NodeMCU ESP8266 yang diintegrasikan dengan Global Positioning System (GPS). Penelitian ini memanfaatkan teknologi Internet of Things (IoT) untuk memantau lokasi geografis kendaraan secara real-time dan menampilkannya pada perangkat pengguna sebagai upaya mitigasi tindakan pencurian. Hasil pengujian menunjukkan bahwa modul GPS mampu memberikan tingkat akurasi yang tinggi dalam melacak koordinat spasial kendaraan di berbagai kondisi cuaca. Namun, fungsionalitas sistem pada penelitian tersebut berfokus secara eksklusif pada pelacakan keamanan (security tracking), dan belum memanfaatkan ekstraksi data pergerakan tersebut untuk diolah menggunakan algoritma kecerdasan buatan guna menghasilkan rekomendasi jadwal perawatan komponen kendaraan secara preventif.
+(Salamah dkk., 2023) mengimplementasikan sistem keamanan dan pemantauan kondisi kendaraan berbasis Internet of Things (IoT) menggunakan transmisi data nirkabel. Penelitian ini mengembangkan sistem yang memungkinkan pengguna memonitor parameter operasional kendaraan dari jarak jauh secara real-time guna memastikan kendaraan beroperasi dalam keadaan normal dan aman. Hasil evaluasi membuktikan bahwa konektivitas arsitektur IoT pada sistem tersebut mampu menjaga stabilitas pengiriman log data sensor menuju server dengan keandalan yang sangat tinggi. Namun, infrastruktur pemantauan pada penelitian ini belum dilengkapi dengan modul pembacaan altimeter (sensor barometrik) untuk mengkalkulasi pengaruh elevasi jalan, serta belum memanfaatkan metode logika Fuzzy untuk memproyeksikan data mentah tersebut menjadi saran pemeliharaan suku cadang secara mandiri.
+(Mulya dkk., 2022) merancang purwarupa sistem keamanan dan pemantauan kendaraan bermotor berbasis Internet of Things (IoT) yang diintegrasikan dengan aplikasi mobile. Penelitian ini menggunakan mikrokontroler NodeMCU dan modul GPS U-blox untuk melacak koordinat lokasi kendaraan secara real-time, di mana aplikasi seluler juga difungsikan sebagai antarmuka kendali jarak jauh untuk menghidupkan atau mematikan kelistrikan mesin kendaraan. Hasil pengujian menunjukkan bahwa sistem pelacakan lokasi dan kontrol relai mesin tersebut mampu beroperasi secara efektif dan responsif melalui ponsel pengguna. Namun, fungsionalitas sistem pada penelitian tersebut berfokus secara eksklusif pada fitur keamanan anti-pencurian (security tracking) dan kendali jarak jauh, serta belum memanfaatkan pengolahan data riwayat pergerakan kendaraan menggunakan algoritma cerdas seperti Logika Fuzzy untuk menghasilkan rekomendasi pemeliharaan komponen mekanis secara prediktif.
+(Alhadidi dkk., 2024) merancang purwarupa sistem pengingat waktu penggantian minyak pelumas (oli) pada sepeda motor berbasis Internet of Things (IoT). Penelitian ini memanfaatkan sensor putaran roda (hall effect) untuk mengakumulasikan jarak tempuh kendaraan, di mana mikrokontroler akan mengirimkan pesan notifikasi pengingat servis secara otomatis kepada pengguna melalui bot pada aplikasi perpesanan Telegram. Hasil pengujian membuktikan bahwa sistem peringatan otomatis berdasarkan jarak tempuh tersebut beroperasi dengan tingkat keberhasilan yang tinggi. Namun, fungsionalitas pemeliharaan pada penelitian tersebut bersifat parsial karena hanya berfokus pada penggantian oli mesin. Selain itu, sistem tersebut belum mengimplementasikan sensor barometrik untuk mengevaluasi dampak kontur jalan secara prediktif, serta masih bergantung pada platform pihak ketiga (Telegram), bukan menggunakan antarmuka aplikasi mandiri berbasis Flutter.
+Berikut adalah tabel perbandingan fitur yang dapat dilihat pada Tabel 2.1.
+Tabel 2.1. Tabel Perbandingan Fitur
+No
+Penulis dan Tahun
+Fitur
+Hasil
+Monitoring IoT
+Logika Fuzzy
+Kontur Jalan
+1
+(Attubel et al., 2020)
+✓
+-
+-
+Android
+2
+(Sibuea et al., 2023)
+✓
+-
+-
+Android
+3
+(Maesa & Hartono, 2025)
+✓
+-
+-
+Android
+4
+(Ramadhan et al., 2024)
+✓
+✓
+-
+Perangkat Keras
+5
+(Auwali et al., 2024)
+✓
+-
+-
+Telegram
+6
+(Ardhana et al., 2023)
+✓
+-
+-
+Website
+7
+(Ubaidillah & Waluyo, 2023)
+-
+-
+-
+Android
+8
+(Kautsar et al., 2023)
+-
+✓
+-
+Perangkat Keras
+9
+(Ariyanto et al., 2025)
+✓
+-
+-
+Android
+10
+(Pamungkas & Yahya, 2023)
+✓
+-
+-
+Website
+11
+(Jayadi & Fitriyadi, 2021)
+-
+-
+-
+SMS Gateway
+12
+(Indrayadi et al., 2024)
+-
+-
+-
+Android
+13
+(Nurulfahmi & Sulistiyowati, 2021)
+✓
+-
+-
+Android
+14
+(Aryatama & Samsugi, 2024)
+-
+-
+-
+Android
+15
+(Ruslizar et al., 2022)
+✓
+-
+-
+Android
+16
+(Gorski et al., 2022)
+-
+✓
+-
+Sistem Industri
+17
+(Silhavy et al., 2023)
+✓
+-
+-
+Perangkat Keras
+18
+(Wahyu & Aryanto, 2024)
+✓
+-
+-
+Aplikasi Mobile
+19
+(Salamah dkk., 2023)
+✓
+-
+-
+Website/Mobile
+20
+(Mulya dkk., 2022)
+✓
+-
+-
+Aplikasi Mobile
+21
+(Alhadidi dkk., 2024)
+✓
+-
+-
+Telegram
+22
+Tugas Akhir yang diajukan oleh saya
+✓
+✓
+✓
+Android
+   
+Berdasarkan Tabel 2.1. terdapat beberapa penelitian terkait sistem monitoring dan aplikasi perawatan kendaraan yang memiliki beragam fitur dan hasil akhir. Tugas Akhir yang saya ajukan menunjukkan keunggulan dalam beberapa aspek dibandingkan dengan penelitian-penelitian sebelumnya. Tugas Akhir saya menggabungkan tiga fitur utama: Monitoring IoT untuk mengakuisisi data pergerakan dinamis kendaraan, Logika Fuzzy untuk sistem pendukung keputusan yang cerdas, serta Kontur Jalan (elevasi dari sensor barometrik) sebagai parameter mutakhir dalam mendeteksi keausan mekanis. Penggabungan ketiga fitur ini menjadikannya lebih komprehensif dan user-friendly dalam menyediakan rekomendasi perawatan sepeda motor secara otomatis dan prediktif. Hasil akhirnya adalah platform Android.
+2.2. Landasan Teori
+2.2.1. Konsep Perawatan Sepeda Motor
+Perawatan kendaraan sepeda motor merupakan suatu kegiatan yang dilakukan untuk menjaga kondisi kendaraan agar tetap dalam keadaan optimal, aman, dan layak digunakan. Sepeda motor terdiri dari berbagai komponen mekanik yang selama proses penggunaannya akan mengalami gesekan, tekanan, dan keausan. Seiring waktu, komponen tersebut dapat mengalami penurunan kinerja sehingga diperlukan perawatan secara berkala untuk mempertahankan performa (Firmansyah, M. G., Sugeng, S., 2023).
+Perawatan sepeda motor secara umum dibagi menjadi dua jenis, yaitu perawatan ringan dan perawatan berkala. Perawatan ringan meliputi pengecekan komponen sederhana seperti kondisi rem, tekanan ban, sistem kelistrikan, serta kebersihan komponen mesin. Sedangkan perawatan berkala dilakukan dalam interval tertentu berdasarkan jarak tempuh atau waktu penggunaan kendaraan, seperti penggantian oli mesin, pemeriksaan sistem transmisi, serta pengecekan komponen utama lainnya (Firmansyah, M. G., Sugeng, S., 2023).
+Berdasarkan buku pedoman servis sepeda motor, perawatan berkala sangat dianjurkan untuk dilakukan secara rutin sesuai dengan jadwal yang telah ditentukan oleh pabrikan. Hal ini bertujuan untuk mencegah kerusakan yang lebih serius serta menjaga kinerja kendaraan tetap optimal. Pada buku servis Honda dijelaskan bahwa perawatan berkala dilakukan pada interval tertentu, seperti setiap 1.000 km, 4.000 km, dan seterusnya, dengan jenis pemeriksaan yang berbeda-beda pada setiap intervalnya (Motor, 2014).
+Selain itu, perawatan yang dilakukan secara rutin juga memiliki manfaat dalam meningkatkan keselamatan berkendara. Kendaraan yang tidak dirawat dengan baik berpotensi mengalami penurunan performa yang dapat menyebabkan risiko kecelakaan. Oleh karena itu, pemilik kendaraan diharapkan memiliki kesadaran untuk melakukan perawatan secara teratur agar kendaraan tetap dalam kondisi prima serta nyaman digunakan (Firmansyah, M. G., Sugeng, S., 2023).
+Dalam konteks penelitian ini, perawatan kendaraan sepeda motor menjadi aspek penting yang berkaitan dengan sistem rekomendasi yang dikembangkan. Sistem yang dirancang bertujuan untuk membantu pengguna dalam menentukan waktu perawatan yang tepat berdasarkan data penggunaan kendaraan. Dengan demikian, perawatan tidak lagi dilakukan secara manual atau berdasarkan perkiraan, melainkan berdasarkan kondisi aktual kendaraan sehingga lebih efektif dan efisien.
+2.2.2. Sistem Monitoring
+Sistem monitoring merupakan suatu sistem yang digunakan untuk melakukan pemantauan terhadap kondisi suatu objek secara berkelanjutan dan real-time. Dalam perkembangan teknologi saat ini, sistem monitoring banyak diimplementasikan menggunakan konsep Internet of Things (IoT) sehingga proses pengambilan data dapat dilakukan secara otomatis melalui sensor tanpa intervensi langsung dari pengguna. Sistem monitoring memungkinkan pengguna memperoleh informasi kondisi objek secara cepat dan akurat melalui perangkat digital (Isnawaty et al., 2023).
+Tujuan utama dari sistem monitoring adalah untuk mempermudah proses pengawasan serta memberikan informasi yang dibutuhkan secara efisien. Dengan adanya sistem monitoring berbasis IoT, pengguna tidak perlu melakukan pengecekan secara langsung di lokasi karena data dapat diakses secara real-time melalui aplikasi. Hal ini dapat meningkatkan efisiensi waktu dan mempermudah pengambilan keputusan berdasarkan data yang diperoleh (Rahmatillah et al., 2022).
+Secara umum, sistem monitoring terdiri dari beberapa komponen utama yang saling terintegrasi, yaitu perangkat input, perangkat pemrosesan, media penyimpanan, dan perangkat output. Perangkat input berupa sensor atau modul seperti GPS digunakan untuk mengumpulkan data dari objek yang dipantau. Data tersebut kemudian diproses oleh mikrokontroler sebelum dikirim ke server atau database untuk disimpan. Selanjutnya, data ditampilkan kepada pengguna melalui aplikasi berbasis mobile atau web (Isnawaty et al., 2023).
+Proses kerja sistem monitoring dimulai dari pengambilan data oleh sensor, kemudian data dikirimkan ke perangkat pemrosesan untuk diolah, lalu disimpan pada server, dan akhirnya ditampilkan kepada pengguna dalam bentuk informasi yang mudah dipahami. Proses ini berlangsung secara terus-menerus sehingga sistem mampu memberikan informasi secara real-time dan akurat.
+Dalam penelitian ini, sistem monitoring digunakan untuk memantau penggunaan sepeda motor secara otomatis dengan memanfaatkan teknologi IoT. Data yang diperoleh dari perangkat monitoring akan diolah untuk menghasilkan informasi yang digunakan sebagai dasar dalam memberikan rekomendasi perawatan kendaraan.
+2.2.3. Sistem Rekomendasi
+Sistem rekomendasi pada era Internet of Things (IoT) tidak lagi terbatas pada penyaringan produk digital, melainkan telah meluas fungsinya pada penciptaan kondisi operasional yang optimal pada dunia nyata. Sebagai contoh, penelitian yang dilakukan oleh Ridwan dan Windra (2024) bertujuan merancang sistem rekomendasi suhu Air Conditioner (AC) menggunakan sensor Internet of Things (IoT) untuk menciptakan lingkungan kerja yang optimal. Dalam pendekatan ini, sistem rekomendasi bertindak berdasarkan data yang diakuisisi secara langsung dan terus-menerus dari lingkungan fisik, sehingga output yang dihasilkan tidak bersifat statis, melainkan sangat adaptif terhadap perubahan kondisi aktual di lapangan (Ridwan & Windra, 2024).
+Untuk mengolah data parameter lingkungan fisik yang kompleks tersebut menjadi sebuah keputusan rekomendasi, sistem IoT sering kali diintegrasikan dengan kecerdasan buatan, seperti logika Fuzzy. Berdasarkan penelitian Novfelia dan Busran (2025), terbukti bahwa metode Fuzzy Logic efektif dalam mengakomodasi data yang bersifat kabur, sehingga mampu memberikan hasil yang fleksibel dan mendekati kenyataan. Penggunaan sistem berbasis IoT dan logika Fuzzy ini secara langsung dapat menjadi solusi praktis dan adaptif untuk membantu pengguna dalam pengambilan keputusan yang akurat berdasarkan besaran nilai parameter dari sensor (Novfelia & Busran, 2025).
+Pada penelitian ini, konsep sistem rekomendasi cerdas berbasis IoT dan logika Fuzzy tersebut difungsikan secara spesifik untuk manajemen perawatan komponen sepeda motor. Sistem yang dirancang akan mengakuisisi data operasional seperti akumulasi jarak tempuh, kecepatan, hingga variasi elevasi (kontur jalan) secara berkelanjutan. Metrik operasional tersebut kemudian diolah menggunakan mesin inferensi logika Fuzzy menjadi sebuah skor tingkat keausan. Hasil matematis ini kemudian diterjemahkan lebih lanjut oleh Large Language Model (Gemini API) menjadi kalimat rekomendasi servis secara tekstual (misalnya saran penggantian oli atau kampas rem) yang komunikatif dan mudah dipahami oleh pengguna awam. Melalui sistem rekomendasi prediktif ini, pengguna mendapatkan peringatan dini secara real-time sebelum terjadinya kerusakan fatal pada komponen mekanis kendaraan.
+2.2.4. Logika Fuzzy (Fuzzy Logic)
+Logika fuzzy adalah cabang kecerdasan buatan yang memiliki kemampuan untuk menangani informasi yang bersifat tidak pasti, tidak tepat, dan ambigu secara fleksibel, menyerupai cara berpikir manusia (Akazue et al, 2024). Berbeda dengan logika biner konvensional yang hanya mengenal nilai benar atau salah, logika fuzzy bekerja dengan derajat keanggotaan (membership degree) yang berada pada rentang nilai [0, 1], sehingga mampu merepresentasikan kondisi yang bersifat gradual dan tidak diskrit.
+Komponen utama dalam sistem berbasis logika fuzzy terdiri atas tiga tahap, yaitu fuzzifikasi, inferensi fuzzy, dan defuzzifikasi (Akazue et al, 2024). Fuzzifikasi adalah proses konversi nilai masukan yang bersifat tegas (crisp) menjadi nilai linguistik melalui fungsi keanggotaan. Fungsi keanggotaan yang umum digunakan antara lain fungsi segitiga (triangular) dan trapesium (trapezoidal), yang masing-masing mendefinisikan derajat keangggotaan suatu nilai terhadap himpunan fuzzy tertentu (Prasetya et al, n.d.). Tahap inferensi fuzzy kemudian menerapkan aturan-aturan IF-THEN berbasis pengetahuan pakar untuk menentukan output fuzzy, sedangkan defuzzifikasi mengonversi output fuzzy tersebut kembali menjadi nilai numerik yang dapat digunakan dalam pengambilan keputusan.
+Salah satu metode inferensi fuzzy yang paling banyak digunakan adalah metode Mamdani, yang pertama kali diusulkan oleh Ebrahim Mamdani pada tahun 1975 untuk mengendalikan sistem mesin uap (E. Kizito et al, 2024). Metode Mamdani dipilih karena basis aturannya bersifat intuitif, mudah dipahami, dan dapat dibangun langsung dari pengetahuan pakar di bidang terkait. Sistem inferensi Mamdani menghasilkan output berupa himpunan fuzzy yang kemudian dikonversi menjadi nilai tegas melalui metode defuzzifikasi centroid atau center of gravity (COG), yang dihitung menggunakan rumus berikut:
+Keterangan: Z* = nilai output tegas, z = nilai pada domain output, μ(z) = derajat keanggotaan output
+Penerapan logika fuzzy Mamdani telah terbukti efektif dalam berbagai domain, mulai dari deteksi kerusakan kendaraan bermotor (Akazue et al, 2024; E. Kizito et al, 2024) hingga evaluasi kualitas produk digital dan pengendalian sistem IoT berbasis sensor (Prasetya et al, n.d.). Kemampuan metode ini dalam menangani ketidakpastian data sensor menjadikannya pendekatan yang relevan untuk sistem monitoring perawatan kendaraan.
+Dalam penelitian ini, metode Fuzzy Logic Mamdani diterapkan untuk menilai kondisi komponen perawatan sepeda motor berdasarkan empat variabel input yang diperoleh dari perangkat IoT, yaitu jarak sejak servis terakhir, durasi sejak servis terakhir, kecepatan rata-rata berkendara, dan intensitas pemakaian harian. Output berupa skor kondisi pada rentang 0–100 per komponen kemudian digunakan sebagai dasar pembangkitan rekomendasi perawatan secara tekstual melalui Gemini API.
+2.2.5. Internet of Things (IoT)
+Internet of Things (IoT) merupakan konsep teknologi yang memungkinkan berbagai perangkat fisik saling terhubung melalui jaringan internet untuk bertukar data dan berkomunikasi secara otomatis tanpa campur tangan manusia secara langsung. IoT mengintegrasikan sensor, perangkat keras, perangkat lunak, serta jaringan komunikasi sehingga objek di dunia nyata dapat menjadi bagian dari sistem digital yang cerdas dan responsif. Dengan adanya IoT, perangkat mampu mengumpulkan, mengirim, serta mengolah data untuk mendukung pengambilan keputusan secara lebih efektif dan efisien (Cahyono, 2013; Hadi, 2025).
+Sejarah perkembangan IoT bermula dari gagasan untuk menghubungkan objek fisik dengan sistem digital melalui jaringan internet. Istilah Internet of Things pertama kali diperkenalkan oleh Kevin Ashton pada tahun 1999, yang menjelaskan bagaimana komputer dapat memahami dunia nyata melalui data yang dikumpulkan oleh sensor tanpa memerlukan input manual dari manusia. Seiring perkembangan teknologi seperti internet, sensor, dan komputasi, IoT berkembang pesat dan mulai diterapkan di berbagai bidang, seperti industri, transportasi, kesehatan, dan rumah pintar (Hadi, 2025).
+Internet of Things memiliki beberapa karakteristik utama yang membedakannya dari teknologi informasi konvensional. Karakteristik tersebut antara lain konektivitas antar perangkat, kemampuan pertukaran data secara real-time, otomatisasi proses, serta kemampuan sistem untuk berkembang (scalable). Selain itu, IoT juga bersifat interoperable, yaitu mampu menghubungkan berbagai perangkat dengan protokol yang berbeda dalam satu sistem terintegrasi. Karakteristik ini memungkinkan IoT digunakan dalam berbagai skenario aplikasi yang kompleks dan dinamis (Hadi, 2025).
+Dalam implementasinya, IoT terdiri dari beberapa komponen utama yang saling berinteraksi. Komponen tersebut meliputi sensor dan aktuator yang berfungsi untuk mengumpulkan data dari lingkungan fisik, perangkat pengendali seperti mikrokontroler untuk memproses data awal, jaringan komunikasi sebagai media transmisi data, serta platform atau server untuk pengolahan dan penyimpanan data. Selain itu, aplikasi pengguna juga menjadi bagian penting dalam sistem IoT untuk menampilkan informasi dan memberikan kontrol terhadap perangkat. Integrasi komponen-komponen tersebut memungkinkan sistem IoT bekerja secara optimal dalam berbagai kebutuhan (Hadi, 2025).
+Prinsip kerja IoT secara umum mengikuti alur pengumpulan data, pengiriman data, pemrosesan data, dan pemberian respons atau tindakan. Pada tahap awal, sensor akan mendeteksi kondisi lingkungan dan mengubahnya menjadi data digital. Data tersebut kemudian dikirim melalui jaringan komunikasi ke server atau cloud untuk diproses dan dianalisis. Hasil analisis selanjutnya digunakan untuk menghasilkan keputusan atau tindakan tertentu, seperti memberikan notifikasi atau mengaktifkan perangkat secara otomatis. Proses ini berlangsung secara berulang sehingga sistem IoT mampu bekerja secara real-time dan adaptif terhadap perubahan kondisi (Cahyono, 2013; Hadi, 2025).
+Penerapan Internet of Things saat ini telah berkembang pesat di berbagai bidang kehidupan. Dalam sektor transportasi, IoT digunakan untuk sistem pelacakan kendaraan dan monitoring perjalanan secara real-time. Dalam bidang kesehatan, IoT dimanfaatkan untuk pemantauan kondisi pasien melalui perangkat wearable. Selain itu, IoT juga banyak diterapkan dalam sistem rumah pintar (smart home), industri, serta pengelolaan kota pintar (smart city). Pemanfaatan IoT ini memberikan berbagai keuntungan seperti peningkatan efisiensi, kemudahan monitoring, serta pengambilan keputusan berbasis data (Cahyono, 2013)
+Dalam penelitian ini, teknologi Internet of Things digunakan sebagai dasar dalam pengembangan sistem monitoring penggunaan sepeda motor. IoT memungkinkan perangkat untuk mengumpulkan data perjalanan secara otomatis melalui sensor dan mengirimkannya ke server untuk diolah menjadi informasi yang dapat digunakan sebagai dasar dalam memberikan rekomendasi perawatan kendaraan. Dengan demikian, penerapan IoT diharapkan dapat meningkatkan efektivitas dalam pemantauan kondisi kendaraan serta membantu pengguna dalam melakukan perawatan secara tepat waktu.
+2.2.6. Metode Waterfall
+Metode Waterfall adalah salah satu model pendekatan System Development Life Cycle (SDLC) yang mengembangkan perangkat lunak secara sistematis dan berurutan dari atas ke bawah. Tahapan dalam model ini secara umum meliputi lima fase utama, yaitu: 
+1.Analisis Kebutuhan (Requirement)
+2.Desain Sistem (Design)
+3.Implementasi atau Pengodean (Implementation)
+4.Pengujian (Verification/Testing)
+5.Pemeliharaan (Maintenance)
+Setiap tahapan di dalam metode ini harus diselesaikan secara utuh dan dievaluasi terlebih dahulu sebelum pengembang diperbolehkan melangkah ke fase berikutnya (Pricillia & Zulfachmi, 2021). (Catatan: Tambahkan gambar blok diagram tahapan Waterfall di sini). Metode Waterfall diimplementasikan dalam penelitian ini sebagai landasan siklus hidup pengerjaan sistem, sehingga tahapan integrasi antara arsitektur perangkat keras IoT, logika backend Laravel, dan antarmuka aplikasi mobile Flutter dapat dieksekusi secara terstruktur sesuai perencanaan awal.
+2.2.7. Metode Prototyping
+Metode Prototyping merupakan suatu teknik pengembangan sistem yang bertujuan untuk mengembangkan rancangan model awal secara bertahap untuk menjadi sebuah sistem final. Pendekatan ini memungkinkan sistem untuk dirancang dan dievaluasi secara iteratif (berulang), yang secara teknis terbukti membuat waktu pengerjaan menjadi lebih cepat serta memakan biaya yang lebih rendah dibandingkan dengan pendekatan metode tradisional (Pramudita, 2022).
+Dalam ruang lingkup perancangan infrastruktur Internet of Things (IoT), metode Prototyping sangat direkomendasikan untuk diterapkan. Berbeda dengan murni perangkat lunak, pengembangan perangkat keras melibatkan komponen kelistrikan fisik yang rawan mengalami kegagalan. Melalui metode purwarupa ini, perangkaian komponen perangkat keras dapat dilakukan secara temporer menggunakan papan sirkuit sementara (breadboard) dan kabel jumper. Hal ini memungkinkan pengembang untuk menguji keandalan arsitektur kelistrikan dan memastikan stabilnya komunikasi jaringan dari modul ke server secara aman dan fleksibel sebelum diproduksi lebih lanjut (Pramudita, 2022).
+Pada penelitian ini, siklus pengembangan dipisahkan menjadi dua alur. Pengembangan perangkat lunak (aplikasi dan REST API) diimplementasikan menggunakan metode Waterfall, sedangkan pengembangan perangkat keras Internet of Things difokuskan sepenuhnya menggunakan metode Prototyping. Penerapan Prototyping pada sisi IoT dilakukan melalui beberapa iterasi pengujian fungsional modul ESP32, sensor GPS NEO-7M, dan sensor barometrik MPU6050. Melalui pendekatan ini, kelayakan operasional alat pemantau (monitoring) dievaluasi murni sebagai purwarupa fungsional (Proof of Concept) guna membuktikan keberhasilan akuisisi dan pengiriman data tanpa mensyaratkan fabrikasi sirkuit cetak (PCB) maupun instalasi fisik mesin secara permanen pada kendaraan bermotor.
+2.2.8. Mikrokontroler ESP32
+Mikrokontroler ESP32 adalah seri mikrokontroler System on a Chip (SoC) berbiaya dan berdaya rendah produksi Espressif Systems yang dirancang dengan kelengkapan modul Wi-Fi dan Bluetooth mode ganda (dual-mode) yang sudah terintegrasi. Secara arsitektur perangkat keras, mikrokontroler ESP32 diotaki oleh mikroprosesor Tensilica Xtensa LX6 berjenis single-core dan dual-core yang mampu beroperasi dengan kecepatan (clock) hingga mencapai 240 MHz. Cip ini juga dibekali dengan berbagai komponen bawaan yang komprehensif, mulai dari sakelar antena terintegrasi, balun RF, amplifier penerima dengan kebisingan rendah, amplifier daya, hingga modul manajemen daya (Siregar dkk., 2022). Mikrokontroler ESP32 digunakan dalam penelitian ini sebagai pusat komputasi perangkat keras yang bertugas mengakuisisi data dari sensor GPS NEO-7M dan MPU6050, kemudian memproses dan mengirimkan kumpulan data real-time tersebut menuju backend Laravel menggunakan protokol jaringan nirkabel.
+2.2.9. Modul GPS NEO-7M
+Global Positioning System (GPS) seri NEO-7M adalah modul penerima (receiver) sinyal navigasi satelit berkinerja tinggi yang diproduksi oleh u-blox. Modul ini memiliki spesifikasi tegangan kerja (input voltage) yang fleksibel pada rentang 3,3V hingga 5V DC. Untuk berkomunikasi dengan mikrokontroler, modul ini memanfaatkan protokol antarmuka serial UART melalui pin TX (Transmit) dan RX (Receive) pada baudrate standar 9600 bps. GPS NEO-7M beroperasi menggunakan format data standar NMEA (National Marine Electronics Association) dan dibekali mesin pencarian hingga 56 channel satelit, yang membuatnya mampu mengunci posisi koordinat secara cepat (waktu cold start yang singkat) (Rahman dkk., 2025). Modul GPS NEO-7M digunakan dalam penelitian ini untuk merekam jejak geospasial yang kemudian diekstraksi menjadi data riwayat jarak tempuh (kilometer) dan kecepatan harian sepeda motor. Data inilah yang selanjutnya menjadi variabel masukan (input) pada algoritma Logika Fuzzy untuk menentukan batas rekomendasi waktu servis.
+2.2.10. Sensor Barometrik MPU6050
+Sensor BMP280 adalah sensor tekanan atmosfer dan suhu yang sangat akurat dan sering digunakan dalam berbagai aplikasi, termasuk stasiun cuaca berbasis IoT, pemantauan lingkungan, navigasi, dan banyak lagi. Sensor BMP280 beroperasi berdasarkan prinsip perubahan tekanan udara dengan perubahan ketinggian. Ketika ketinggian berubah, tekanan atmosfer juga berubah. Sensor ini menggunakan prinsip tersebut untuk mengukur perubahan tekanan atmosfer dan mengkonversinya menjadi nilai tekanan yang dapat diinterpretasikan (Satria dkk., 2024). Mengingat sifat pembacaan tekanan udara yang berkorelasi langsung dengan elevasi tersebut, modul sensor ini difungsikan dalam penelitian ini sebagai sistem altimeter. Sistem ini bertugas membaca perubahan ketinggian secara terus-menerus agar logika program dapat mengenali apakah sepeda motor sedang melintasi kontur jalan yang menanjak, menurun, atau datar, yang kemudian dijadikan parameter kalkulasi tingkat beban operasional mesin dan kampas rem.
+2.2.11. Integrasi Sistem IoT, Web, dan Mobile
+Integrasi sistem Internet of Things (IoT), Web, dan Mobile merupakan arsitektur komputasi yang menggabungkan kapabilitas akuisisi data dari perangkat keras fisik, pemrosesan logis terpusat di ranah server, dan aksesibilitas interaktif pada ponsel pintar. Arsitektur terpadu ini menciptakan sebuah ekosistem interoperabilitas, di mana kondisi dari objek di dunia nyata dapat direkam secara otomatis oleh jaringan sensor, untuk kemudian dikonversi menjadi informasi digital yang dapat diakses, dipantau, dan dikendalikan oleh pengguna dari mana saja secara nirkabel (Suhardi dkk., 2024).
+Secara konseptual, aliran data (data flow) pada integrasi ini bergerak secara sekuensial dari lapisan sensor hingga lapisan pengguna. Mikrokontroler pada sisi IoT bertugas mengumpulkan pembacaan lingkungan dan mentransmisikannya ke database server (lapisan Web) melalui protokol komunikasi jaringan. Pada lapisan server, data mentah tersebut ditampung, dikelola, dan diproses lebih lanjut menggunakan algoritma logika bisnis tertentu. Sistem backend di sisi Web ini kemudian bertindak sebagai penyedia layanan (Web Service) yang mendistribusikan hasil pengolahan datanya agar dapat dirender oleh aplikasi perangkat seluler (Mobile Android/iOS) menjadi antarmuka visual berupa grafik, teks peringatan, maupun notifikasi secara real-time (Suhardi dkk., 2024).
+Pada penelitian ini, integrasi ketiga platform tersebut diimplementasikan secara komprehensif untuk menciptakan arsitektur sistem pemantauan perawatan sepeda motor yang cerdas. Modul IoT (ESP32, GPS NEO-7M, dan sensor barometrik MPU6050) bertindak sebagai node yang secara konstan merekam parameter dinamis kendaraan dan mengunggahnya ke server. Framework Laravel bertindak sebagai inti layanan Web (Backend) yang menyimpan riwayat perjalanan sekaligus mengeksekusinya ke dalam mesin inferensi Logika Fuzzy dan algoritma Large Language Model (Gemini API). Hasil kalkulasi dari server tersebut selanjutnya didistribusikan secara transparan menggunakan RESTful API ke arah aplikasi Mobile berbasis Flutter, sehingga pengguna dapat melihat rekomendasi penggantian suku cadang secara responsif tepat di genggaman mereka.
+2.2.12. Framework Laravel
+Laravel merupakan framework berbasis PHP yang bersifat open-source dan dirancang untuk mempercepat proses pengembangan aplikasi web dengan menyediakan sintaks yang ekspresif dan terstruktur (Mogbojuri Babatunde, n.d.). Filosofi utama Laravel adalah memungkinkan pengembang untuk berfokus pada logika bisnis aplikasi, bukan pada pengerjaan kode yang bersifat berulang, sehingga produktivitas tim pengembang dapat meningkat secara signifikan.
+Laravel menggunakan pola arsitektur Model-View-Controller (MVC) yang memisahkan logika bisnis, tampilan antarmuka, dan pengelolaan data secara terstruktur (AL-atraqchi, 2022). Dalam konteks ini, Model berfungsi untuk berinteraksi dengan sumber data, View bertanggung jawab atas tampilan antarmuka pengguna, dan Controller berperan sebagai penghubung antara keduanya sekaligus mengelola logika pemrosesan permintaan dari client. Penerapan arsitektur MVC ini terbukti memfasilitasi pengembangan paralel dan mempermudah pemeliharaan sistem jangka panjang (Fadilah et al, 2023).
+Salah satu fitur unggulan Laravel adalah Eloquent ORM (Object Relational Mapper), yang memungkinkan pengembang berinteraksi dengan tabel basis data menggunakan sintaks PHP yang ekspresif tanpa harus menulis query SQL secara langsung (Mogbojuri Babatunde, n.d.). Selain itu, Laravel menyediakan sistem routing yang fleksibel, mekanisme autentikasi bawaan, manajemen migrasi basis data, serta template engine Blade untuk pembangunan tampilan yang dinamis dan dapat digunakan kembali.
+Dalam konteks pengembangan RESTful API, Laravel menyediakan kemudahan melalui pemisahan rute API pada berkas routes/api.php, yang dirancang untuk komunikasi stateless dan dapat dilindungi menggunakan paket Sanctum berbasis token JWT (AL-atraqchi, 2022). Kemampuan Laravel dalam membangun API yang aman dan terstruktur menjadikannya pilihan yang tepat sebagai backend pada sistem berbasis IoT maupun aplikasi mobile, termasuk sistem yang menggunakan Flutter sebagai frontend-nya.
+2.2.13. Database MySQL
+MySQL adalah sistem manajemen basis data relasional (Relational Database Management System/RDBMS) yang bersifat open-source dan telah menjadi salah satu pilihan paling populer dalam pengembangan aplikasi web maupun sistem berbasis IoT (Gyorodi et al, 2020). Basis data relasional seperti MySQL menyimpan data dalam bentuk tabel-tabel yang saling berhubungan melalui kunci primer dan kunci asing, sehingga integritas data dapat dijaga secara konsisten melalui penerapan prinsip ACID (Atomicity, Consistency, Isolation, Durability).
+MySQL mendukung operasi CRUD (Create, Read, Update, Delete) yang merupakan operasi dasar dalam setiap aplikasi berbasis data. Hasil pengujian kinerja menunjukkan bahwa MySQL memiliki performa yang baik terutama pada operasi dengan jumlah data yang relatif kecil dan query sederhana (Gyorodi et al, 2020). Namun, pada operasi select dengan beberapa inner join dan volume data besar, waktu respons MySQL cenderung meningkat secara signifikan seiring bertambahnya kompleksitas query.
+Dalam pengembangan sistem berbasis Laravel, MySQL digunakan sebagai basis data utama yang diakses melalui Eloquent ORM, sehingga pengelolaan skema basis data dapat dilakukan secara terstruktur menggunakan mekanisme migrasi (migration) (Mogbojuri Babatunde, n.d.). Integrasi antara Laravel dan MySQL memungkinkan pengembang mendefinisikan relasi antar-entitas secara deklaratif, baik relasi one-to-one, one-to-many, maupun many-to-many. Pada sistem Tringgo, MySQL digunakan untuk menyimpan data kendaraan, histori perjalanan, data sensor, serta hasil rekomendasi perawatan yang dihasilkan oleh mesin inferensi fuzzy.
+2.2.14. Aplikasi Mobile
+Aplikasi mobile (aplikasi seluler) merupakan perangkat lunak komputasi yang dirancang secara khusus untuk dioperasikan pada perangkat nirkabel portabel, seperti ponsel pintar (smartphone) maupun komputer tablet. Berbeda dengan sistem berbasis desktop konvensional, aplikasi mobile didesain dengan antarmuka yang sangat dioptimalkan untuk navigasi layar sentuh, serta memiliki kemampuan arsitektural untuk mengakses sumber daya perangkat keras bawaan ponsel, seperti layanan lokasi geografis dan fitur peringatan sistem. Pemanfaatan aplikasi mobile memberikan kemudahan operasional yang signifikan karena sifat fisiknya yang sangat portabel, sehingga akses pertukaran informasi dan penyajian layanan internet dapat dilakukan oleh pengguna secara langsung kapan saja dan di mana saja (Frendiana, 2024).
+Dalam konteks arsitektur Internet of Things (IoT) dan sistem pemantauan terpusat (monitoring), aplikasi mobile memegang peranan esensial sebagai lapisan presentasi informasi (frontend) dan antarmuka interaksi utama bagi pengguna akhir. Data logaritmik dan telemetri dari perangkat sensor di lapangan yang sebelumnya diakumulasi serta diolah di tingkat server akan didistribusikan menuju aplikasi seluler. Aplikasi ini kemudian akan menerjemahkan data mentah tersebut menjadi visualisasi yang mudah dimengerti, seperti grafik, dasbor, maupun indikator peringatan bahaya. Melalui ekosistem seluler ini, proses pemantauan tidak lagi memerlukan akses ke basis data secara teknis, melainkan dapat dipantau langsung secara nirkabel dan real-time (Frendiana, 2024).
+Pada penelitian ini, aplikasi mobile diposisikan sebagai ujung tombak komunikasi antara arsitektur kecerdasan komputasi (server) dengan pemilik kendaraan bermotor. Dibangun untuk ekosistem Android menggunakan bahasa pemrograman Dart dan framework Flutter, aplikasi ini difungsikan untuk menampilkan visualisasi riwayat pemakaian sepeda motor, yang meliputi kalkulasi jarak tempuh dan variasi kontur jalan. Secara lebih spesifik, aplikasi mobile ini ditugaskan sebagai layar penampil hasil keputusan dari mesin inferensi Logika Fuzzy dan pengolah teks Gemini API. Ketika algoritma kecerdasan buatan menyimpulkan adanya degradasi komponen suku cadang (seperti kelayakan oli atau kampas rem), aplikasi akan secara otomatis memicu pesan notifikasi pemeliharaan secara prediktif dan tekstual tepat di genggaman pengguna.
+2.2.15. Framework Flutter
+Flutter merupakan framework pengembangan aplikasi multi-platform yang dikembangkan oleh Google dan pertama kali dirilis pada tahun 2017. Framework ini memungkinkan pengembang untuk membangun aplikasi mobile (Android dan iOS), web, desktop, serta embedded hanya dari satu basis kode yang sama. Flutter menggunakan bahasa pemrograman Dart yang dioptimalkan secara khusus untuk pembangunan antarmuka pengguna, sehingga memungkinkan penulisan kode yang ekspresif dan produktif. Berbeda dengan pendekatan cross-platform lainnya, Flutter merender seluruh antarmuka secara mandiri menggunakan mesin grafis Skia tanpa bergantung pada komponen antarmuka bawaan sistem operasi, sehingga menghasilkan tampilan yang konsisten di berbagai platform (Białkowski et al, 2022).
+Dari sisi performa, penelitian Białkowski et al (2022) yang membandingkan efisiensi waktu Flutter dengan aplikasi Android native menunjukkan bahwa aplikasi native secara umum lebih unggul pada UI thread, terutama saat proses inisialisasi aplikasi. Namun demikian, perbedaan performa pada render thread antara keduanya terbilang kecil dan tidak signifikan dalam penggunaan sehari-hari. Bahkan pada skenario pengujian tertentu yang melibatkan operasi antarmuka yang lebih kompleks, aplikasi Flutter justru menunjukkan waktu eksekusi render thread yang lebih cepat dibandingkan aplikasi native. Temuan ini sejalan dengan kesimpulan Giovanni et al (2021)yang menyatakan bahwa Flutter layak dijadikan pilihan utama pengembangan aplikasi mobile dalam konteks bisnis, sekaligus terbukti melampaui performa React Native pada seluruh skenario pengujian yang dilakukan.
+Dalam penelitian ini, Flutter digunakan sebagai framework utama dalam pengembangan aplikasi mobile Tringgo yang berjalan pada sistem operasi Android. Pemilihan Flutter didasarkan pada kemampuannya membangun antarmuka pengguna yang responsif dan informatif, kemudahan integrasi dengan backend Laravel melalui RESTful API, serta dukungan terhadap layanan notifikasi push secara real-time. Dengan memanfaatkan Flutter, pengembangan aplikasi dapat dilakukan secara efisien dari satu basis kode dengan hasil antarmuka yang halus dan performa yang memadai untuk kebutuhan sistem monitoring kendaraan berbasis IoT.
+2.2.16. Gemini API
+Gemini API merupakan layanan antarmuka pemrograman aplikasi yang disediakan oleh Google untuk mengakses kemampuan model kecerdasan buatan Gemini secara programatik. Gemini adalah keluarga model multimodal yang dikembangkan oleh Google dan mampu memproses berbagai modalitas input secara bersamaan, meliputi teks, gambar, audio, dan video, untuk menghasilkan respons berbasis teks maupun gambar (Team Gemini, 2025). Model Gemini tersedia dalam beberapa ukuran sesuai kebutuhan, yaitu Ultra untuk tugas-tugas yang sangat kompleks, Pro untuk keseimbangan antara performa dan efisiensi, serta Nano untuk penggunaan di perangkat dengan keterbatasan sumber daya komputasi. Akses terhadap Gemini API dapat dilakukan melalui Google AI Studio untuk pengembangan berbasis kunci API, maupun melalui Cloud Vertex AI untuk kebutuhan skala enterprise(Gemini API, 2023).
+Secara teknis, model Gemini dibangun di atas arsitektur Transformer decoder yang diperkuat dengan mekanisme multi-query attention dan dilatih dengan panjang konteks hingga 32.768 token (Team Gemini, 2025). Kemampuan ini memungkinkan model untuk memahami dan mengolah dokumen, percakapan panjang, serta data multimodal secara efektif dalam satu konteks pemrosesan. Gemini API menyediakan berbagai fitur yang dapat dimanfaatkan oleh pengembang, antara lain text generation, structured output, function calling untuk integrasi dengan layanan eksternal, serta kemampuan streaming respons secara bertahap. Selain itu, Google menyediakan SDK resmi dalam berbagai bahasa pemrograman seperti Python, JavaScript, Go, dan Dart untuk mempermudah integrasi Gemini API ke dalam aplikasi (Gemini API, 2023).
+Dalam penelitian ini, Gemini API dimanfaatkan sebagai komponen pembangkit teks rekomendasi perawatan kendaraan pada sistem Tringgo. Setelah mesin inferensi fuzzy menghasilkan skor kondisi komponen kendaraan, skor tersebut dikirimkan ke Gemini API sebagai konteks prompt untuk menghasilkan teks rekomendasi yang informatif dan mudah dipahami oleh pengguna awam. Pendekatan ini memungkinkan sistem untuk menghasilkan rekomendasi yang bersifat dinamis dan natural, tidak sekadar menampilkan nilai numerik, sehingga meningkatkan kualitas pengalaman pengguna dalam memahami kondisi kendaraannya.
+2.2.17. Protokol MQTT dan Message Broker
+Message Queuing Telemetry Transport (MQTT) merupakan sebuah protokol komunikasi jaringan yang dirancang secara khusus untuk arsitektur Internet of Things (IoT) dan komunikasi antar-mesin (Machine-to-Machine / M2M). Protokol MQTT beroperasi menggunakan model komunikasi asinkron berbasis publish dan subscribe (publikasi dan berlangganan). Berbeda dengan protokol HTTP yang menggunakan arsitektur request/response berukuran besar, MQTT bersifat sangat ringan (lightweight) dan memiliki header paket data yang sangat kecil. Karakteristik ini membuat protokol MQTT sangat unggul dan efisien untuk digunakan pada perangkat mikrokontroler dengan sumber daya memori terbatas serta pada lingkungan jaringan nirkabel dengan ketersediaan pita lebar (bandwidth) yang rendah (Elytia dkk., 2026).
+Dalam arsitekturnya, protokol MQTT sangat bergantung pada entitas pusat yang disebut sebagai Message Broker (Broker Pesan). Broker berfungsi sebagai server pengelola lalu lintas data yang memfasilitasi dan mendistribusikan aliran pesan antara perangkat pengirim (Publisher) dan perangkat penerima (Subscriber). Pengiriman data ini dikategorikan berdasarkan jalur identifikasi yang disebut sebagai Topik (Topic). Ketika sebuah perangkat IoT (Publisher) mempublikasikan data sensor ke sebuah Topik tertentu di Broker, maka Broker tersebut akan langsung menyebarkan data tersebut hanya kepada klien-klien (Subscriber) yang telah berlangganan pada Topik yang sama. Mekanisme ini memisahkan perangkat pengirim dan penerima secara ruang dan waktu (decoupling), sehingga keduanya tidak perlu terhubung secara bersamaan atau mengetahui alamat IP masing-masing secara langsung (Elytia dkk., 2026).
+Pada penelitian ini, protokol MQTT difungsikan sebagai jalur komunikasi utama antara perangkat keras sepeda motor dan sistem server. Mikrokontroler ESP32 bertindak sebagai Publisher yang secara konstan mempublikasikan data mentah (seperti koordinat GPS dan tekanan altimeter jalan) menuju Message Broker di awan (cloud). Di sisi lain, sistem backend berbasis Laravel bertindak sebagai Subscriber yang terus bersiaga (mendengarkan Topik tersebut) untuk menerima log data perjalanan. Segera setelah Broker mendistribusikan data ke server, sistem Laravel akan menyimpannya ke dalam database MySQL sekaligus mengeksekusinya ke dalam mesin inferensi Logika Fuzzy, memastikan kelancaran pemantauan metrik kendaraan secara nirkabel dan seketika (real-time).
+2.2.18. Perangkat Lunak Pendukung
+Pengembangan sebuah sistem cerdas yang mengintegrasikan perangkat keras Internet of Things (IoT) dan perangkat lunak membutuhkan ekosistem alat bantu (tools) di sisi pengembang. Perangkat lunak pendukung (supporting software) merujuk pada program atau aplikasi Integrated Development Environment (IDE) yang diinstal secara lokal pada komputer pengembang. Fungsinya adalah sebagai fasilitas utama untuk menulis, mengompilasi, mendeteksi kesalahan sintaks (debugging), serta menguji kode sumber (source code) sebelum sistem tersebut diterapkan ke dalam lingkungan produksi perangkat fisik (Jaladri & Hardani, 2022).
+Dalam penelitian ini, editor kode sumber utama yang digunakan adalah Visual Studio Code (VS Code). Visual Studio Code merupakan sebuah IDE lintas platform berkinerja tinggi yang bersifat open-source. Editor ini dirancang dengan antarmuka yang sangat ringan namun mendukung ekosistem ekstensi (plugins) yang sangat masif. Penggunaan VS Code memusatkan seluruh kegiatan penulisan kode ke dalam satu ruang kerja (workspace), baik itu penulisan backend REST API menggunakan Laravel, perancangan antarmuka aplikasi seluler menggunakan framework Flutter, maupun perumusan skrip algoritma sensor perangkat keras (Jaladri & Hardani, 2022).
+Khusus untuk kompilasi dan manajemen modul mikrokontroler, perangkat lunak pendukung tambahan yang digunakan adalah PlatformIO. PlatformIO adalah ekosistem pengembangan sistem tertanam (embedded system) profesional yang diintegrasikan secara langsung ke dalam aplikasi Visual Studio Code sebagai ekstensi cerdas. Keunggulan utama PlatformIO dibandingkan perangkat lunak compiler konvensional adalah sistem manajemen pustaka (library manager) yang diunduh secara otomatis sesuai spesifikasi papan sirkuit, serta dukungan toolchain yang lebih cepat. Dalam arsitektur sistem ini, PlatformIO bertindak sebagai mesin kompilasi yang menerjemahkan algoritma pembacaan sensor GPS dan barometrik, sekaligus sebagai media eksekutor (flasher) untuk menanamkan kode program tersebut ke dalam memori mikrokontroler ESP32 (Jaladri & Hardani, 2022).
+Selain editor kode, pengembangan sistem yang melibatkan arsitektur Client-Server memerlukan perangkat lunak pengujian antarmuka pemrograman aplikasi (API). Dalam hal ini, perangkat lunak Postman digunakan sebagai instrumen penguji untuk memvalidasi respons dan aliran data dari RESTful API backend Laravel. Melalui pengujian menggunakan Postman, pengembang dapat menyimulasikan pengiriman data (request) dan memastikan bahwa server meresponsnya dengan format JavaScript Object Notation (JSON) yang tepat beserta status kode HTTP yang sesuai, sebelum integrasi final dilakukan pada sisi aplikasi seluler (Adji dkk., 2026).
+Selanjutnya, pada sisi pengembangan antarmuka seluler berbasis framework Flutter, perangkat lunak pendukung yang mutlak diperlukan adalah Android Studio beserta Android SDK (Software Development Kit). Meskipun penulisan sintaks program dapat dilakukan di dalam Visual Studio Code, toolchain bawaan dari Android SDK berfungsi sebagai mesin kompilator (compiler) inti yang bertugas menerjemahkan bahasa pemrograman Dart menjadi berkas instalasi format Android Package Kit (.apk). Selain itu, instalasi lingkungan Android Studio juga menyediakan fasilitas emulator Android Virtual Device (AVD) yang memungkinkan pengembang untuk menyimulasikan dan menjalankan aplikasi pada layar ponsel pintar virtual secara langsung melalui komputer (Ikhsan dkk., 2026).
+2.2.19. Platform Kolaborasi Berbasis Web
+Dalam pengembangan sistem perangkat lunak modern, penggunaan layanan komputasi awan (cloud computing) sangat krusial untuk memastikan kolaborasi kerja berjalan secara sinkron dan terdokumentasi dengan baik. Pada penelitian ini, terdapat dua platform kolaborasi berbasis web yang digunakan secara masif, yaitu Figma untuk perancangan visual antarmuka dan platform GitHub untuk manajemen pembaruan kode sumber. Kehadiran platform berbasis web ini meniadakan ketergantungan pengembang terhadap instalasi aplikasi pihak ketiga yang memberatkan memori perangkat keras secara lokal, sekaligus meminimalisasi risiko kehilangan berkas akibat kerusakan penyimpanan fisik (Muttaqin dkk., 2024).
+Figma merupakan perangkat lunak perancangan antarmuka pengguna (User Interface/UI) dan pengalaman pengguna (User Experience/UX) yang beroperasi sepenuhnya melalui peramban web (web browser). Berbeda dengan aplikasi desain grafis konvensional, keunggulan utama Figma terletak pada fitur kolaboratif yang memungkinkan pengembang untuk merancang tata letak, menyusun komponen, dan mengevaluasi purwarupa kanvas secara bersamaan dan real-time. Pada arsitektur sistem ini, aplikasi Figma digunakan pada fase awal metode Prototyping guna memvisualisasikan rancangan kerangka layar (wireframe) dari aplikasi seluler pengguna serta tata letak dasbor server sebelum implementasi penulisan sintaks program dieksekusi (Muttaqin dkk., 2024).
+Sementara itu, pada tahap implementasi dan pengodean, manajemen kolaborasi difasilitasi menggunakan Git dan GitHub. Git adalah sistem kontrol versi (Version Control System / VCS) terdistribusi yang dijalankan untuk merekam dan melacak setiap riwayat perubahan pada baris kode program secara historis. Untuk menyinkronkan data riwayat dari sistem lokal tersebut dengan jaringan internet global, digunakanlah GitHub. GitHub bertindak sebagai platform layanan komputasi awan yang menyediakan pusat penyimpanan (hosting) untuk repositori Git. Melalui ekosistem GitHub, pengembang dapat saling mengunggah revisi kode (push), menarik pembaruan fitur dari anggota tim lain (pull), serta membagi cabang pekerjaan (branching) secara aman. Pemanfaatan arsitektur kolaborasi ini menjamin bahwa seluruh alur pengembangan REST API Laravel, antarmuka aplikasi seluler Flutter, hingga modifikasi algoritma perangkat keras IoT tetap terorganisasi dan aman dari konflik pembaruan (update conflict) (Santoso, 2026).
+BAB III
+KEGIATAN PELAKSANAAN
+Metode Pelaksanaan
+Menjelaskan pendekatan/metodologi pengembangan sistem yang digunakan (misalnya waterfall, prototyping, atau agile), beserta tahapan kerja dari perencanaan hingga pengujian.
+3.1.1. Alur Pelaksanaan Penelitian
+Pelaksanaan Tugas Akhir sistem TrinGo dilaksanakan secara bertahap melalui beberapa fase utama. Tahap awal diawali dengan studi literatur untuk mendalami konsep Internet of Things (IoT), Logika Fuzzy, dan integrasi Generative AI pada domain manajemen kendaraan bermotor. Selanjutnya, dilakukan tahap perancangan yang meliputi analisis sistem berjalan, analisis kebutuhan, perancangan arsitektur, perancangan perangkat keras, perancangan basis data, perancangan sistem inferensi fuzzy, hingga perancangan antarmuka pengguna.
+Tahap berikutnya adalah pembuatan alat, yang mencakup perakitan perangkat keras IoT (ESP32, GPS NEO-7M, dan sensor MPU6050) serta pengembangan perangkat lunak sisi backend (Laravel) dan aplikasi mobile (Flutter). Tahapan terakhir adalah pengujian sistem secara menyeluruh, baik pengujian perangkat keras, perangkat lunak, maupun pengujian terpadu, untuk memvalidasi fungsionalitas dan keandalan sistem sebelum dilakukan penarikan kesimpulan pada laporan akhir.
+3.1.2. Model Pengembangan Sistem
+Sistem TrinGo terdiri atas dua ranah pengembangan dengan karakteristik yang berbeda, yaitu perangkat keras IoT dan perangkat lunak backend/mobile. Oleh karena itu, penelitian ini mengadopsi dua model pengembangan yang diterapkan secara paralel sebagaimana dijelaskan pada sub-bab berikut.
+3.1.2.1. Metode Prototyping (Untuk Sisi Perangkat Keras IoT)
+Sisi perangkat keras IoT dikembangkan menggunakan metode Prototyping yang bersifat iteratif. Perangkaian awal mikrokontroler ESP32, modul GPS NEO-7M, dan sensor MPU6050 dilakukan pada breadboard untuk memvalidasi konektivitas antarkomponen dan keakuratan pembacaan data sensor sebelum masuk ke tahap pengujian lapangan. Pendekatan iteratif ini memungkinkan perbaikan cepat terhadap kesalahan pengabelan maupun kalibrasi sensor tanpa perlu mengulang keseluruhan proses perancangan dari awal.
+3.1.2.2. Metode Waterfall (Untuk Sisi Perangkat Lunak Backend & Mobile)
+Sisi perangkat lunak backend dan mobile dikembangkan menggunakan metode Waterfall yang terstruktur secara sekuensial, dimulai dari analisis kebutuhan sistem, perancangan basis data dan arsitektur MVC pada Laravel, pengodean aplikasi mobile menggunakan Flutter, hingga tahap verifikasi dan pengujian. Pendekatan ini dipilih karena kebutuhan fungsional sistem backend dan mobile relatif telah terdefinisi dengan jelas sejak awal perancangan, sehingga tahapan yang runtut dapat menjaga konsistensi implementasi.
+Analisis Sistem
+Membahas gambaran umum sistem yang berjalan saat ini (jika ada) serta permasalahan yang melatarbelakangi dibangunnya sistem TrinGo, termasuk analisis terhadap sistem sejenis sebagai pembanding.
+3.2.1. Analisis Sistem Berjalan & Masalah Teridentifikasi
+Secara umum, pemilik sepeda motor masih mengandalkan pencatatan odometer secara manual untuk menentukan jadwal perawatan berkala, seperti penggantian oli mesin dan kampas rem. Praktik ini rentan terhadap kelalaian karena bergantung sepenuhnya pada ingatan dan kedisiplinan pengguna, sehingga jadwal perawatan sering terlewat atau tidak akurat dan berpotensi menimbulkan kerusakan komponen yang lebih parah.
+Selain itu, sistem pelacakan berbasis GPS konvensional memiliki keterbatasan pada kondisi blank spot, misalnya saat kendaraan melintasi terowongan, underpass, atau area dengan halangan bangunan tinggi. Pada kondisi tersebut, sinyal satelit dapat terputus untuk sementara waktu sehingga data posisi dan jarak tempuh tidak dapat direkam secara akurat pada rentang waktu tersebut, yang berdampak pada perhitungan akumulasi jarak tempuh kendaraan.
+3.2.2. Analisis Solusi yang Diusulkan (Sistem TrinGo)
+Berdasarkan permasalahan tersebut, penelitian ini mengusulkan sistem TrinGo (Smart Motorcycle Management System), yaitu sistem berbasis Internet of Things yang mengintegrasikan perangkat keras pada kendaraan dengan platform cloud dan aplikasi mobile untuk memantau kondisi sepeda motor secara real-time. Otomasi pemantauan jarak tempuh dilakukan melalui kombinasi data GPS dan estimasi inersia dari sensor MPU6050, sehingga akumulasi jarak tetap dapat tercatat meskipun sinyal GPS terputus sementara (dead reckoning).
+Sensor MPU6050 turut memantau getaran fisik (g-force) kendaraan sebagai salah satu indikator intensitas berkendara. Data-data telemetri tersebut selanjutnya diolah menggunakan algoritma Fuzzy Logic Mamdani untuk menghasilkan estimasi keausan suku cadang secara real-time, yang kemudian diterjemahkan menjadi narasi rekomendasi perawatan berbahasa alami melalui integrasi Gemini API, sehingga informasi yang diterima pengguna mudah dipahami tanpa perlu menafsirkan angka teknis.
+Analisis Kebutuhan Sistem
+Menjabarkan kebutuhan fungsional (fitur-fitur yang harus ada) dan kebutuhan non-fungsional (performa, keamanan, kompatibilitas) dari sistem, biasanya juga mencakup kebutuhan perangkat keras dan perangkat lunak pendukung.
+3.3.1. Kebutuhan Perangkat Keras (Hardware)
+System on a Chip (SoC): Mikrokontroler ESP32 (Varian 30 Pin) sebagai unit pemrosesan pusat perangkat IoT.
+Modul Navigasi: Receiver GPS NEO-7M dengan komunikasi UART untuk akuisisi data posisi.
+Sensor Inersia: IMU MPU6050 (Accelerometer & Gyroscope 3-Axis) via komunikasi I2C, digunakan untuk mendeteksi pergerakan, getaran, dan estimasi jarak dead reckoning.
+Komponen Pendukung: Kabel jumper, breadboard, dan catu daya portabel untuk kebutuhan prototipe.
+3.3.2. Kebutuhan Perangkat Lunak (Software)
+Environment IoT: Visual Studio Code dan ekstensi PlatformIO IDE untuk pemrograman firmware ESP32.
+Infrastruktur Server: Framework Laravel 12, basis data MySQL, dan Mosquitto sebagai MQTT Broker.
+Platform Antarmuka: Flutter SDK (bahasa Dart) untuk pengembangan aplikasi mobile pada sistem operasi Android.
+Perancangan Arsitektur Sistem
+Menggambarkan arsitektur keseluruhan sistem — bagaimana ESP32, backend Laravel, database MySQL, aplikasi Flutter, MQTT Broker, dan Gemini API saling terhubung dan berkomunikasi dalam satu kesatuan sistem.
+3.4.1. Diagram Arsitektur Komputasi Berlapis (Layered Architecture)
+Arsitektur sistem TrinGo dirancang menggunakan pendekatan sistem terdistribusi berlapis (layered architecture) yang membagi keseluruhan fungsionalitas ke dalam empat lapisan fungsional utama. Pendekatan perancangan ini bertujuan untuk menjaga skalabilitas, fleksibilitas integrasi, keamanan data, serta kemudahan dalam proses pemeliharaan jangka panjang. Keempat lapisan tersebut meliputi Lapisan Perangkat IoT, Lapisan Perantara Pesan (Message Broker), Lapisan Server Backend, dan Lapisan Aplikasi Mobile.
+Gambar 3.1. Diagram Arsitektur Komputasi Berlapis Sistem TrinGo
+Gambar di atas mengilustrasikan diagram arsitektur sistem secara menyeluruh beserta interaksi yang terjadi antarkomponen. Penjelasan fungsionalitas dari masing-masing lapisan pada arsitektur tersebut adalah sebagai berikut.
+Layer 1: Perangkat IoT (IoT Device Layer). Lapisan ini beroperasi secara langsung pada objek fisik (sepeda motor) dan bertindak sebagai komponen ujung tombak untuk akuisisi data (data acquisition). Komponen utama pada lapisan ini adalah mikrokontroler ESP32 yang berfungsi sebagai unit pemrosesan mikro sentral. ESP32 terhubung dengan modul pelacak GPS NEO-7M untuk mendapatkan koordinat lokasi spasial kendaraan. Selain itu, diintegrasikan pula sensor inersia (IMU) MPU6050 yang difungsikan untuk mengukur percepatan (accelerometer) dan rotasi (gyroscope) tiga sumbu kendaraan. Data inersia dari sensor ini dimanfaatkan untuk mendeteksi status pergerakan motor (diam/bergerak), mengukur intensitas getaran (g-force), serta menjadi basis perhitungan estimasi jarak melalui metode dead reckoning ketika sinyal GPS hilang. Mikrokontroler ESP32 memprogram siklus pembacaan data dari sensor-sensor tersebut, menyusunnya ke dalam format payload data yang efisien, dan mentransmisikannya ke lapisan broker secara nirkabel.
+Layer 2: Perantara Pesan (Message Broker Layer). Lapisan ini berfungsi sebagai jembatan komunikasi asinkron antara node perangkat keras IoT dan infrastruktur peladen. Sistem menggunakan MQTT (Message Queuing Telemetry Transport) Broker karena efektivitas dan efisiensinya dalam menangani lalu lintas data berukuran kecil secara kontinu, terutama pada perangkat dengan keterbatasan daya komputasi dan bandwidth jaringan. Data telemetri dipublikasikan (publish) oleh modul ESP32 ke dalam topic pengenal spesifik pada MQTT Broker. Selanjutnya, broker secara otomatis mendistribusikan pesan tersebut kepada server backend yang telah terdaftar sebagai pihak pendengar (subscriber), memastikan kontinuitas aliran data kendaraan secara real-time dengan latensi minimum.
+Layer 3: Server Backend (Backend Server Layer). Lapisan server memegang peran vital sebagai pusat komputasi, penyedia antarmuka pemrograman aplikasi (API), dan implementasi logika bisnis terpusat. Dibangun menggunakan framework web PHP tangguh yaitu Laravel 12, backend menerima aliran data telemetri dari MQTT Broker dan menyimpannya ke dalam basis data relasional MySQL untuk keperluan tracking historis dan riwayat perjalanan kendaraan. Lapisan ini mengimplementasikan algoritma Fuzzy Logic Mamdani yang berperan sebagai inti komputasi untuk mengevaluasi dan menentukan status kesehatan atau kondisi motor berdasarkan data dari sensor. Setelah perhitungan Fuzzy menghasilkan suatu konklusi, hasil tersebut kemudian diteruskan menuju Gemini API yang bertindak murni sebagai generator pesan (output message generator).
+Layer 4: Aplikasi Mobile (Mobile Application Layer). Lapisan terluar ini merupakan frontend visual yang berinteraksi langsung dengan pengguna (end-user). Aplikasi ini dikembangkan dengan pendekatan crossplatform menggunakan framework antarmuka deklaratif Flutter, sehingga memungkinkan aplikasi beroperasi dengan performa tinggi pada sistem operasi Android maupun iOS menggunakan basis kode tunggal (single codebase). Aplikasi berkomunikasi dengan lapisan server menerapkan standar pola arsitektur Representational State Transfer (REST) API melalui protokol HTTPS.
+Sebagai elaborasi lebih lanjut terhadap Layer 3, arsitektur backend mengadopsi pola MVC (Model-View-Controller) yang dioptimalkan untuk respons API, dengan alur pemrosesan setiap permintaan (request) berjalan searah dari rute hingga basis data.
+Gambar 3.2. Alur Arsitektur Backend Berpola MVC
+Routes (api.php): menerima seluruh request HTTP dari klien (aplikasi mobile) dan mengarahkannya ke fungsi Controller yang tepat.
+Modul
+Method
+Endpoint (Prefix: /api/v1)
+Deskripsi
+Autentikasi
+POST
+/auth/login
+Memvalidasi kredensial (email & password) dan menerbitkan access token.
+Autentikasi
+POST
+/auth/refresh-token
+Memperbarui access token tanpa perlu login ulang.
+Kendaraan
+GET
+/vehicles/primary
+Mengambil data detail kendaraan yang diatur sebagai utama (default).
+Rekomendasi & AI
+GET
+/vehicles/primary/maintenance-recommendations
+Menghasilkan rekomendasi kondisi komponen berbasis perhitungan Fuzzy Logic.
+Rekomendasi & AI
+GET
+/motors/{motorId}/home-insight
+Mendapatkan rangkuman insight kesehatan motor untuk halaman dasbor.
+Servis & Jadwal
+GET
+/service-schedules/primary
+Menampilkan jadwal dan pengingat (reminder) servis yang akan datang.
+Servis & Jadwal
+GET
+/services/summary/{vehicle_id}
+Mengambil ringkasan pengeluaran dan riwayat biaya servis kendaraan.
+Telemetri (IoT)
+POST
+/motors/{motorId}/tracking/start
+Mengirim perintah untuk memulai sesi perekaman rute perjalanan dan telemetri IoT.
+Telemetri (IoT)
+POST
+/motors/{motorId}/tracking/stop
+Menghentikan sesi perekaman telemetri IoT.
+Telemetri (IoT)
+GET
+/motors/{motorId}/tracking/last-location
+Mengambil data titik koordinat GPS terakhir yang dikirim oleh perangkat IoT.
+Tabel 3.1. Daftar Endpoint REST API Utama
+Middleware: menyaring setiap request yang masuk, salah satunya untuk memvalidasi token keamanan (Sanctum) sebelum memproses data.
+Controller: memproses logika bisnis, seperti memvalidasi input, mengkalkulasi rekomendasi (Fuzzy Logic), dan memformat data ke dalam bentuk JSON.
+Model: berfungsi sebagai antarmuka ORM (Object-Relational Mapping) untuk berkomunikasi dengan database, sehingga manipulasi tabel di MySQL dapat dilakukan berbasis objek.
+Database: tempat penyimpanan persisten untuk seluruh data pengguna, kendaraan, jadwal servis, riwayat, dan data telemetri IoT.
+Karena perangkat IoT ESP32 mengirimkan data secara real-time melalui protokol MQTT, Laravel tidak dapat menerima data tersebut melalui koneksi HTTP standar sehingga dirancang sebuah daemon (proses latar belakang) khusus. Perintah CLI php artisan mqtt:subscribe dirancang berjalan terus-menerus (long-running process) di background server, biasanya dikelola menggunakan Supervisor pada sistem operasi Linux, untuk mendengarkan (subscribe) secara aktif pada topik telemetri broker MQTT, melakukan parsing payload JSON, lalu menyimpannya ke dalam basis data secara real-time.
+Untuk melayani aplikasi mobile, backend menyediakan sekumpulan REST API. Tabel berikut merangkum endpoint utama beserta fungsionalitasnya. Mengingat aplikasi mobile bersifat stateless dalam mengakses API, sistem keamanan backend diimplementasikan menggunakan Laravel Sanctum. Saat pengguna berhasil login, Sanctum menghasilkan token akses utama (Bearer Token) sekaligus mengaktifkan mekanisme refresh token untuk mendukung fitur persistent login. Middleware auth:sanctum memastikan bahwa setiap request harus menyertakan token pada Header Authorization; jika token tidak valid atau tidak ada, server akan menolak akses dengan kode HTTP 401 (Unauthorized).
+Perancangan Perangkat Keras IoT (Hardware Wiring & Firmware Flow)
+Berisi rancangan rangkaian hardware seperti ESP32, sensor GPS NEO-7M, dan MPU6050, termasuk skema wiring/pengkabelan dan penjelasan fungsi masing-masing komponen.
+3.5.1. Skema Rangkaian Elektronik & Konfigurasi Pinout
+Perancangan rangkaian perangkat keras sistem TrinGo berpusat pada mikrokontroler ESP32 sebagai unit pemrosesan utama yang mengintegrasikan dua komponen sensor sekaligus, yaitu sensor inersia MPU6050 dan modul GPS NEO-7M. Rangkaian ini dirancang dengan tegangan kerja 3,3V DC (Arus Searah) yang disuplai melalui pin 3V3 pada ESP32. Secara keseluruhan, rangkaian terbagi menjadi tiga jalur utama sebagai berikut.
+Gambar 3.3. Skema Rangkaian Elektronik ESP32, GPS NEO-7M, dan MPU6050
+Jalur Catu Daya (Power Path). Pin 3V3 pada ESP32 dihubungkan secara paralel ke pin VCC pada MPU6050 dan GPS NEO-7M menggunakan kabel merah. Pin GND dihubungkan ke GND masing-masing komponen menggunakan kabel hitam, sehingga distribusi tegangan 3,3V DC merata ke seluruh sensor.
+Jalur Komunikasi I2C Bus (MPU6050). GPIO 22 dihubungkan ke pin SDA dan GPIO 21 dihubungkan ke pin SCL pada MPU6050. Protokol I2C dipilih karena hanya membutuhkan dua jalur komunikasi data (SDA dan SCL) sekaligus memungkinkan penambahan perangkat I2C lain pada bus yang sama.
+Jalur Komunikasi Serial UART (GPS NEO-7M). GPIO 16 (RX2) dihubungkan ke pin TX dan GPIO 17 (TX2) dihubungkan ke pin RX pada modul GPS melalui port UART2 pada ESP32.
+Pin GPS NEO-7M
+Pin ESP32
+Fungsi
+TX
+GPIO 16 (RX2)
+Mengirim data NMEA dari GPS ke ESP32
+RX
+GPIO 17 (TX2)
+Menerima perintah konfigurasi dari ESP32
+VCC
+3V3
+Sumber tegangan 3,3V DC
+GND
+GND
+Ground (penutup sirkuit)
+Tabel 3.2. Konfigurasi Pinout Modul GPS NEO-7M
+Modul GPS NEO-7M mengirimkan data dalam format NMEA (National Marine Electronics Association) secara berkala dengan interval yang dapat dikonfigurasi sesuai kebutuhan sistem. Data yang diperoleh dari modul ini meliputi koordinat geografis (latitude dan longitude), kecepatan berkendara (speed), arah mata angin (heading), ketinggian berbasis GPS (altitude), serta jumlah satelit yang terhubung.
+Pin MPU6050
+Pin ESP32
+Fungsi
+SDA
+GPIO 22
+Jalur data dua arah (Serial Data) protokol I2C
+SCL
+GPIO 21
+Jalur clock sinkronisasi (Serial Clock) protokol I2C
+VCC
+3V3
+Sumber tegangan 3,3V DC
+GND
+GND
+Ground (penutup sirkuit)
+Tabel 3.3. Konfigurasi Pinout Sensor Inersia MPU6050
+Sensor MPU6050 merupakan modul Inertial Measurement Unit (IMU) 6-axis yang terdiri atas accelerometer 3-axis dan gyroscope 3-axis dalam satu chip. Sensor ini berkomunikasi dengan mikrokontroler ESP32 menggunakan protokol I2C (Inter-Integrated Circuit) dengan alamat default 0x68. Protokol I2C dipilih karena efisien dalam penggunaan pin mikrokontroler, di mana satu bus I2C dapat menghubungkan beberapa perangkat sekaligus hanya dengan dua jalur komunikasi, yaitu SDA dan SCL.
+Data yang diperoleh dari sensor ini meliputi percepatan linear pada sumbu X, Y, dan Z (accelerometer), serta kecepatan sudut rotasi pada ketiga sumbu tersebut (gyroscope). Data mentah tersebut diolah oleh firmware ESP32 untuk menghasilkan nilai intensitas getaran (g-force) dan status pergerakan kendaraan (bergerak/diam), yang kemudian dikemas bersama data GPS dalam satu paket JSON dan dikirimkan ke MQTT Broker secara berkala selama perjalanan berlangsung.
+3.5.2. Perancangan Alur Kerja Firmware (Non-Blocking Loop)
+Alur kerja (workflow) perangkat keras IoT yang dikendalikan oleh mikrokontroler ESP32 dirancang secara non-blocking agar perangkat dapat mengumpulkan data keadaan dan lingkungan secara periodik tanpa saling menghambat antarproses, lalu mengirimkannya ke server. Firmware dirancang dengan empat logika utama sebagaimana dijelaskan berikut, sebelum diuraikan pula flowchart alur kerja secara menyeluruh.
+Logika Inisialisasi & Kalibrasi G-Force. Pada tahap setup, ESP32 menjalankan Wire.begin() untuk mengaktifkan komunikasi I2C dan menginisialisasi sensor MPU6050. Sesaat setelah inisialisasi, firmware merekam nilai offset inersia awal (baseline) saat motor dalam kondisi diam, yang digunakan sebagai acuan kalibrasi agar pembacaan g-force selanjutnya lebih presisi dan tidak bias terhadap posisi pemasangan sensor.
+Logika Penyaringan Sinyal Awal (flag is_initial_fix_done). Sistem menahan transmisi data MQTT selama sinyal satelit GPS belum terkunci secara stabil sejak alat pertama kali dinyalakan. Aturan ini mencegah pengiriman data koordinat yang belum valid (fix belum tercapai) pada awal pengoperasian perangkat.
+Logika Komputasi Dead Reckoning. Ketika sinyal GPS hilang (blank spot), firmware melakukan perhitungan integral linear ganda terhadap data akselerometer MPU6050 untuk mengekstrak estimasi kecepatan (est_speed_kmh) dan estimasi jarak (est_distance_m) kendaraan, sehingga akumulasi jarak tempuh tetap dapat tercatat meskipun tanpa koordinat GPS yang valid.
+Logika Pengiriman Pintar (Smart Time-Based Interval). Frekuensi pengiriman paket JSON melalui MQTT diatur secara dinamis, yaitu setiap 5 detik ketika motor terdeteksi melaju dan setiap 30 detik ketika motor terdeteksi berhenti, guna menghemat penggunaan daya dan bandwidth jaringan tanpa mengurangi akurasi pemantauan.
+Gambar 3.4. Flowchart Alur Kerja Firmware ESP32
+Penjelasan alur kerja pada flowchart di atas adalah sebagai berikut.
+Mulai (Start): titik awal saat ESP32 dihidupkan atau di-reset.
+Inisialisasi Sistem: konfigurasi awal komponen (I2C, Serial), mengaktifkan sensor (GPS NEO-7M & MPU6050) beserta kalibrasi g-force awal, serta menghubungkan perangkat ke WiFi dan MQTT Broker.
+Pengecekan Koneksi: memastikan ESP32 terhubung ke WiFi dan MQTT; jika gagal, sistem akan terus mencoba (loop).
+Cek Perintah MQTT: mengecek instruksi Start/Stop dari backend. Jika "Start", alur berlanjut; jika "Stop", perangkat langsung menuju mode Sleep untuk menghemat daya.
+Baca Data Sensor: membaca koordinat dan kecepatan dari GPS, serta percepatan dan rotasi tiga sumbu dari MPU6050 untuk menentukan status gerak dan g-force.
+Cek Ketersediaan Fix GPS: apabila sinyal GPS tersedia dan valid, data koordinat dipakai langsung; apabila tidak tersedia (blank spot), sistem beralih ke komputasi dead reckoning berbasis data MPU6050.
+Kemas Data ke JSON: menggabungkan seluruh data sensor menjadi satu format terstruktur (JSON) agar mudah dibaca oleh server.
+Publish ke MQTT Broker: mengirim paket data JSON ke backend menggunakan protokol MQTT sesuai interval pengiriman pintar.
+Jeda Waktu / Sleep: menunda operasi sejenak (delay/sleep) untuk menghemat daya dan bandwidth, lalu mengulang siklus ke tahap pengecekan perintah.
+Pengembangan firmware dilakukan menggunakan Visual Studio Code yang terintegrasi dengan ekstensi PlatformIO, sehingga manajemen pustaka (library) dan struktur proyek dapat dikelola secara terpusat melalui berkas konfigurasi platformio.ini berikut.
+[env:esp32doit-devkit-v1]platform = espressif32board = esp32doit-devkit-v1framework = arduinomonitor_speed = 115200lib_deps =    mikalhart/TinyGPSPlus@^1.0.3    knolleary/PubSubClient@^2.8.0    electroniccats/MPU6050@^1.3.0    bblanchon/ArduinoJson@^7.0.4
+Pustaka MPU6050 (electroniccats/MPU6050) digunakan untuk berkomunikasi dengan sensor inersia melalui antarmuka I2C, menggantikan pustaka barometrik pada rancangan sebelumnya. Inisialisasi sensor dilakukan pada fase setup, sebagaimana potongan kode berikut.
+// File: imu_handler.cpp// Inisialisasi MPU6050 dan kalibrasi offset saat motor diamvoid initImu() {  Wire.begin(21, 22); // SDA=21? disesuaikan definisi pin proyek  mpu.initialize();  calibrateGForceOffset(); // Merekam baseline saat motor diam}
+Pembacaan data sensor berjalan pada gelung (loop) utama program secara non-blocking, sebagaimana potongan kode berikut pada file telemetry.cpp yang mengemas data GPS dan MPU6050 ke dalam satu payload JSON.
+void publishTelemetry(uint32_t nowMs) {  if (!mqtt.connected()) return;  String topic = String("vehicle/") + deviceId + "/telemetry";  JsonDocument doc;  doc["device_id"]      = deviceId;  doc["timestamp"]      = millis();  doc["has_fix"]        = hasFix;  doc["lat"]            = lat;  doc["lng"]            = lng;  doc["speed_kmh"]      = speedKmh;  doc["est_distance_m"] = estDistanceM;   // hasil dead reckoning  doc["mpu_is_moving"]  = mpuIsMoving;  doc["mpu_g_force"]    = mpuGForce;  doc["address"]        = lastAddress;  String payload;  serializeJson(doc, payload);  mqtt.publish(topic.c_str(), payload.c_str());}
+Konfigurasi koneksi WiFi dan MQTT Broker dibuat terpusat di dalam header config.h. Demi menjaga keamanan data, nilai kredensial asli tidak ditampilkan secara eksplisit pada laporan ini dan digantikan dengan placeholder sebagaimana berikut.
+// (include/config.h)static const char* WIFI_SSID     = "<NAMA_WIFI>";static const char* WIFI_PASSWORD = "<PASSWORD_WIFI>";static const char* MQTT_HOST     = "<ALAMAT_BROKER_MQTT>";static const int   MQTT_PORT     = 1883;static const char* MQTT_USERNAME = "<USERNAME_MQTT>";static const char* MQTT_PASSWORD = "<PASSWORD_MQTT>";
+Perancangan UML (Unified Modeling Language)
+Memodelkan sistem secara visual melalui Use Case Diagram, Activity Diagram, dan Sequence Diagram untuk menjelaskan interaksi aktor, alur proses, dan urutan komunikasi antarobjek dalam sistem.
+3.6.1. Use Case Diagram Sistem TrinGo
+Use Case Diagram pada sistem TrinGo menggambarkan hubungan fungsional antara aktor Pengendara dengan sistem. Diagram ini mendefinisikan seluruh hak akses dan interaksi yang dapat dilakukan pengguna, di antaranya memulai dan menghentikan fitur pelacakan lokasi motor secara real-time, memeriksa kesehatan komponen kendaraan berdasarkan data sensor seperti getaran yang direkam oleh MPU6050, mengelola riwayat servis dengan mencatat dan menampilkan histori perawatan kendaraan, serta menerima notifikasi rekomendasi perawatan yang dikirimkan sistem melalui Firebase Cloud Messaging berdasarkan hasil analisis data sensor dan perhitungan Fuzzy Logic. Diagram ini menjadi dasar untuk menentukan ruang lingkup fungsional aplikasi mobile sebelum masuk ke tahap perancangan proses (Activity Diagram) dan interaksi objek (Sequence Diagram).
+3.6.2. Activity Diagram Pemrosesan Log Telemetri
+Activity Diagram ini menjelaskan alur proses pengolahan data telemetri dari perangkat keras hingga tersimpan di basis data, digambarkan dalam beberapa swimlane yang merepresentasikan komponen-komponen sistem yang saling berinteraksi. Proses dimulai dari mikrokontroler ESP32 yang membaca data dari sensor GPS NEO-7M dan MPU6050, kemudian menyusun data tersebut ke dalam format payload JSON dan mem-publish-nya ke MQTT Broker. Broker selanjutnya meneruskan pesan yang dipublikasikan tersebut ke Daemon Subscriber Laravel, yang bertindak sebagai listener untuk menerima payload dari broker, lalu melakukan proses parsing atau pengurai data JSON serta validasi untuk memastikan data sesuai format dan nilai yang wajar. Data yang telah melalui proses validasi tersebut selanjutnya disimpan ke dalam basis data MySQL untuk digunakan pada proses analisis maupun ditampilkan di aplikasi. Alur ini menggambarkan bagaimana data sensor real-time dari kendaraan dapat mengalir secara asinkron dari perangkat IoT menuju backend server tanpa memerlukan permintaan langsung dari sisi client, sesuai karakteristik protokol MQTT yang bersifat publish-subscribe.
+3.6.3. Sequence Diagram Ingesti Data Pintar
+Sequence Diagram ini memperjelas urutan waktu pertukaran pesan antarobjek saat sistem mengeksekusi mekanisme filter anti-GPS drift, yaitu proses untuk menyaring data lokasi yang tidak akurat akibat gangguan sinyal GPS. Objek yang terlibat dalam proses ini meliputi MQTT Subscriber yang menerima data mentah dari ESP32, modul validasi silang berbasis MPU6050 yang membandingkan data pergerakan berupa akselerasi dan gyroscope dengan data posisi dari GPS, serta lapisan penyimpanan data yang hanya menyimpan data yang telah lolos validasi silang tersebut. Ketika data GPS menunjukkan perpindahan signifikan namun data MPU6050 menunjukkan motor dalam keadaan diam, maka data tersebut dianggap sebagai drift atau noise sehingga difilter dan tidak disimpan. Mekanisme ini penting karena GPS berbasis satelit rentan terhadap galat posisi terutama saat sinyal lemah, sehingga kombinasi dengan data sensor gerak MPU6050 dapat meningkatkan akurasi pelacakan lokasi kendaraan.
+Perancangan Basis Data (Database Design)
+Menjelaskan struktur basis data MySQL yang digunakan, meliputi rancangan tabel, relasi antar-tabel (ERD), serta atribut/tipe data yang menyimpan data pengguna, perjalanan, sensor, dan riwayat servis.
+3.7.1. Entity Relationship Diagram (ERD)
+Rancangan basis data relasional MySQL sistem TrinGo divisualisasikan melalui Entity Relationship Diagram (ERD) berikut, yang menggambarkan relasi antar entitas utama seperti pengguna, kendaraan, perjalanan, titik telemetri, dan riwayat servis.
+Gambar 3.5. Entity Relationship Diagram (ERD) Sistem TrinGo
+3.7.2. Spesifikasi Struktur Tabel Operasional Perjalanan (trip_points)
+Tabel trip_points menyimpan data telemetri hasil akuisisi perangkat IoT secara granular per titik waktu. Berikut adalah spesifikasi kolom tabel yang telah dirapikan.
+Kolom
+Tipe Data
+Keterangan
+trip_id
+BIGINT (FK)
+Relasi ke tabel trips, menandakan sesi perjalanan terkait.
+timestamp
+DATETIME
+Waktu pencatatan titik telemetri.
+has_fix
+BOOLEAN
+Menandakan validitas sinyal GPS pada titik tersebut.
+latitude / longitude
+DECIMAL (nullable)
+Koordinat geografis; bernilai null saat blank spot GPS.
+speed_kmh
+FLOAT
+Kecepatan kendaraan dalam km/jam.
+est_distance_m
+FLOAT
+Estimasi jarak hasil dead reckoning saat GPS tidak tersedia.
+mpu_is_moving
+BOOLEAN
+Status pergerakan kendaraan berdasarkan pembacaan MPU6050.
+mpu_g_force
+FLOAT
+Nilai intensitas getaran (g-force) hasil pembacaan MPU6050.
+Tabel 3.4. Spesifikasi Kolom Tabel trip_points
+Perancangan Sistem Inferensi Fuzzy Mamdani (Rekomendasi Perawatan)
+Sistem rekomendasi perawatan pada TrinGo menggunakan pendekatan hibrida, yaitu menggabungkan Logika Fuzzy Mamdani untuk menghitung tingkat kesehatan (health score) komponen secara matematis, dan Generative AI (Gemini API) untuk merangkai skor tersebut menjadi narasi rekomendasi berbasis bahasa manusia.
+Gambar 3.6. Alur Sistem Rekomendasi Perawatan Berbasis Fuzzy-Gemini
+3.8.1. Penentuan Variabel Input & Fungsi Keanggotaan (Fuzzifikasi)
+Sistem logika Fuzzy mengolah empat metrik kuantitatif utama. Masing-masing metrik dibagi menjadi himpunan linguistik (Low, Medium, High) menggunakan fungsi keanggotaan berbentuk trapesium (trap) maupun segitiga (tri).
+Variabel Input
+Satuan
+Rentang Nilai
+Himpunan Linguistik
+Deskripsi
+Jarak Tempuh (Mileage)
+Kilometer (km)
+0 - 5.000+
+Rendah, Menengah, Tinggi
+Akumulasi jarak sejak servis terakhir.
+Durasi Hari (Days Since)
+Hari
+0 - 180+
+Baru, Sedang, Lama
+Waktu yang berlalu sejak penggantian komponen.
+Kecepatan Rata-rata
+km/jam
+0 - 120
+Lambat, Sedang, Cepat
+Agresivitas berkendara (riding behavior).
+Intensitas Berkendara
+Score (0-10)
+0 - 10
+Rendah, Sedang, Tinggi
+Frekuensi penggunaan kendaraan harian, turut mempertimbangkan data g-force MPU6050.
+Tabel 3.5. Variabel Input Fuzzy
+Pada file FuzzyEngine.php, masukan crisp (nilai pasti) dihitung derajat keanggotaannya terhadap batas fungsi linguistik yang telah ditentukan.
+// File: app/Services/Fuzzy/FuzzyEngine.phpforeach ($inputDefs as $var => $def) {    $x = (float) ($inputs[$var] ?? 0);    $sets = $def['sets'] ?? [];    $fuzzyInputs[$var] = [];    foreach ($sets as $setName => $setDef) {        $fuzzyInputs[$var][$setName] = $this->membership($x, $setDef);    }}
+3.8.2. Penyusunan Basis Aturan Pakar (Fuzzy Rule Base)
+Nilai fuzzifikasi dianalisis menggunakan Mamdani inference rules bertipe relasional (IF-THEN) yang disusun dalam bentuk matriks aturan, mengombinasikan keempat variabel input untuk menentukan tingkat kelayakan keausan komponen oli mesin dan kampas rem. Sebagai ilustrasi, salah satu aturan menyatakan: IF Jarak Tempuh Tinggi AND Durasi Hari Lama THEN Skor Oli Critical. Pengkondisian AND diproses dengan mengambil nilai minimum dari himpunan (min()), sedangkan agregasi antaraturan dengan tujuan output yang sama menggunakan operator maksimum (max()).
+// File: app/Services/Fuzzy/FuzzyEngine.phpforeach ($rules as $rule) {    $thenSet = $rule['then'];    $degree = 1.0;    if (isset($rule['all'])) {        foreach ($rule['all'] as $cond) {            $degree = min($degree, $this->conditionDegree($fuzzyInputs, $cond));        }    }    $weight = $rule['weight'] ?? 1.0;    $degree *= $weight;    $outputActivations[$thenSet] = max($outputActivations[$thenSet] ?? 0.0, $degree);}
+3.8.3. Proses Evaluasi Inferensi & Defuzzifikasi (Centroid Method)
+Aktivasi fuzzy output disatukan untuk menemukan nilai titik berat (Center of Area), yang kemudian dikonversikan kembali menjadi sebuah nilai metrik konkret berupa skor kondisi komponen berskala 0-100.
+Variabel Output
+Rentang Skor
+Status Linguistik
+Tindakan yang Disarankan
+Normal (Aman)
+0% - 40%
+Good
+Komponen dalam kondisi prima, belum perlu servis.
+Warning (Perhatian)
+41% - 75%
+Warning
+Keausan mulai terjadi, persiapkan servis dalam waktu dekat.
+Critical (Bahaya)
+76% - 100%
+Critical
+Harus segera diservis/diganti untuk menghindari kerusakan fatal.
+Tabel 3.6. Variabel Output Fuzzy
+// File: app/Services/Fuzzy/FuzzyEngine.php// (Sigma x*mu(x)) / (Sigma mu(x))for ($x = $minX; $x <= $maxX; $x += $step) {    $mu = 0.0;    foreach ($outputActivations as $setName => $activation) {        $setDef = $outputSets[$setName];        $mu = max($mu, min($activation, $this->membership($x, $setDef)));    }    $numerator   += $x * $mu;    $denominator += $mu;}$score = ($denominator > 0.0) ? ($numerator / $denominator) : 50.0;
+Perancangan Integrasi Generative AI (Gemini API)
+Menjelaskan bagaimana sistem mengintegrasikan Google Gemini API untuk menghasilkan narasi/rekomendasi perawatan berbasis bahasa alami dari hasil perhitungan fuzzy dan data sensor.
+3.9.1. Arsitektur Prompt Context Builder
+Proses pertukaran hasil skor Fuzzy ke Gemini API ditangani oleh kelas RecommendationService. Skor numerik dan pelabelan tingkat kritis (normal, warning, critical) yang dihasilkan oleh FuzzyEngine tidak ditampilkan secara langsung kepada pengguna, melainkan diproses lebih lanjut melalui backend Laravel yang otomatis menyusun prompt linguistik terstruktur berdasarkan skor Fuzzy numerik.
+Sistem merangkai metrik telemetri awal beserta skor definitif hasil Fuzzy ke dalam kelas GeminiPromptBuilder.
+Kelas builder menyusunnya menjadi konteks linguistik yang kokoh agar Large Language Model dapat memaknai batasan keausan spesifik masing-masing komponen.
+Setelah prompt tercipta, sistem mengirimkannya sebagai payload request ke Gemini API.
+// File: app/Services/RecommendationService.php (potongan integrasi)$fuzzy = $this->fuzzyEngine->evaluateMotorType($motorType, $inputs);$prompt = $this->promptBuilder->build(    motorType:  $motorType,    inputs:     $inputs,    scores:     $fuzzy['scores'],     // Hasil Defuzzifikasi Centroid    statuses:   $fuzzy['statuses'],   // Status Ambang Batas Fuzzy    thresholds: $fuzzy['thresholds'],);$result = $this->gemini->generateRecommendation(...);
+3.9.2. Pemrosesan Output Natural Language Generation (NLG)
+Meskipun Logika Fuzzy sangat akurat dalam memberikan persentase keausan (misalnya skor kerusakan oli 82%), angka tersebut seringkali kaku dan sulit dipahami mekanik awam maupun pemilik kendaraan. Oleh sebab itu, Gemini API berperan menerjemahkan skor tersebut menjadi narasi yang lebih mudah dipahami.
+Pengiriman ke API: teks prompt dikirimkan ke endpoint Gemini API Google via cURL/HTTP Client bawaan Laravel.
+Pembentukan Narasi: Gemini AI memproses parameter tersebut dan merespons dengan paragraf edukatif berisi saran mekanik yang kontekstual terhadap kondisi komponen.
+Distribusi: teks output dari AI tersebut diteruskan ke aplikasi mobile pengguna melalui RESTful API sebagai bagian dari Rekomendasi Pintar.
+Pendekatan hibrida ini diterapkan dengan tujuan spesifik: Logika Fuzzy menuntaskan kalkulasi keausan berdasarkan parameter ukur pasti secara konsisten tanpa risiko halusinasi, sementara Gemini API bertugas mengubah determinasi skor tersebut ke dalam penuturan saran servis yang luwes dan ramah dibaca oleh pengguna.
+Perancangan Antarmuka Sistem (User Interface)
+Berisi rancangan tampilan aplikasi Flutter, seperti mockup/wireframe halaman dashboard, tracking, riwayat servis, dan notifikasi, untuk memastikan kemudahan penggunaan (usability).
+3.10.1. Perancangan UI Aplikasi Mobile (Flutter Android)
+Perancangan antarmuka aplikasi mobile bertujuan untuk memberikan gambaran interaksi antara pengguna dengan sistem manajemen sepeda motor berbasis IoT. Antarmuka dirancang secara intuitif agar pengguna dapat memantau data telemetri kendaraan dan mengelola jadwal perawatan secara efisien. Berikut adalah rancangan mockup/wireframe pada aplikasi mobile.
+Gambar 3.7. Antarmuka Login
+Pada antarmuka Login, pengguna diharuskan memasukkan kredensial akun (email dan kata sandi) yang akan divalidasi oleh sistem autentikasi. Halaman ini juga menyediakan akses ke fitur lupa kata sandi (forgot password) dan registrasi akun baru.
+Gambar 3.8. Antarmuka Dashboard / Beranda
+Halaman Dashboard berfungsi sebagai pusat kendali utama (control center) setelah pengguna berhasil login, menampilkan ringkasan data motor yang sedang aktif, ikon notifikasi, serta kartu informasi Odometer saat ini.
+Gambar 3.9. Antarmuka Tambah Jarak Manual
+Halaman ini menyediakan tombol akses cepat untuk fitur penambahan jarak tempuh secara manual, sebagai alternatif apabila fitur pelacakan otomatis tidak digunakan.
+Gambar 3.10. Antarmuka Statistik Mingguan
+Halaman ini menampilkan statistik rata-rata jarak tempuh harian dan mingguan kendaraan.
+Gambar 3.11. Antarmuka Insight
+Halaman ini merangkum insight kesehatan motor untuk memberikan gambaran cepat kondisi kendaraan kepada pengguna.
+Gambar 3.12. Antarmuka Pelacakan GPS (GPS Tracking)
+Antarmuka Peta Perjalanan mengintegrasikan layanan peta digital yang memetakan posisi geografis atau rute perjalanan motor. Saat fitur tracking diaktifkan, antarmuka ini akan terus memperbarui pergerakan motor berdasarkan data koordinat GPS secara real-time.
+Gambar 3.13. Antarmuka Status Kesehatan Motor
+Antarmuka ini menyajikan kartu status kendaraan (Vehicle Status Card) dengan indikator warna (misalnya status Urgent, Soon, atau Good Condition), dihitung berdasarkan metrik jarak sejak servis terakhir dilengkapi visualisasi progress bar.
+Gambar 3.14. Antarmuka Rekomendasi Perawatan
+Berbekal perhitungan sistem dan penilaian metrik (skor fuzzy), antarmuka ini memberikan rekomendasi komponen mana saja yang perlu segera mendapat perhatian, disertai badge prioritas tingkat urgensi.
+Gambar 3.15. Antarmuka Menu Jadwal Servis
+Pada antarmuka ini, pengguna dapat melihat jadwal servis motor berikutnya dan menambahkan jadwal servis baru, mengacu pada interval jarak tempuh dibandingkan dengan Odometer kendaraan saat ini.
+Gambar 3.16. Antarmuka Tips dan Trik Perawatan
+Antarmuka ini menyuguhkan artikel dan edukasi ringan tentang tata cara menjaga komponen sepeda motor, guna meningkatkan literasi pengguna dalam merawat kendaraannya secara mandiri.
+Gambar 3.17. Antarmuka Riwayat Perjalanan (Trip History)
+Antarmuka Riwayat Perjalanan mencatat seluruh aktivitas penambahan jarak tempuh (trip), baik yang direkam otomatis melalui fitur pelacakan GPS maupun penambahan jarak odometer secara manual.
+Gambar 3.18. Antarmuka Notifikasi
+Antarmuka Notifikasi menampilkan daftar pesan alert atau pengingat yang dikirimkan kepada pengguna, termasuk peringatan jadwal servis yang jatuh tempo maupun kondisi mendesak (urgent) melalui Firebase Cloud Messaging (FCM).
+Gambar 3.19. Antarmuka Pengaturan / Profil
+Antarmuka Pengaturan memungkinkan pengguna melihat atau mengubah data diri, melakukan penggantian kata sandi keamanan (change password), serta mengatur preferensi aplikasi lainnya.
+Perancangan Pengujian (Skenario Uji)
+Menjelaskan skenario dan metode pengujian sistem yang akan dilakukan (misalnya black-box testing, pengujian akurasi sensor, atau pengujian fuzzy logic) untuk memvalidasi bahwa sistem berjalan sesuai kebutuhan.
+3.11.1. Rencana Pengujian Validasi Ganda (Anti GPS Drift)
+Pengujian ini bertujuan membuktikan bahwa data lompatan koordinat GPS (GPS drift) dapat di-nol-kan ketika sensor MPU6050 membaca kondisi motor tidak bergerak. Skenario pengujian dilakukan dengan menempatkan alat dalam kondisi diam pada area yang terhalang gedung atau atap, sehingga sinyal GPS berpotensi memberikan pembacaan koordinat yang melompat-lompat (drift) meskipun kendaraan tidak berpindah posisi. Sistem diharapkan dapat mendeteksi kondisi diam berdasarkan data MPU6050 (mpu_is_moving bernilai false) dan mengabaikan perubahan koordinat GPS yang tidak valid pada rentang waktu tersebut, sehingga akumulasi jarak tempuh tidak bertambah secara keliru.
+3.11.2. Rencana Pengujian Dead Reckoning (Kondisi GPS Loss)
+Pengujian ini bertujuan menguji keandalan firmware dalam mempertahankan akumulasi data jarak berbasis inersia saat sinyal GPS hilang sepenuhnya. Skenario pengujian dilakukan dengan mengendarai kendaraan menembus area blank spot, seperti terowongan atau underpass, untuk menguji kemampuan sistem dalam mengosongkan koordinat spasial (has_fix bernilai false) namun tetap mencatat data akumulasi jarak melalui perhitungan dead reckoning berbasis data akselerometer MPU6050 (est_distance_m), sehingga total jarak tempuh perjalanan tetap tercatat secara wajar setibanya kendaraan kembali mendapatkan sinyal GPS yang valid.
+BAB IV 
+ANALISIS DAN PEMBAHASAN
+4.1. Hasil Pembuatan Perangkat Keras
+4.1.1. Hasil Perakitan Perangkat IoT
+4.1.2. Hasil Instalasi Perangkat pada Kendaraan
+4.2. Hasil Pengujian Perangkat Keras
+4.2.1. Hasil Pengujian Modul GPS NEO-6M
+4.2.2. Hasil Pengujian Sensor Akselerometer MPU6050
+4.2.3. Hasil Pengujian Modul GSM SIM800L
+4.3. Hasil Pengujian Perangkat Lunak
+4.3.1. Hasil Pengujian Komunikasi MQTT
+4.3.2. Hasil Pengujian RESTful API Laravel
+4.3.3. Hasil Pengujian Sistem Rekomendasi Fuzzy Mamdani
+4.3.4. Hasil Pengujian Notifikasi Firebase Cloud Messaging
+4.3.5. Hasil Pengujian Antarmuka Aplikasi Mobile
+4.4. Hasil Pengujian Sistem Secara Terpadu
+4.4.1. Hasil Pengujian Skenario Perjalanan Normal
+4.4.2. Hasil Pengujian Skenario Pemicu Rekomendasi Perawatan
+4.4.3. Hasil Pengujian Pengiriman Notifikasi Real-Time
+4.5. Analisis Kinerja Sistem
+4.5.1. Analisis Akurasi Data GPS dan Akselerometer
+4.5.2. Analisis Keandalan Transmisi Data MQTT
+4.5.3. Analisis Kinerja Sistem Rekomendasi Fuzzy Mamdani
+4.5.4. Analisis Waktu Respons Sistem
+4.6. Pembahasan
+4.6.1. Pembahasan Kinerja Perangkat Keras
+4.6.2. Pembahasan Kinerja Perangkat Lunak
+4.6.3. Pembahasan Kesesuaian Sistem dengan Kebutuhan Pengguna
+BAB V
+KESIMPULAN
+5.1. Kesimpulan
+5.2. Saran

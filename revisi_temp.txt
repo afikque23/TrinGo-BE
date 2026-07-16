@@ -1,0 +1,95 @@
+Revisi Komprehensif Variabel Logika Fuzzy Bab II & Bab III
+Judul TA: RANCANG BANGUN SISTEM MONITORING PERAWATAN SEPEDA MOTOR DAN REKOMENDASINYA MENGGUNAKAN TEKNOLOGI IOT BERBASIS MOBILE
+Program Studi: Teknik Informatika - Politeknik Negeri Semarang
+BAB II: TINJAUAN PUSTAKA
+2.x. Formalisasi Matematis Fungsi Keanggotaan Fuzzy Mamdani
+Proses fuzzifikasi memerlukan fungsi matematis kontinuitas untuk memetakan nilai tegas (crisp) menjadi derajat keanggotaan fuzzy dengan rentang μ(x) ∈ [0, 1]. Pada sistem ini, representasi himpunan fuzzy menggunakan tiga jenis kurva utama, yaitu Kurva Linier Turun (Linear Down), Kurva Segitiga (Triangular), dan Kurva Linier Naik (Linear Up).
+1. Fungsi Kurva Linier Turun
+Kurva linier turun digunakan untuk memetakan parameter himpunan awal (seperti Rendah, Baru, atau Lambat) yang memiliki nilai optimal penuh pada batas bawah dan menurun secara konstan hingga nol pada batas atas. Persamaan matematisnya dirumuskan sebagai berikut:
+μ_down(x) =   1,               jika x ≤ a  (b - x)/(b - a), jika a < x < b  0,               jika x ≥ b
+2. Fungsi Kurva Linier Naik
+Kurva linier naik digunakan untuk memetakan parameter himpunan akhir (seperti Tinggi, Lama, atau Cepat) di mana nilai derajat keanggotaan bernilai nol pada batas bawah dan merangkak naik secara linier menuju nilai optimal satu pada batas atas. Persamaan matematisnya dirumuskan sebagai berikut:
+μ_up(x) =   0,               jika x ≤ a  (x - a)/(b - a), jika a < x < b  1,               jika x ≥ b
+3. Fungsi Kurva Segitiga (Triangular)
+Kurva segitiga memetakan parameter transisi atau kondisi Menengah/Sedang. Kurva ini dibentuk oleh tiga parameter batas utama (a, b, c) di mana nilai derajat keanggotaan mencapai puncak (μ=1) tepat pada titik b. Persamaan matematisnya dirumuskan sebagai berikut:
+μ_tri(x) =   0,               jika x ≤ a atau x ≥ c  (x - a)/(b - a), jika a < x ≤ b  (c - x)/(c - b), jika b < x < c
+4. Metode Defuzzifikasi Centroid (Center of Area)
+Tahap akhir untuk menghasilkan output nilai tegas (crisp score) dari komposisi aturan fuzzy dilakukan dengan metode Centroid diskrit, yang diimplementasikan melalui formula penjumlahan sampel terintegrasi sebagai berikut:
+Z* = ∑(z_i * μ_output(z_i)) / ∑(μ_output(z_i))
+Keterangan: Z* merupakan persentase keausan akhir, z_i adalah nilai sampel domain output, dan μ_output(z_i) merupakan nilai derajat keanggotaan hasil agregasi aturan fuzzy.
+BAB III: METODOLOGI PERANCANGAN
+3.x. Pemetaan Batas Semesta Pembicaraan dan Fungsi Keanggotaan
+Sistem cerdas TrinGo menggunakan 4 variabel input dinamis yang diproses secara asinkron melalui Laravel backend. Berdasarkan rentang operasional kendaraan nyata, visualisasi kurva diimplementasikan ke dalam rumus matematika formal di bawah ini:
+Nama Variabel Input
+Semesta Pembicaraan
+Himpunan Fuzzy
+Tipe Kurva
+Parameter Batas Parameter (a, b, c)
+1. Jarak Tempuh (X1)
+0 - 5000 km
+Rendah
+Linier Turun
+a = 1000, b = 2500
+1. Jarak Tempuh (X1)
+0 - 5000 km
+Menengah
+Segitiga
+a = 1000, b = 2500, c = 4000
+1. Jarak Tempuh (X1)
+0 - 5000 km
+Tinggi
+Linier Naik
+a = 2500, b = 4000
+2. Durasi Hari (X2)
+0 - 180 Hari
+Baru
+Linier Turun
+a = 30, b = 90
+2. Durasi Hari (X2)
+0 - 180 Hari
+Sedang
+Segitiga
+a = 30, b = 90, c = 150
+2. Durasi Hari (X2)
+0 - 180 Hari
+Lama
+Linier Naik
+a = 90, b = 150
+3. Kecepatan Rata-rata (X3)
+0 - 120 km/jam
+Lambat
+Linier Turun
+a = 20, b = 60
+3. Kecepatan Rata-rata (X3)
+0 - 120 km/jam
+Sedang
+Segitiga
+a = 20, b = 60, c = 100
+3. Kecepatan Rata-rata (X3)
+0 - 120 km/jam
+Cepat
+Linier Naik
+a = 60, b = 100
+4. Intensitas Berkendara (X4)
+0 - 10 Score
+Rendah
+Linier Turun
+a = 2, b = 5
+4. Intensitas Berkendara (X4)
+0 - 10 Score
+Sedang
+Segitiga
+a = 2, b = 5, c = 8
+4. Intensitas Berkendara (X4)
+0 - 10 Score
+Tinggi
+Linier Naik
+a = 5, b = 8
+Formulasi Matematis Variabel Input 1: Jarak Tempuh (X1)
+μ_Rendah(X1) =   1,                   jika X1 ≤ 1000  (2500 - X1)/1500,    jika 1000 < X1 < 2500  0,                   jika X1 ≥ 2500μ_Menengah(X1) =   0,                   jika X1 ≤ 1000 atau X1 ≥ 4000  (X1 - 1000)/1500,    jika 1000 < X1 <= 2500  (4000 - X1)/1500,    jika 2500 < X1 < 4000μ_Tinggi(X1) =   0,                   jika X1 ≤ 2500  (X1 - 2500)/1500,    jika 2500 < X1 < 4000  1,                   jika X1 ≥ 4000
+Formulasi Matematis Variabel Input 2: Durasi Hari (X2)
+μ_Baru(X2) =   1,                   jika X2 ≤ 30  (90 - X2)/60,        jika 30 < X2 < 90  0,                   jika X2 ≥ 90μ_Sedang(X2) =   0,                   jika X2 ≤ 30 atau X2 ≥ 150  (X2 - 30)/60,        jika 30 < X2 <= 90  (150 - X2)/60,       jika 90 < X2 < 150μ_Lama(X2) =   0,                   jika X2 ≤ 90  (X2 - 90)/60,        jika 90 < X2 < 150  1,                   jika X2 ≥ 150
+Formulasi Matematis Variabel Input 3: Kecepatan Rata-rata (X3)
+μ_Lambat(X3) =   1,                   jika X3 ≤ 20  (60 - X3)/40,        jika 20 < X3 < 60  0,                   jika X3 ≥ 60μ_Sedang(X3) =   0,                   jika X3 ≤ 20 atau X3 ≥ 100  (X3 - 20)/40,        jika 20 < X3 <= 60  (100 - X3)/40,       jika 60 < X3 < 100μ_Cepat(X3) =   0,                   jika X3 ≤ 60  (X3 - 60)/40,        jika 60 < X3 < 100  1,                   jika X3 ≥ 100
+Formulasi Matematis Variabel Input 4: Intensitas Berkendara (X4)
+μ_Rendah(X4) =   1,                   jika X4 ≤ 2  (5 - X4)/3,          jika 2 < X4 < 5  0,                   jika X4 ≥ 5μ_Sedang(X4) =   0,                   jika X4 ≤ 2 atau X4 ≥ 8  (X4 - 2)/3,          jika 2 < X4 <= 5  (8 - X4)/3,          jika 5 < X4 < 8μ_Tinggi(X4) =   0,                   jika X4 ≤ 5  (X4 - 5)/3,          jika 5 < X4 < 8  1,                   jika X4 ≥ 8

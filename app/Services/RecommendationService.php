@@ -169,6 +169,11 @@ class RecommendationService
         ];
     }
 
+    public function buildInputsPublic(Vehicle $vehicle): array
+    {
+        return $this->buildInputsFromVehicle($vehicle);
+    }
+
     private function buildInputsFromVehicle(Vehicle $vehicle): array
     {
         $currentOdometer = (int) ($vehicle->odometer ?? 0);

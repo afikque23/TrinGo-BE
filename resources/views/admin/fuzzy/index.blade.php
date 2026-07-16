@@ -82,6 +82,8 @@
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
     transition: border-color .2s, background .2s;
   }
   .btn-ghost:hover { background: rgba(107,124,79,.12); border-color: #6b7c4f; }
@@ -97,6 +99,8 @@
     height: 32px;
     font-size: 12px;
     cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
     transition: color .2s, border-color .2s;
   }
   .btn-subtle:hover { color: #d1d5dc; border-color: #364153; }
@@ -211,7 +215,7 @@
     {{-- Component Badges --}}
     <div class="flex flex-wrap gap-2">
       <template x-for="comp in currentComponents" :key="comp.id">
-        <div class="relative" @click.outside="if(openMenu===comp.id) openMenu=null">
+        <div class="relative" @click.outside="if(openMenu===comp.id) openMenu=null" :class="{'z-50': openMenu===comp.id}">
           <div :class="{
               'bg-[#6b7c4f] border-[#6b7c4f] text-white': selectedComp?.id === comp.id,
               'bg-[#0a0a0a] border-gray-800 text-gray-600 opacity-50': !comp.is_active,
@@ -317,7 +321,7 @@
       <div class="bg-[#0a0a0a] border border-[#1e2939] rounded-[10px] p-4">
         <p class="text-sm text-[#c8cdd6] font-semibold mb-1" x-text="`Variabel Input Aktif — ${selectedComp.name}`"></p>
         <p class="text-xs text-[#6a7282] mb-4">Pilih variabel IoT yang digunakan untuk menghitung kondisi komponen ini. Minimal 1 variabel.</p>
-        <div class="grid grid-cols-2 gap-2.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <template x-for="v in allVars" :key="v.key">
             <div :class="form.activeVars.includes(v.key) ? 'bg-[#111111] border-[#364153]' : 'bg-[#0a0a0a] border-[#1e2939]'"
               class="flex items-center justify-between px-5 py-3.5 rounded-lg border transition-colors">
@@ -455,7 +459,7 @@
       <h3 class="fz-section-title mb-5">Test Konfigurasi</h3>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="space-y-4">
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <template x-for="v in allVars" :key="v.key">
               <div :class="form.activeVars.includes(v.key) ? '' : 'opacity-30'">
                 <label class="block text-xs text-[#6a7282] mb-2 uppercase tracking-widest" x-text="v.label.split(' (')[0]"></label>

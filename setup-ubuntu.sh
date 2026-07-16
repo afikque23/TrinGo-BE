@@ -9,7 +9,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 DB_DATABASE="motorcyclemanagement"
 DB_USER="tringgo_db"
-DB_PASSWORD=$(openssl rand -base64 12 | tr -dc 'a-zA-Z0-9')
+DB_PASSWORD="praupos1"
 MQTT_USER="tringgo_mqtt"
 MQTT_PASSWORD="erenvsreiner"
 APP_DIR="/var/www/motorcycle_management"

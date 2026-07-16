@@ -8,7 +8,10 @@ use App\Models\FuzzyAuditLog;
 use App\Models\FuzzyRule;
 use App\Models\FuzzyVariable;
 use App\Models\MotorType;
+use App\Models\Trip;
+use App\Models\Vehicle;
 use App\Services\FuzzyEngine;
+use App\Services\RecommendationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +19,10 @@ use Illuminate\View\View;
 
 class FuzzyLogicController extends Controller
 {
-    public function __construct(private FuzzyEngine $fuzzy) {}
+    public function __construct(
+        private FuzzyEngine $fuzzy,
+        private RecommendationService $recommendation,
+    ) {}
 
     public function index(): View
     {
@@ -250,6 +256,130 @@ class FuzzyLogicController extends Controller
             ];
         }
         return $mf;
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  FUZZY SIMULATOR — Pengujian BAB 4
+    // ═══════════════════════════════════════════════════════════
+
+    public function simulator(): View
+    {
+        $vehicles = Vehicle::with('owner')->orderBy('id')->get();
+        $motorTypes = MotorType::where('is_active', true)->get();
+        return view('admin.fuzzy.simulator', compact('vehicles', 'motorTypes'));
+    }
+
+    /**
+     * Jalankan kalkulasi Fuzzy dari vehicle ASLI (baca data nyata dari DB)
+     * atau dari input manual (override 4 variabel langsung).
+     */
+    public function simulatorRun(Request $request)
+    {
+        $mode = $request->input('mode', 'manual'); // 'vehicle' | 'manual'
+
+        if ($mode === 'vehicle') {
+            $request->validate(['vehicle_id' => 'required|exists:vehicles,id']);
+            $vehicle = Vehicle::with(['serviceHistories', 'trips'])->findOrFail($request->vehicle_id);
+            $inputs  = $this->recommendation->buildInputsPublic($vehicle);
+        } else {
+            $request->validate([
+                'jarak'      => 'required|numeric|min:0',
+                'durasi'     => 'required|numeric|min:0',
+                'kecepatan'  => 'required|numeric|min:0',
+                'intensitas' => 'required|numeric|min:0',
+            ]);
+            $inputs = [
+                'distance_since_service_km'   => (float) $request->jarak,
+                'duration_since_service_days' => (float) $request->durasi,
+                'avg_speed_kph'               => (float) $request->kecepatan,
+                'intensity_km_per_day'        => (float) $request->intensitas,
+                'jarak'                       => (float) $request->jarak,
+                'durasi'                      => (float) $request->durasi,
+                'kecepatan'                   => (float) $request->kecepatan,
+                'intensitas'                  => (float) $request->intensitas,
+            ];
+        }
+
+        $motorTypeSlug = $request->input('motor_type', 'matic');
+        $components    = ComponentConfig::with(['fuzzyVariables', 'fuzzyRules'])
+            ->whereHas('motorType', fn ($q) => $q->where('slug', $motorTypeSlug))
+            ->where('is_active', true)
+            ->get();
+
+        $results = [];
+        foreach ($components as $comp) {
+            $engineInputs = [
+                'jarak'      => $inputs['jarak'] ?? $inputs['distance_since_service_km'] ?? 0,
+                'durasi'     => $inputs['durasi'] ?? $inputs['duration_since_service_days'] ?? 0,
+                'kecepatan'  => $inputs['kecepatan'] ?? $inputs['avg_speed_kph'] ?? 0,
+                'intensitas' => $inputs['intensitas'] ?? $inputs['intensity_km_per_day'] ?? 0,
+            ];
+            $results[] = [
+                'component' => $comp->name,
+                'result'    => $this->fuzzy->calculate($comp, $engineInputs),
+            ];
+        }
+
+        return response()->json([
+            'inputs'  => $inputs,
+            'results' => $results,
+        ]);
+    }
+
+    /**
+     * Inject trip dummy ke database — data akan muncul di mobile app secara nyata.
+     */
+    public function simulatorInjectTrip(Request $request)
+    {
+        $validated = $request->validate([
+            'vehicle_id'       => 'required|exists:vehicles,id',
+            'distance_km'      => 'required|numeric|min:0.1',
+            'avg_speed_kph'    => 'required|numeric|min:1',
+            'duration_minutes' => 'required|numeric|min:1',
+            'days_ago'         => 'required|integer|min:0|max:30',
+        ]);
+
+        $startAt = now()->subDays($validated['days_ago'])->subMinutes($validated['duration_minutes']);
+        $endAt   = now()->subDays($validated['days_ago']);
+
+        $vehicle = Vehicle::findOrFail($validated['vehicle_id']);
+        $startOdo = $vehicle->odometer ?? 0;
+        $endOdo = $startOdo + $validated['distance_km'];
+
+        $trip = Trip::create([
+            'vehicle_id'       => $validated['vehicle_id'],
+            'status'           => 'completed',
+            'started_by'       => auth()->id() ?? 1,
+            'source'           => 'manual',
+            'start_at'         => $startAt,
+            'end_at'           => $endAt,
+            'duration_minutes' => $validated['duration_minutes'],
+            'distance_meters'  => (int) ($validated['distance_km'] * 1000),
+            'avg_speed_kph'    => $validated['avg_speed_kph'],
+            'start_odometer'   => $startOdo,
+            'end_odometer'     => $endOdo,
+        ]);
+
+        $vehicle->update(['odometer' => $endOdo]);
+
+        return response()->json([
+            'message' => 'Trip dummy berhasil diinjeksi.',
+            'trip_id' => $trip->id,
+            'detail'  => [
+                'tanggal'  => $startAt->format('d M Y'),
+                'jarak'    => $validated['distance_km'] . ' km',
+                'kecepatan'=> $validated['avg_speed_kph'] . ' km/jam',
+            ],
+        ]);
+    }
+
+    /**
+     * Hapus trip dummy yang sudah diinjeksi.
+     */
+    public function simulatorDeleteTrip(Trip $trip)
+    {
+        $trip->forceDelete();
+        return response()->json(['message' => 'Trip dummy dihapus.']);
     }
 
     private function log(ComponentConfig $component, string $field, ?string $old, ?string $new): void

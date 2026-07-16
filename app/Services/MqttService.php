@@ -33,11 +33,11 @@ class MqttService
                 ->setSocketTimeout(5);
                 
             if ($username) {
-                $settings->setUsername($username);
+                $settings = $settings->setUsername($username);
             }
             
             if ($password) {
-                $settings->setPassword($password);
+                $settings = $settings->setPassword($password);
             }
 
             $client = new MqttClient($host, $port, $clientId);
