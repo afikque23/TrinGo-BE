@@ -87,7 +87,8 @@ class TrackingController extends Controller
         // Update trip
         $endAt = Carbon::now();
         $startAt = Carbon::parse($trip->start_at);
-        $durationMinutes = $startAt->diffInMinutes($endAt);
+        // Simpan durasi sebagai menit bulat agar konsisten di seluruh UI dan riwayat trip.
+        $durationMinutes = (int) round($startAt->diffInSeconds($endAt) / 60);
 
         // Calculate distance and speed from trip points
         $points = TripPoint::where('trip_id', $trip->id)->orderBy('sequence')->get();
