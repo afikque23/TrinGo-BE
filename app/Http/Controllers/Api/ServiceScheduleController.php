@@ -6,15 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreServiceScheduleRequest;
 use App\Http\Requests\UpdateServiceScheduleRequest;
 use App\Http\Resources\ServiceScheduleResource;
+use App\Models\ServiceHistory;
 use App\Models\ServiceSchedule;
 use App\Models\Vehicle;
 use App\Services\ServiceScheduleService;
 use App\Services\ServiceScheduleReminderService;
 use App\Traits\ApiResponse;
 use App\Traits\HasOwnerIdentification;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 
 class ServiceScheduleController extends Controller
 {
@@ -497,6 +500,129 @@ class ServiceScheduleController extends Controller
         }
 
         return $this->errorResponse('Failed to reset reminder flag.', 500);
+    }
+
+    /**
+     * Mark schedule as completed, create service history entry, and roll baseline forward.
+     *
+     * @param Request $request
+     * @param string $scheduleId
+     * @return JsonResponse
+     */
+    public function complete(Request $request, string $scheduleId): JsonResponse
+    {
+        $validated = $request->validate([
+            'performed_at' => ['required', 'date', 'before_or_equal:today'],
+            'odometer' => ['nullable', 'integer', 'min:0'],
+            'service_provider' => ['nullable', 'string', 'max:150'],
+            'cost' => ['nullable', 'numeric', 'min:0'],
+            'currency' => ['nullable', 'string', 'size:3'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        // Get owner's vehicles first
+        $vehicleQuery = Vehicle::query();
+        $this->applyOwnerFilter($vehicleQuery, $request);
+        $ownedVehicleIds = $vehicleQuery->pluck('id');
+
+        $schedule = ServiceSchedule::with(['serviceType', 'reminderOption'])
+            ->whereIn('vehicle_id', $ownedVehicleIds)
+            ->findOrFail($scheduleId);
+
+        $vehicle = Vehicle::whereIn('id', $ownedVehicleIds)->findOrFail($schedule->vehicle_id);
+
+        $performedAt = Carbon::parse($validated['performed_at'])->startOfDay();
+        $serviceOdometer = array_key_exists('odometer', $validated)
+            ? (int) $validated['odometer']
+            : (int) ($vehicle->odometer ?? 0);
+
+        $intervalValue = (int) ($schedule->interval_value ?? 0);
+        if ($intervalValue <= 0) {
+            if (
+                $schedule->schedule_type === 'km'
+                && $schedule->target_km !== null
+                && $schedule->last_service_mileage !== null
+            ) {
+                $intervalValue = (int) $schedule->target_km - (int) $schedule->last_service_mileage;
+            } elseif (
+                $schedule->schedule_type === 'time'
+                && $schedule->target_date !== null
+                && $schedule->last_service_date !== null
+            ) {
+                $intervalValue = Carbon::parse($schedule->last_service_date)
+                    ->diffInDays(Carbon::parse($schedule->target_date));
+            }
+        }
+
+        if ($intervalValue <= 0) {
+            $intervalValue = $schedule->schedule_type === 'km' ? 1000 : 30;
+        }
+
+        DB::transaction(function () use (
+            $validated,
+            $schedule,
+            $vehicle,
+            $performedAt,
+            $serviceOdometer,
+            $intervalValue
+        ) {
+            $serviceName = $schedule->service_name
+                ?? $schedule->serviceType?->name
+                ?? 'Service';
+
+            $costCents = null;
+            if (array_key_exists('cost', $validated) && $validated['cost'] !== null) {
+                $costCents = (int) round(((float) $validated['cost']) * 100);
+            }
+
+            ServiceHistory::create([
+                'vehicle_id' => $schedule->vehicle_id,
+                'service_type_id' => $schedule->service_type_id,
+                'service_type' => $serviceName,
+                'performed_at' => $performedAt->toDateString(),
+                'odometer' => $serviceOdometer,
+                'cost_cents' => $costCents,
+                'currency' => strtoupper((string) ($validated['currency'] ?? 'IDR')),
+                'service_provider' => $validated['service_provider'] ?? null,
+                'notes' => $validated['notes'] ?? null,
+            ]);
+
+            $updates = [
+                'last_service_date' => $performedAt->toDateString(),
+                'interval_value' => $intervalValue,
+                'reminder_sent' => false,
+                'reminder_sent_at' => null,
+                'is_active' => true,
+            ];
+
+            if ($schedule->schedule_type === 'km') {
+                $updates['last_service_mileage'] = $serviceOdometer;
+                $updates['target_km'] = $serviceOdometer + $intervalValue;
+            } else {
+                $updates['target_date'] = $performedAt->copy()->addDays($intervalValue)->toDateString();
+            }
+
+            $schedule->update($updates);
+
+            if ($serviceOdometer > (int) ($vehicle->odometer ?? 0)) {
+                $vehicle->update([
+                    'odometer' => $serviceOdometer,
+                ]);
+            }
+        });
+
+        $schedule->refresh();
+        $schedule->load(['vehicle', 'serviceType', 'reminderOption']);
+
+        return $this->success([
+            'schedule' => new ServiceScheduleResource($schedule),
+            'completed_at' => $performedAt->toDateString(),
+            'next_target' => [
+                'schedule_type' => $schedule->schedule_type,
+                'target_km' => $schedule->target_km,
+                'target_date' => $schedule->target_date?->format('Y-m-d'),
+            ],
+        ], 'Servis berhasil dicatat dan jadwal berikutnya telah diperbarui.');
     }
 }
 
