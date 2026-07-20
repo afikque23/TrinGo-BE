@@ -204,3 +204,5 @@ Route::get('/health', function () {
         'timestamp' => now(),
     ]);
 });
+
+Route::get('/debug-configs', function() { return \App\Models\ComponentConfig::get(['name', 'reset_interval']); });

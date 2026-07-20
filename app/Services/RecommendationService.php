@@ -357,7 +357,7 @@ class RecommendationService
             $status = $this->resolveComponentStatus($statuses, $componentName, (int) $componentConfig->id);
 
             $matchedHistory = $this->matchHistoryForComponent($histories, $componentName);
-            $targetKm = (float) ($componentConfig->reset_interval ?? 0);
+            $targetKm = (float) ($componentConfig->critical ?? 0);
 
             $baselineKm = $matchedHistory?->odometer;
             $distanceFromScheduleKm = $baselineKm !== null
