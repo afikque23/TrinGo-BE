@@ -60,7 +60,7 @@ Route::prefix('auth')->name('api.auth.')->group(function () {
 Route::prefix('public')->group(function () {
     Route::get('/contents', [ContentController::class, 'publicIndex']);
     Route::get('/contents/{type}', [ContentController::class, 'getByType']);
-    
+
     // Public Tips - Browse without authentication
     Route::get('/tips', [TipsController::class, 'index']);
     Route::get('/tips/{tip}', [TipsController::class, 'show']);
@@ -85,7 +85,7 @@ Route::middleware(['auth:sanctum,web'])->group(function () {
 
     // Master Data - Reminder Options
     Route::get('/reminder-options', [ReminderOptionController::class, 'index']);
-    
+
     // Vehicle Management
     Route::get('/vehicles/primary', [VehicleController::class, 'getPrimary']);
     Route::get('/vehicles/primary/service-metrics', [VehicleController::class, 'getServiceMetrics']);

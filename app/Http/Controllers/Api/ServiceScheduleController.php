@@ -54,12 +54,12 @@ class ServiceScheduleController extends Controller
         // Filter by vehicle_id if provided
         if ($request->has('vehicle_id')) {
             $vehicleId = $request->vehicle_id;
-            
+
             // Validate that vehicle belongs to owner
             if (!$ownedVehicleIds->contains($vehicleId)) {
                 return ServiceScheduleResource::collection(collect([]));
             }
-            
+
             $query->forVehicle($vehicleId);
         }
 
@@ -94,7 +94,7 @@ class ServiceScheduleController extends Controller
         $vehicleQuery = Vehicle::query();
         $this->applyOwnerFilter($vehicleQuery, $request);
         $vehicle = $vehicleQuery->find($request->vehicle_id);
-        
+
         if (!$vehicle) {
             return $this->errorResponse(
                 'Kendaraan tidak ditemukan atau bukan milik Anda.',
@@ -187,7 +187,7 @@ class ServiceScheduleController extends Controller
             if ($schedule->schedule_type == 'time' || (isset($validated['schedule_type']) && $validated['schedule_type'] == 'time')) {
                 $targetDate = isset($validated['target_date']) ? \Carbon\Carbon::parse($validated['target_date']) : \Carbon\Carbon::parse($schedule->target_date);
                 $lastDate = isset($validated['last_service_date']) ? \Carbon\Carbon::parse($validated['last_service_date']) : ($schedule->last_service_date ? \Carbon\Carbon::parse($schedule->last_service_date) : null);
-                
+
                 if ($lastDate) {
                     $validated['interval_value'] = $targetDate->diffInDays($lastDate);
                 }
@@ -348,8 +348,8 @@ class ServiceScheduleController extends Controller
             $today = \Carbon\Carbon::today();
             $targetDate = \Carbon\Carbon::parse($schedule->target_date);
             $remaining = $today->diffInDays($targetDate, false);
-            $reminderThreshold = $schedule->reminderOption 
-                ? $this->convertReminderToDays($schedule->reminderOption) 
+            $reminderThreshold = $schedule->reminderOption
+                ? $this->convertReminderToDays($schedule->reminderOption)
                 : 7;
 
             $status = $this->determineStatus($remaining, $reminderThreshold);
@@ -467,8 +467,8 @@ class ServiceScheduleController extends Controller
             'current_odometer' => $currentOdometer,
             'reminders_triggered' => count($triggeredReminders),
             'reminders' => $triggeredReminders,
-        ], count($triggeredReminders) > 0 
-            ? 'Reminder notifications have been sent.' 
+        ], count($triggeredReminders) > 0
+            ? 'Reminder notifications have been sent.'
             : 'No reminders to trigger at this time.');
     }
 
