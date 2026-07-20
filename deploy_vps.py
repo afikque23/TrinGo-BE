@@ -30,7 +30,7 @@ files_to_upload = [
     # Fuzzy Simulator (Pengujian BAB 4)
     "app/Http/Controllers/Admin/FuzzyLogicController.php",
     "resources/views/admin/fuzzy/simulator.blade.php",
-    "routes/web.php",
+    "routes/web.php"
 ]
 
 local_base = "c:/laragon/www/motorcycle_management"

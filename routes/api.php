@@ -130,6 +130,7 @@ Route::middleware(['auth:sanctum,web'])->group(function () {
     Route::get('/service-schedules/status/{vehicle_id}', [App\Http\Controllers\Api\ServiceScheduleController::class, 'evaluateStatus']);
     Route::post('/service-schedules/check-reminders/{vehicle_id}', [App\Http\Controllers\Api\ServiceScheduleController::class, 'checkReminders']);
     Route::post('/service-schedules/{schedule_id}/reset-reminder', [App\Http\Controllers\Api\ServiceScheduleController::class, 'resetReminder']);
+    Route::post('/service-schedules/{schedule_id}/complete', [App\Http\Controllers\Api\ServiceScheduleController::class, 'complete']);
     Route::apiResource('service-schedules', App\Http\Controllers\Api\ServiceScheduleController::class);
 
     // Trip Management

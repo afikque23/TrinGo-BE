@@ -87,7 +87,8 @@ class TrackingController extends Controller
         // Update trip
         $endAt = Carbon::now();
         $startAt = Carbon::parse($trip->start_at);
-        $durationMinutes = $startAt->diffInMinutes($endAt);
+        // Simpan durasi sebagai menit bulat agar konsisten di seluruh UI dan riwayat trip.
+        $durationMinutes = (int) round($startAt->diffInSeconds($endAt) / 60);
 
         // Calculate distance and speed from trip points
         $points = TripPoint::where('trip_id', $trip->id)->orderBy('sequence')->get();
@@ -268,7 +269,13 @@ class TrackingController extends Controller
         $lat = $vehicle->last_latitude;
         $lng = $vehicle->last_longitude;
         $hasCoordinates = $lat !== null && $lng !== null;
-        $gpsReady = $hasCoordinates;
+        $satellites = $vehicle->last_satellites;
+        $hdop = $vehicle->last_hdop;
+        $gpsReady = $hasCoordinates
+            && $satellites !== null
+            && $hdop !== null
+            && (int) $satellites >= 4
+            && (float) $hdop <= 5.0;
 
         // Hitung status IoT online/offline berdasarkan last_telemetry_received_at
         $lastReceived = $vehicle->last_telemetry_received_at;
@@ -287,8 +294,8 @@ class TrackingController extends Controller
             'heading_deg'     => $vehicle->last_heading_deg,
             'altitude'        => $vehicle->last_altitude,
             'accuracy_meters' => $vehicle->last_accuracy_meters,
-            'satellites'      => $vehicle->last_satellites,
-            'hdop'            => $vehicle->last_hdop,
+            'satellites'      => $satellites,
+            'hdop'            => $hdop,
             'baro_rel_alt_m'  => $vehicle->last_baro_rel_alt_m,
             'grade_pct'       => $vehicle->last_grade_pct,
             'gps_ready'       => $gpsReady,
