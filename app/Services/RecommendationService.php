@@ -371,7 +371,7 @@ class RecommendationService
 
             $item = [
                 'komponen' => $componentName,
-                'prioritas' => $existing['prioritas'] ?? $status,
+                'prioritas' => $status,
                 'saran' => $existing['saran'] ?? $this->defaultSuggestionForStatus($status),
                 'estimasi_waktu' => $existing['estimasi_waktu'] ?? '-',
                 'active_vars' => $componentConfig->active_vars ?? [],
