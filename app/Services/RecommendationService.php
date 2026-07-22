@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AiRecommendationCache;
+use App\Models\ComponentConfig;
 use App\Models\MotorType;
 use App\Models\Vehicle;
 use App\Services\Fuzzy\FuzzyEngine;
@@ -373,6 +374,8 @@ class RecommendationService
                 'prioritas' => $existing['prioritas'] ?? $status,
                 'saran' => $existing['saran'] ?? $this->defaultSuggestionForStatus($status),
                 'estimasi_waktu' => $existing['estimasi_waktu'] ?? '-',
+                'active_vars' => $componentConfig->active_vars ?? [],
+                'required_variables' => $this->buildRequiredVariables($componentConfig, $inputs),
                 'component_config_id' => (int) $componentConfig->id,
                 'schedule_id' => null,
                 'jarak_sejak_servis_km' => round($distanceFromScheduleKm, 1),
@@ -402,6 +405,92 @@ class RecommendationService
             ->first();
 
         return $motorType?->componentConfigs ?? collect();
+    }
+
+    private function buildRequiredVariables(ComponentConfig $componentConfig, array $inputs): array
+    {
+        $required = [];
+
+        foreach (($componentConfig->active_vars ?? []) as $activeVar) {
+            $definition = $this->resolveVariableDefinition((string) $activeVar);
+            $valueKey = $definition['value_key'];
+            $value = $inputs[$valueKey] ?? $inputs[(string) $activeVar] ?? null;
+
+            $required[] = [
+                'key' => (string) $activeVar,
+                'label' => $definition['label'],
+                'unit' => $definition['unit'],
+                'value' => is_numeric($value) ? (float) $value : $value,
+                'formatted_value' => $this->formatVariableValue($value, $definition['unit']),
+            ];
+        }
+
+        return $required;
+    }
+
+    private function resolveVariableDefinition(string $rawKey): array
+    {
+        $normalized = strtolower(trim($rawKey));
+
+        return match ($normalized) {
+            'jarak', 'jarak_tempuh', 'mileage', 'distance_since_service_km', 'distance' => [
+                'label' => 'Jarak Tempuh (Mileage)',
+                'unit' => 'km',
+                'value_key' => 'distance_since_service_km',
+            ],
+            'durasi', 'duration_since_service_days', 'days_since_service' => [
+                'label' => 'Durasi Sejak Servis',
+                'unit' => 'hari',
+                'value_key' => 'duration_since_service_days',
+            ],
+            'kecepatan', 'avg_speed_kph', 'speed' => [
+                'label' => 'Kecepatan Rata-rata',
+                'unit' => 'km/jam',
+                'value_key' => 'avg_speed_kph',
+            ],
+            'intensitas', 'intensity_km_per_day' => [
+                'label' => 'Intensitas Pemakaian',
+                'unit' => 'km/hari',
+                'value_key' => 'intensity_km_per_day',
+            ],
+            'suhu', 'ambient_temp_c', 'temperature' => [
+                'label' => 'Suhu Lingkungan',
+                'unit' => '°C',
+                'value_key' => 'ambient_temp_c',
+            ],
+            'ketinggian', 'elevation_gain_m', 'elevation' => [
+                'label' => 'Elevasi / Tanjakan',
+                'unit' => 'm',
+                'value_key' => 'elevation_gain_m',
+            ],
+            'odometer', 'odo' => [
+                'label' => 'Odometer',
+                'unit' => 'km',
+                'value_key' => 'odometer',
+            ],
+            default => [
+                'label' => Str::headline(str_replace(['_', '-'], ' ', $normalized ?: $rawKey)),
+                'unit' => null,
+                'value_key' => $normalized ?: $rawKey,
+            ],
+        };
+    }
+
+    private function formatVariableValue(mixed $value, ?string $unit): string
+    {
+        if ($value === null || $value === '') {
+            return '-';
+        }
+
+        if (!is_numeric($value)) {
+            return (string) $value;
+        }
+
+        $number = (float) $value;
+        $precision = abs($number - round($number)) < 0.05 ? 0 : 1;
+        $formatted = number_format($number, $precision, '.', ',');
+
+        return $unit ? ($formatted . ' ' . $unit) : $formatted;
     }
 
     private function resolveComponentStatus(array $statuses, string $componentName, int $fallbackId): string
