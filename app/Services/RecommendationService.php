@@ -399,7 +399,9 @@ class RecommendationService
             ->where('slug', strtolower(trim($motorTypeSlug)))
             ->with([
                 'componentConfigs' => function ($q) {
-                    $q->where('is_active', true)->orderBy('name');
+                    $q->where('is_active', true)
+                        ->with(['fuzzyVariables'])
+                        ->orderBy('name');
                 },
             ])
             ->first();
@@ -410,22 +412,77 @@ class RecommendationService
     private function buildRequiredVariables(ComponentConfig $componentConfig, array $inputs): array
     {
         $required = [];
+        $fuzzyVarByKey = $componentConfig->fuzzyVariables->keyBy('var_key');
 
         foreach (($componentConfig->active_vars ?? []) as $activeVar) {
             $definition = $this->resolveVariableDefinition((string) $activeVar);
             $valueKey = $definition['value_key'];
             $value = $inputs[$valueKey] ?? $inputs[(string) $activeVar] ?? null;
+            $numericValue = is_numeric($value) ? (float) $value : null;
+
+            $fuzzyVar = $fuzzyVarByKey->get((string) $activeVar);
+            $warningThreshold = $fuzzyVar?->med_b;
+            $criticalThreshold = $fuzzyVar?->high_b;
+
+            $toWarning = ($numericValue !== null && $warningThreshold !== null)
+                ? round((float) $warningThreshold - $numericValue, 1)
+                : null;
+            $toCritical = ($numericValue !== null && $criticalThreshold !== null)
+                ? round((float) $criticalThreshold - $numericValue, 1)
+                : null;
+
+            $variableStatus = 'unknown';
+            if ($numericValue !== null) {
+                if ($criticalThreshold !== null && $numericValue >= (float) $criticalThreshold) {
+                    $variableStatus = 'critical';
+                } elseif ($warningThreshold !== null && $numericValue >= (float) $warningThreshold) {
+                    $variableStatus = 'warning';
+                } else {
+                    $variableStatus = 'normal';
+                }
+            }
 
             $required[] = [
                 'key' => (string) $activeVar,
                 'label' => $definition['label'],
                 'unit' => $definition['unit'],
-                'value' => is_numeric($value) ? (float) $value : $value,
+                'value' => $numericValue ?? $value,
                 'formatted_value' => $this->formatVariableValue($value, $definition['unit']),
+                'warning_threshold' => $warningThreshold !== null ? (float) $warningThreshold : null,
+                'critical_threshold' => $criticalThreshold !== null ? (float) $criticalThreshold : null,
+                'formatted_warning_threshold' => $this->formatVariableValue($warningThreshold, $definition['unit']),
+                'formatted_critical_threshold' => $this->formatVariableValue($criticalThreshold, $definition['unit']),
+                'to_warning' => $toWarning,
+                'to_critical' => $toCritical,
+                'formatted_to_warning' => $this->formatDeltaValue($toWarning, $definition['unit']),
+                'formatted_to_critical' => $this->formatDeltaValue($toCritical, $definition['unit']),
+                'status_by_threshold' => $variableStatus,
             ];
         }
 
         return $required;
+    }
+
+    private function formatDeltaValue(?float $delta, ?string $unit): string
+    {
+        if ($delta === null) {
+            return '-';
+        }
+
+        $abs = abs($delta);
+        $precision = abs($abs - round($abs)) < 0.05 ? 0 : 1;
+        $formatted = number_format($abs, $precision, '.', ',');
+        $suffix = $unit ? (' ' . $unit) : '';
+
+        if ($delta > 0) {
+            return 'Sisa ' . $formatted . $suffix . ' menuju batas';
+        }
+
+        if ($delta < 0) {
+            return 'Melewati batas ' . $formatted . $suffix;
+        }
+
+        return 'Pas batas';
     }
 
     private function resolveVariableDefinition(string $rawKey): array
@@ -434,7 +491,7 @@ class RecommendationService
 
         return match ($normalized) {
             'jarak', 'jarak_tempuh', 'mileage', 'distance_since_service_km', 'distance' => [
-                'label' => 'Jarak Tempuh (Mileage)',
+                'label' => 'Jarak Tempuh Sejak Servis',
                 'unit' => 'km',
                 'value_key' => 'distance_since_service_km',
             ],
@@ -444,7 +501,7 @@ class RecommendationService
                 'value_key' => 'duration_since_service_days',
             ],
             'kecepatan', 'avg_speed_kph', 'speed' => [
-                'label' => 'Kecepatan Rata-rata',
+                'label' => 'Kecepatan Rata-rata Berkendara',
                 'unit' => 'km/jam',
                 'value_key' => 'avg_speed_kph',
             ],
@@ -459,7 +516,7 @@ class RecommendationService
                 'value_key' => 'ambient_temp_c',
             ],
             'ketinggian', 'elevation_gain_m', 'elevation' => [
-                'label' => 'Elevasi / Tanjakan',
+                'label' => 'Kondisi Tanjakan (Elevasi)',
                 'unit' => 'm',
                 'value_key' => 'elevation_gain_m',
             ],
