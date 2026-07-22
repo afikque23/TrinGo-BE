@@ -130,21 +130,23 @@ class RecommendationService
             }
         }
 
-        $monitoringSummary = $this->buildMonitoringSummary($statuses, $motorType);
-        $sections = $this->enrichSectionsWithComponentProgress(
+        $enriched = $this->enrichSectionsWithComponentProgress(
             $sections,
             $vehicle,
             $inputs,
             $statuses,
             $motorType,
         );
+        $sections = $enriched['sections'] ?? $sections;
+        $effectiveStatuses = $enriched['component_statuses'] ?? $statuses;
+        $monitoringSummary = $this->buildMonitoringSummary($effectiveStatuses, $motorType);
 
         return [
             'vehicle_id' => $vehicle->id,
             'motor_type' => $motorType,
             'inputs' => $inputs,
             'component_scores' => $this->roundScores($scores),
-            'component_statuses' => $statuses,
+            'component_statuses' => $effectiveStatuses,
             'monitoring_summary' => $monitoringSummary,
             'thresholds' => $thresholds,
             'sections' => $sections,
@@ -321,11 +323,17 @@ class RecommendationService
         $sections = is_array($sections) ? $sections : [];
         $configuredComponents = $this->loadActiveComponentsForMotorType($motorTypeSlug);
         if ($configuredComponents->isEmpty()) {
-            return $sections;
+            return [
+                'sections' => $sections,
+                'component_statuses' => $statuses,
+            ];
         }
 
-        $distanceSinceServiceKm = (float) ($inputs['distance_since_service_km'] ?? 0);
         $currentOdometer = (int) ($vehicle->odometer ?? 0);
+        $defaultDistanceSinceServiceKm = (float) max(0, $currentOdometer);
+        $defaultDurationSinceServiceDays = $vehicle->created_at
+            ? (float) max(0, $vehicle->created_at->diffInDays(now()))
+            : (float) ($inputs['duration_since_service_days'] ?? 0);
 
         $rawRecommendations = $sections['rekomendasi_komponen'] ?? [];
         $recommendations = is_array($rawRecommendations) ? $rawRecommendations : [];
@@ -345,9 +353,10 @@ class RecommendationService
         $histories = $vehicle->serviceHistories()
             ->orderByDesc('performed_at')
             ->orderByDesc('id')
-            ->get(['id', 'service_type', 'odometer']);
+            ->get(['id', 'service_type', 'odometer', 'performed_at']);
 
         $output = [];
+        $effectiveStatuses = [];
         foreach ($configuredComponents as $componentConfig) {
             $componentName = trim((string) $componentConfig->name);
             if ($componentName === '') {
@@ -363,7 +372,19 @@ class RecommendationService
             $baselineKm = $matchedHistory?->odometer;
             $distanceFromScheduleKm = $baselineKm !== null
                 ? max(0.0, (float) ($currentOdometer - (int) $baselineKm))
-                : $distanceSinceServiceKm;
+                : $defaultDistanceSinceServiceKm;
+
+            $durationFromScheduleDays = $matchedHistory?->performed_at
+                ? (float) max(0, $matchedHistory->performed_at->diffInDays(now()))
+                : $defaultDurationSinceServiceDays;
+
+            $componentInputs = $inputs;
+            $componentInputs['distance_since_service_km'] = $distanceFromScheduleKm;
+            $componentInputs['duration_since_service_days'] = $durationFromScheduleDays;
+
+            $requiredVariables = $this->buildRequiredVariables($componentConfig, $componentInputs);
+            $thresholdStatus = $this->resolveStatusFromRequiredVariables($requiredVariables);
+            $effectiveStatus = $thresholdStatus ?? $status;
 
             $remainingKm = $targetKm > 0
                 ? max(0.0, $targetKm - $distanceFromScheduleKm)
@@ -371,26 +392,52 @@ class RecommendationService
 
             $item = [
                 'komponen' => $componentName,
-                'prioritas' => $status,
-                'saran' => $existing['saran'] ?? $this->defaultSuggestionForStatus($status),
+                'prioritas' => $effectiveStatus,
+                'saran' => $existing['saran'] ?? $this->defaultSuggestionForStatus($effectiveStatus),
                 'estimasi_waktu' => $existing['estimasi_waktu'] ?? '-',
                 'active_vars' => $componentConfig->active_vars ?? [],
-                'required_variables' => $this->buildRequiredVariables($componentConfig, $inputs),
+                'required_variables' => $requiredVariables,
                 'component_config_id' => (int) $componentConfig->id,
                 'schedule_id' => null,
                 'jarak_sejak_servis_km' => round($distanceFromScheduleKm, 1),
                 'hingga_servis_berikutnya_km' => $remainingKm !== null ? round($remainingKm, 1) : null,
                 'target_servis_km' => $targetKm > 0 ? round($targetKm, 1) : null,
-                'status_fuzzy' => $status,
+                'status_fuzzy' => $effectiveStatus,
                 'is_service_due' => $remainingKm !== null ? $remainingKm <= 0.0 : false,
             ];
 
             $output[] = array_merge($existing, $item);
+
+            $statusKey = $this->componentKeyFromName($componentName, (int) $componentConfig->id);
+            $effectiveStatuses[$statusKey] = $effectiveStatus;
         }
 
         $sections['rekomendasi_komponen'] = $output;
 
-        return $sections;
+        return [
+            'sections' => $sections,
+            'component_statuses' => $effectiveStatuses,
+        ];
+    }
+
+    private function resolveStatusFromRequiredVariables(array $requiredVariables): ?string
+    {
+        if (empty($requiredVariables)) {
+            return null;
+        }
+
+        $hasWarning = false;
+        foreach ($requiredVariables as $variable) {
+            $status = strtolower((string) ($variable['status_by_threshold'] ?? ''));
+            if ($status === 'critical') {
+                return 'critical';
+            }
+            if ($status === 'warning') {
+                $hasWarning = true;
+            }
+        }
+
+        return $hasWarning ? 'warning' : 'normal';
     }
 
     private function loadActiveComponentsForMotorType(string $motorTypeSlug)

@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CompleteFuzzyServiceRequest;
+use App\Models\AiRecommendationCache;
+use App\Models\MotorType;
 use App\Models\Vehicle;
 use App\Models\ServiceHistory;
 use App\Models\ServiceType;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Services\RecommendationService;
 use App\Traits\ApiResponse;
@@ -137,7 +141,7 @@ class RecommendationController extends Controller
         }
     }
 
-    public function markServiceComplete(Request $request, int $motorId): JsonResponse
+    public function markServiceComplete(CompleteFuzzyServiceRequest $request, int $motorId): JsonResponse
     {
         try {
             $user = $request->user();
@@ -154,55 +158,133 @@ class RecommendationController extends Controller
                 return $this->notFoundResponse('Motor tidak ditemukan');
             }
 
-            $validated = $request->validate([
-                'component_name' => 'required|string',
-                'performed_at' => 'required|date',
-                'odometer' => 'required|integer|min:0',
-                'service_provider' => 'nullable|string|max:150',
-                'notes' => 'nullable|string',
-            ]);
+            $validated = $request->validated();
+            $componentName = trim((string) $validated['component_name']);
+            if ($componentName === '') {
+                return $this->errorResponse('Nama komponen tidak boleh kosong.', 422);
+            }
 
-            DB::beginTransaction();
-            try {
-                $componentName = trim($validated['component_name']);
-                $serviceType = ServiceType::firstOrCreate(
-                    ['name' => $componentName],
-                    ['is_active' => true]
+            $motorTypeSlug = strtolower(trim((string) $vehicle->tipe_motor));
+            $componentConfig = null;
+            if ($motorTypeSlug !== '') {
+                $motorType = MotorType::query()->where('slug', $motorTypeSlug)->first();
+                if ($motorType) {
+                    $componentConfig = $motorType->componentConfigs()
+                        ->where('is_active', true)
+                        ->whereRaw('LOWER(name) = ?', [mb_strtolower($componentName)])
+                        ->first();
+                }
+            }
+
+            if (!$componentConfig) {
+                return $this->errorResponse(
+                    'Komponen tidak valid untuk tipe motor ini.',
+                    422,
+                    ['component_name' => ['Pilih komponen sesuai daftar rekomendasi.']]
                 );
+            }
 
-                $history = new ServiceHistory([
-                    'vehicle_id' => $vehicle->id,
+            $performedAt = Carbon::parse((string) $validated['performed_at'])->toDateString();
+            $requiresOdometer = $this->componentRequiresMileage($componentConfig->active_vars ?? []);
+            $odometerInput = $validated['odometer'] ?? null;
+
+            if ($requiresOdometer && $odometerInput === null) {
+                return $this->errorResponse(
+                    'Odometer wajib diisi untuk komponen berbasis jarak tempuh.',
+                    422,
+                    ['odometer' => ['Wajib diisi karena komponen ini memakai variabel jarak tempuh.']]
+                );
+            }
+
+            $serviceOdometer = $odometerInput !== null ? (int) $odometerInput : null;
+
+            // Historical backfill is allowed: service odometer may be lower than current vehicle odometer.
+            // Vehicle odometer remains monotonic and will only be updated when service odometer is higher.
+
+            $result = DB::transaction(function () use ($validated, $user, $vehicle, $componentName, $performedAt, $serviceOdometer) {
+                $lockedVehicle = Vehicle::query()
+                    ->where('id', $vehicle->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $serviceType = ServiceType::query()
+                    ->whereRaw('LOWER(name) = ?', [mb_strtolower($componentName)])
+                    ->first();
+
+                if (!$serviceType) {
+                    $serviceType = ServiceType::create([
+                        'name' => $componentName,
+                        'is_active' => true,
+                    ]);
+                }
+
+                // Protect against accidental double tap: detect exact duplicate submitted very recently.
+                $duplicate = ServiceHistory::query()
+                    ->where('vehicle_id', $lockedVehicle->id)
+                    ->whereRaw('LOWER(service_type) = ?', [mb_strtolower($componentName)])
+                    ->whereDate('performed_at', $performedAt)
+                    ->where('odometer', $serviceOdometer)
+                    ->where('created_at', '>=', now()->subMinutes(2))
+                    ->latest('id')
+                    ->first();
+
+                if ($duplicate) {
+                    return ['history' => $duplicate, 'created' => false];
+                }
+
+                $history = ServiceHistory::create([
+                    'vehicle_id' => $lockedVehicle->id,
+                    'service_type_id' => $serviceType->id,
                     'service_type' => $componentName,
-                    'performed_at' => $validated['performed_at'],
-                    'odometer' => $validated['odometer'],
+                    'performed_at' => $performedAt,
+                    'odometer' => $serviceOdometer,
                     'service_provider' => $validated['service_provider'] ?? null,
                     'notes' => $validated['notes'] ?? null,
                 ]);
-                $history->service_type_id = $serviceType->id;
-                $history->save();
 
-                if ($validated['odometer'] > $vehicle->odometer) {
-                    $vehicle->odometer = $validated['odometer'];
-                    $vehicle->save();
+                if ($serviceOdometer !== null && $serviceOdometer > (int) ($lockedVehicle->odometer ?? 0)) {
+                    $lockedVehicle->update([
+                        'odometer' => $serviceOdometer,
+                    ]);
                 }
 
-                \Illuminate\Support\Facades\Cache::forget('fuzzy_snapshot_' . $vehicle->id);
-                \Illuminate\Support\Facades\Cache::forget('recommendation_cache_' . $user->id . '_' . $vehicle->id);
+                AiRecommendationCache::query()
+                    ->where('user_id', $user->id)
+                    ->where('vehicle_id', $lockedVehicle->id)
+                    ->delete();
 
-                DB::commit();
+                return ['history' => $history, 'created' => true];
+            });
 
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Servis komponen berhasil dicatat',
-                ]);
-            } catch (\Exception $e) {
-                DB::rollBack();
-                throw $e;
-            }
+            return response()->json([
+                'success' => true,
+                'message' => $result['created']
+                    ? 'Servis komponen berhasil dicatat.'
+                    : 'Permintaan duplikat terdeteksi. Data servis sebelumnya digunakan.',
+                'data' => [
+                    'service_history_id' => $result['history']->id,
+                    'component_name' => $componentName,
+                    'performed_at' => $performedAt,
+                    'odometer' => $serviceOdometer,
+                    'duplicate' => !$result['created'],
+                ],
+            ]);
         } catch (\Throwable $e) {
             Log::error('Error marking service complete: ' . $e->getMessage());
             return $this->errorResponse('Gagal mencatat servis komponen', 500, ['error' => $e->getMessage()]);
         }
+    }
+
+    private function componentRequiresMileage(array $activeVars): bool
+    {
+        foreach ($activeVars as $var) {
+            $key = strtolower(trim((string) $var));
+            if (in_array($key, ['jarak', 'jarak_tempuh', 'mileage', 'distance_since_service_km', 'distance'], true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function formatGeneratedAt(mixed $value): ?string

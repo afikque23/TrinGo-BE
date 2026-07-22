@@ -98,6 +98,7 @@ Route::middleware(['auth:sanctum,web'])->group(function () {
         Route::get('/home-insight', [RecommendationController::class, 'homeInsight']);
         Route::get('/service-recommendation', [RecommendationController::class, 'serviceRecommendation']);
         Route::get('/scores', [RecommendationController::class, 'scores']);
+        Route::post('/fuzzy-service-complete', [RecommendationController::class, 'markServiceComplete']);
 
         // Tracking endpoints
         Route::post('/tracking/start', [\App\Http\Controllers\Api\TrackingController::class, 'start']);

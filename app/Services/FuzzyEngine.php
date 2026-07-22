@@ -60,6 +60,40 @@ class FuzzyEngine
             $scores[$rule->output] = max($scores[$rule->output], $fired);
         }
 
+        $hasAnyRuleFired = max($scores) > 0;
+
+        // Defensive fallback: if rules never fire, derive urgency from active variable thresholds.
+        // This avoids a misleading "Baik" label when admin config has active_vars that are not covered by rules.
+        if (!$hasAnyRuleFired) {
+            $fallbackLabel = 'Baik';
+
+            foreach ($activeVars as $varKey) {
+                $mf = $variables->get($varKey);
+                if (!$mf) {
+                    continue;
+                }
+
+                $val = (float) ($inputs[$varKey] ?? 0);
+                $warnThreshold = (float) ($mf->med_b ?? 0);
+                $criticalThreshold = (float) ($mf->high_b ?? 0);
+
+                if ($criticalThreshold > 0 && $val >= $criticalThreshold) {
+                    $fallbackLabel = 'Kritis';
+                    break;
+                }
+
+                if ($warnThreshold > 0 && $val >= $warnThreshold) {
+                    $fallbackLabel = 'Perlu Servis';
+                }
+            }
+
+            $scores = match ($fallbackLabel) {
+                'Kritis' => ['Baik' => 0.0, 'Perlu Servis' => 0.0, 'Kritis' => 1.0],
+                'Perlu Servis' => ['Baik' => 0.0, 'Perlu Servis' => 1.0, 'Kritis' => 0.0],
+                default => ['Baik' => 1.0, 'Perlu Servis' => 0.0, 'Kritis' => 0.0],
+            };
+        }
+
         // Step 3: Defuzzifikasi (centroid sederhana)
         $outputMap = ['Baik' => 20.0, 'Perlu Servis' => 60.0, 'Kritis' => 90.0];
         $totalWeight = array_sum($scores) ?: 1.0;
