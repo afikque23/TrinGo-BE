@@ -39,7 +39,9 @@ files_to_upload = [
     "app/Http/Controllers/TripController.php",
     "database/seeders/NotificationTemplateSeederUpdate.php",
     "storage/app/firebase/service-account.json",
-    "app/Services/NotificationService.php"
+    "app/Services/NotificationService.php",
+    "app/Http/Controllers/Web/TipShareController.php",
+    "resources/views/tips/share.blade.php"
 ]
 
 local_base = "c:/laragon/www/motorcycle_management"
