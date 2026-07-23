@@ -141,9 +141,6 @@ Route::middleware('guest')->group(function () {
     })->name('login.submit');
 });
 
-// Web Preview untuk Share Tips ke WhatsApp dll
-Route::get('/tips/{id}', [\App\Http\Controllers\Web\TipShareController::class, 'show'])->name('tips.share');
-
 Route::post('/logout', function (\Illuminate\Http\Request $request) {
     \Illuminate\Support\Facades\Auth::logout();
     $request->session()->invalidate();
