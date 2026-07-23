@@ -91,7 +91,7 @@ class FcmNotificationService
                         // Set HIGH priority untuk high/critical agar muncul heads-up notification
                         'priority' => in_array($priority, ['high', 'critical']) ? 'HIGH' : 'NORMAL',
                         'notification' => [
-                            'channel_id' => 'mototracker_' . $categoryKey,
+                            'channel_id' => 'tringgo_' . $categoryKey,
                             'sound' => 'default',
                             'notification_priority' => $priority === 'critical' ? 'PRIORITY_MAX' : 'PRIORITY_HIGH',
                         ],

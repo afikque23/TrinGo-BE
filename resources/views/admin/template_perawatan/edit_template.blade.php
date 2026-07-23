@@ -1,6 +1,6 @@
 @extends('layouts.sidebar')
 
-@section('title', 'Edit Template - MotoTracker')
+@section('title', 'Edit Template - TringGo')
 @section('page-title', 'Form Template Perawatan')
 
 @section('content')

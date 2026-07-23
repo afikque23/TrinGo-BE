@@ -69,7 +69,7 @@ Route::prefix('public')->group(function () {
 
 ```
 URL: http://localhost:8000/login
-Email: admin@mototracker.com
+Email: admin@tringgo.com
 Password: [your admin password]
 ```
 
@@ -139,7 +139,7 @@ http://localhost:8000/admin/manajemen-konten
 curl -X POST "http://localhost:8000/api/auth/login" \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "admin@mototracker.com",
+    "email": "admin@tringgo.com",
     "password": "your_password"
   }'
 ```
@@ -164,7 +164,7 @@ php artisan tinker
 ```
 
 ```php
-$user = User::where('email', 'admin@mototracker.com')->first();
+$user = User::where('email', 'admin@tringgo.com')->first();
 $token = $user->createToken('admin-token')->plainTextToken;
 echo $token;
 ```
@@ -359,7 +359,7 @@ Mobile developer cukup hit endpoint public:
 ```javascript
 // React Native / Flutter
 const response = await fetch(
-    "https://api.mototracker.com/api/public/contents/terms",
+    "https://api.tringgo.com/api/public/contents/terms",
 );
 const data = await response.json();
 

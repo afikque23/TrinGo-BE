@@ -1,6 +1,6 @@
 @extends('layouts.sidebar')
 
-@section('title', 'Manajemen Filter - MotoTracker Admin')
+@section('title', 'Manajemen Filter - TringGo Admin')
 
 @section('page-title', 'Manajemen Filter')
 
@@ -73,7 +73,7 @@
     <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-2">
             <h1 class="text-xl sm:text-2xl font-bold text-white" style="font-family: Arial, sans-serif;">Manajemen Filter &amp; Master Data</h1>
-            <p class="text-sm text-[#99A1AF]" style="font-family: Arial, sans-serif;">Pusat konfigurasi filter dinamis dan master data untuk aplikasi mototracker</p>
+            <p class="text-sm text-[#99A1AF]" style="font-family: Arial, sans-serif;">Pusat konfigurasi filter dinamis dan master data untuk aplikasi tringgo</p>
         </div>
         
         <!-- Tab Navigation (scrollable on mobile) -->

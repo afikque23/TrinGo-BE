@@ -18,7 +18,7 @@ class TemplatePerawatanSeeder extends Seeder
     public function run(): void
     {
         $admin = User::query()
-            ->where('email', 'admin@mototracker.com')
+            ->where('email', 'admin@tringgo.com')
             ->first();
 
         if (!$admin) {
@@ -28,7 +28,7 @@ class TemplatePerawatanSeeder extends Seeder
         if (!$admin) {
             $admin = User::query()->create([
                 'name' => 'Administrator',
-                'email' => 'admin@mototracker.com',
+                'email' => 'admin@tringgo.com',
                 'password' => 'admin123',
                 'role' => 'admin',
                 'email_verified_at' => now(),

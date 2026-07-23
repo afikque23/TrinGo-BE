@@ -9,7 +9,7 @@
 ✅ push_sent = YES
 ✅ push_success = YES
 ✅ Priority = HIGH
-✅ Channel ID = mototracker_trip
+✅ Channel ID = tringgo_trip
 ```
 
 ### Flutter Status: ❌ NOT RECEIVING
@@ -71,7 +71,7 @@ Future<void> _showNotification(RemoteMessage message) async {
     message.notification?.body,
     NotificationDetails(
       android: AndroidNotificationDetails(
-        'mototracker_$categoryKey', // Match backend channel ID
+        'tringgo_$categoryKey', // Match backend channel ID
         'Notifications',
         channelDescription: 'App notifications',
         importance: Importance.high, // ← HIGH importance for heads-up

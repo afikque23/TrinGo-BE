@@ -138,7 +138,7 @@
                         @php
                         $generalVars = [
                             ['{user_name}', 'Nama pengguna'],
-                            ['{app_name}', 'Nama aplikasi (MotoTracker)'],
+                            ['{app_name}', 'Nama aplikasi (TringGo)'],
                             ['{date_now}', 'Tanggal saat ini'],
                         ];
                         @endphp

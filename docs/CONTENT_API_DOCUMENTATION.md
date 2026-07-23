@@ -2,7 +2,7 @@
 
 ## Overview
 
-Dynamic Content Management System untuk MotoTracker - memungkinkan admin mengelola konten statis aplikasi mobile melalui API.
+Dynamic Content Management System untuk TringGo - memungkinkan admin mengelola konten statis aplikasi mobile melalui API.
 
 **Base URL (project ini):**
 
@@ -475,7 +475,7 @@ curl -X POST "http://localhost:8000/api/v1/motorcycle/admin/contents" \
 // Fetch Terms & Conditions
 async function fetchTerms() {
     const response = await fetch(
-        "https://api.mototracker.com/api/v1/motorcycle/public/contents/terms",
+        "https://api.tringgo.com/api/v1/motorcycle/public/contents/terms",
     );
     const data = await response.json();
 
@@ -492,7 +492,7 @@ async function fetchTerms() {
 // Fetch FAQ
 async function fetchFAQ() {
     const response = await fetch(
-        "https://api.mototracker.com/api/v1/motorcycle/public/contents/faq",
+        "https://api.tringgo.com/api/v1/motorcycle/public/contents/faq",
     );
     const data = await response.json();
 

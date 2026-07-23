@@ -202,6 +202,9 @@ class TripController extends Controller
 
                 // Kirim notifikasi perjalanan selesai dengan odometer terbaru
                 $this->sendTripCompletedNotification($vehicle->fresh(), $trip, $distanceKm);
+                
+                // Dispatch event to trigger critical fuzzy checks
+                \App\Events\VehicleStatusChecked::dispatch($vehicle->fresh());
             }
 
             DB::commit();
@@ -400,6 +403,9 @@ class TripController extends Controller
 
             // Kirim notifikasi jarak manual ditambahkan dengan odometer terbaru
             $this->sendTripCompletedNotification($vehicle->fresh(), $trip, $distanceKm);
+            
+            // Dispatch event to trigger critical fuzzy checks
+            \App\Events\VehicleStatusChecked::dispatch($vehicle->fresh());
 
             DB::commit();
 

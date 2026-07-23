@@ -1,6 +1,6 @@
 @extends('layouts.sidebar')
 
-@section('title', 'Manajemen Notifikasi - MotoTracker')
+@section('title', 'Manajemen Notifikasi - TringGo')
 @section('page-title', 'Manajemen Notifikasi')
 
 @section('content')

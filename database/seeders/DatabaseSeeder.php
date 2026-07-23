@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Create a default user for quick login (mobile/testing)
-        $email = 'user@mototracker.com';
+        $email = 'user@tringgo.com';
         $password = 'user123';
 
         User::updateOrCreate(

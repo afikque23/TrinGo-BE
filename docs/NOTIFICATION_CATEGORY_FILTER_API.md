@@ -1276,7 +1276,7 @@ Saat membuat template notifikasi di admin panel, Anda bisa menggunakan variabel 
 
 | Variabel     | Deskripsi        | Contoh Output |
 | ------------ | ---------------- | ------------- |
-| `{app_name}` | Nama aplikasi    | MotoTracker   |
+| `{app_name}` | Nama aplikasi    | TringGo   |
 | `{date_now}` | Tanggal sekarang | 2026-02-19    |
 
 ---

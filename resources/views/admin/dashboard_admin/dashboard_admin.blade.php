@@ -1,12 +1,12 @@
 @extends('layouts.sidebar')
 
-@section('title', 'Dashboard Admin - MotoTracker')
+@section('title', 'Dashboard Admin - TringGo')
 @section('page-title', 'Dashboard Admin')
 
 @section('content')
 <!-- Header Section -->
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-white mb-1" style="font-family: Arial, sans-serif;">Dashboard Admin MotoTracker</h1>
+    <h1 class="text-2xl font-bold text-white mb-1" style="font-family: Arial, sans-serif;">Dashboard Admin TringGo</h1>
     <p class="text-sm text-[#99A1AF]" style="font-family: Arial, sans-serif;">Pusat Pengelolaan Konten dan Konfigurasi Aplikasi</p>
 </div>
 

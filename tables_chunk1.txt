@@ -1,0 +1,221 @@
+﻿=== TABLE 1 ===
+Nama / NIM / Kelas | : Aji Saka / 3.34.23.1.01 / IK 3B
+Nama / NIM / Kelas | : Arya Yusufa Agnil Fikri / 3.34.23.1.05 / IK 3B
+Jurusan | : Teknik Elektro
+Program Studi | : Teknik Informatika
+
+=== TABLE 2 ===
+Mahasiswa, | Mahasiswa,
+Aji Saka | Arya Yususfa Agnil Fikri
+NIM. 3.34.23.1.01 | NIM. 3.34.23.1.05
+
+=== TABLE 3 ===
+ | Semarang, 20 Juli 2026
+Pembimbing I | Pembimbing II
+Dr. Sukamto, S. KOM., M.T. | WIKTASARI, S.T., M. KOM.
+NIP. 1 | NIP. 1
+Mengetahui,
+Ketua Program Studi D3 Teknik Informatika
+
+Idhawati Hestiningsih, S.Kom., M.Kom.
+NIP. 197711192008012013 | Mengetahui,
+Ketua Program Studi D3 Teknik Informatika
+
+Idhawati Hestiningsih, S.Kom., M.Kom.
+NIP. 197711192008012013
+
+=== TABLE 4 ===
+ | Tim Penguji | 
+Penguji I, | Penguji II, | Penguji III,
+Dr.Ir. Kurnianingsih, S.T.,M.T. | Wahyu Sulistiyo, S.T.,M.Kom. | Nurseno Bayu Aji, S.Kom.,M.Kom.
+NIP. 197904262003122002 | NIP. 197704012005011001 | NIP. 199107302019031010
+
+=== TABLE 5 ===
+Ketua | Sekretaris,
+Mardiyono, S.Kom, M.Sc. | Aisyatul Karima, S.Kom., M.Sc.
+NIP. 197403112000121001 | NIP. 198605292019032009
+Mengesahkan,
+Ketua Jurusan Teknik Elektro
+
+
+
+Yusnan Badruzzaman, S.T., M.Kom., NIP. 197503132006041001 | Mengesahkan,
+Ketua Jurusan Teknik Elektro
+
+
+
+Yusnan Badruzzaman, S.T., M.Kom., NIP. 197503132006041001
+
+=== TABLE 6 ===
+Aji Saka | Arya Yusufa Agnil Fikri
+
+=== TABLE 7 ===
+No | Penulis dan Tahun | Fitur | Fitur | Fitur | Fitur | Perangkat/Modul IoT | Hasil
+No | Penulis dan Tahun | 1 | 2 | 3 | 4 | Perangkat/Modul IoT | Hasil
+1 | (Attubel et al., 2020) | ÔêÜ | - | - | ÔêÜ | GPS + GSM + Sensor Arus ACS-712 | Android
+2 | (Sibuea et al., 2023) | ÔêÜ | - | - | ÔêÜ | Mikrokontroler IoT (Odometer Digital) | Android
+3 | (Maesa & Hartono, 2025) | ÔêÜ | - | - | ÔêÜ | ESP32 + GPS Neo-6M + Sensor Getar SW-420 | Android
+4 | (Ramadhan et al., 2024) | ÔêÜ | ÔêÜ | ÔêÜ | - | ESP32 + Multi-Sensor Gas | Perangkat Keras
+5 | (Auwali et al., 2024) | ÔêÜ | - | - | - | ESP32-Cam (Face Recognition) | Telegram
+6 | (Ardhana et al., 2023) | ÔêÜ | - | - | - | Simulasi Sensor Suhu & Kelembaban (Wokwi) | Website
+7 | (Ubaidillah & Waluyo, 2023) | - | - | - | ÔêÜ | - | Android
+8 | (Kautsar et al., 2023) | - | ÔêÜ | ÔêÜ | - | Sensor Suhu & Volume Air Radiator | Perangkat Keras
+9 | (Ariyanto et al., 2025) | ÔêÜ | - | - | ÔêÜ | ESP32 (Sensor Suhu & Kelembapan) | Android
+10 | (Pamungkas & Yahya, 2023) | ÔêÜ | - | - | - | Mikrokontroler + Sensor Tegangan/Arus Aki | Website
+11 | (Jayadi & Fitriyadi, 2021) | - | - | - | - | Arduino (Odometer Lokal) | SMS Gateway
+12 | (Indrayadi et al., 2024) | - | - | - | ÔêÜ | - | Android
+13 | (Nurulfahmi & Sulistiyowati, 2021) | ÔêÜ | - | - | ÔêÜ | Modul GPS + Kamera | Android
+14 | (Aryatama & Samsugi, 2024) | - | - | - | ÔêÜ | ESP32 (Kontrol Bluetooth) | Android
+15 | (Ruslizar et al., 2022) | ÔêÜ | - | - | ÔêÜ | Mikrokontroler GPS + Relay | Android
+16 | (Gorski et al., 2022) | - | ÔêÜ | ÔêÜ | - | Sensor Condition Monitoring (Industri) | Sistem Industri
+17 | (Silhavy et al., 2023) | ÔêÜ | - | - | - | ESP32 (Studi Protokol MQTT/REST) | Perangkat Keras
+18 | (Wahyu & Aryanto, 2024) | ÔêÜ | - | - | ÔêÜ | NodeMCU ESP8266 + GPS | Aplikasi Mobile
+19 | (Salamah dkk., 2023) | ÔêÜ | - | - | ÔêÜ | Sensor IoT Nirkabel (Umum) | Website/Mobile
+20 | (Mulya dkk., 2022) | ÔêÜ | - | - | ÔêÜ | NodeMCU + GPS U-blox | Aplikasi Mobile
+21 | (Alhadidi dkk., 2024) | ÔêÜ | - | - | - | Sensor Hall Effect (Roda) | Telegram
+22 | Tugas Akhir yang diajukan oleh saya | ÔêÜ | ÔêÜ | ÔêÜ | ÔêÜ | ESP32 + GPS NEO-7M + MPU6050 | Android
+
+=== TABLE 8 ===
+Modul | Method | Endpoint (Prefix: /api/v1) | Deskripsi
+Autentikasi | POST | /auth/login | Memvalidasi kredensial (email & password) dan menerbitkan access token.
+Autentikasi | POST | /auth/refresh-token | Memperbarui access token tanpa perlu login ulang.
+Kendaraan | GET | /vehicles/primary | Mengambil data detail kendaraan yang diatur sebagai utama (default).
+Rekomendasi & AI | GET | /vehicles/primary/maintenance-recommendations | Menghasilkan rekomendasi kondisi komponen berbasis perhitungan Fuzzy Logic.
+Rekomendasi & AI | GET | /motors/{motorId}/home-insight | Mendapatkan rangkuman insight kesehatan motor untuk halaman dasbor.
+Servis & Jadwal | GET | /service-schedules/primary | Menampilkan jadwal dan pengingat (reminder) servis yang akan datang.
+Servis & Jadwal | GET | /services/summary/{vehicle_id} | Mengambil ringkasan pengeluaran dan riwayat biaya servis kendaraan.
+Telemetri (IoT) | POST | /motors/{motorId}/tracking/start | Mengirim perintah untuk memulai sesi perekaman rute perjalanan dan telemetri IoT.
+Telemetri (IoT) | POST | /motors/{motorId}/tracking/stop | Menghentikan sesi perekaman telemetri IoT.
+Telemetri (IoT) | GET | /motors/{motorId}/tracking/last-location | Mengambil data titik koordinat GPS terakhir yang dikirim oleh perangkat IoT.
+
+=== TABLE 9 ===
+Pin GPS NEO-7M | Pin ESP32 | Fungsi
+TX | GPIO 16 (RX2) | Mengirim data NMEA dari GPS ke ESP32
+RX | GPIO 17 (TX2) | Menerima perintah konfigurasi dari ESP32
+VCC | VIN | Sumber tegangan VIN
+GND | GND | Ground (penutup sirkuit)
+
+=== TABLE 10 ===
+Pin MPU6050 | Pin ESP32 | Fungsi
+SDA | GPIO 22 | Jalur data dua arah (Serial Data) protokol I2C
+SCL | GPIO 21 | Jalur clock sinkronisasi (Serial Clock) protokol I2C
+VCC | VIN | Sumber tegangan VIN
+GND | GND | Ground (penutup sirkuit)
+
+=== TABLE 11 ===
+Kolom | Tipe Data | Keterangan
+trip_id | BIGINT (FK) | Relasi ke tabel trips, menandakan sesi perjalanan terkait.
+timestamp | DATETIME | Waktu pencatatan titik telemetri.
+has_fix | BOOLEAN | Menandakan validitas sinyal GPS pada titik tersebut.
+latitude / longitude | DECIMAL (nullable) | Koordinat geografis; bernilai null saat blank spot GPS.
+speed_kmh | FLOAT | Kecepatan kendaraan dalam km/jam.
+est_distance_m | FLOAT | Estimasi jarak hasil dead reckoning saat GPS tidak tersedia.
+mpu_is_moving | BOOLEAN | Status pergerakan kendaraan berdasarkan pembacaan MPU6050.
+mpu_g_force | FLOAT | Nilai intensitas getaran (g-force) hasil pembacaan MPU6050.
+
+=== TABLE 12 ===
+Nama Komponen | Jarak Tempuh | Durasi Hari | Kecepatan Rata-rata | Intensitas Berkendara | Dasar Alasan Teknis & Bukti Halaman
+Oli Mesin | ON | ON | ON | ON | Viskositas oli turun akibat km, durasi bulan, kemacetan stop&go, dan beban mesin (BeAT Hal.55, Vario Hal.57)
+Ban (Tire) | ON | ON | OFF | ON | Tekanan & kedalaman telapak ban aus akibat km dan beban guncangan (BeAT Hal.64, Vario Hal.66)
+Filter Udara | ON | ON | OFF | OFF | Elemen viscous diganti murni berdasarkan jarak & waktu (BeAT Hal.56, Vario Hal.58)
+Busi | ON | ON | OFF | OFF | Pengapian dicek KPB 2 dan diganti per 8.000 km (BeAT Hal.55, Vario Hal.57)
+Aki (Battery) | ON | ON | OFF | OFF | Tipe maintenance-free diperiksa tegangannya secara berkala (BeAT Hal.57, Vario Hal.59)
+Rem (Kampas Rem) | ON | ON | ON | ON | Gesekan kampas dipengaruhi km, deselerasi (G-Force), & minyak rem 2 th (BeAT Hal.57, Vario Hal.59)
+CVT / Belt (Drive Belt) | ON | ON | OFF | ON | V-Belt aus oleh kilometrase dan entakan akselerasi (BeAT Hal.56, Vario Hal.58)
+Roller CVT | ON | ON | OFF | ON | Roller weight aus bersamaan Drive Belt per 8.000 km (BeAT Hal.56, Vario Hal.58)
+Oli Gardan (Final Drive) | ON | ON | OFF | OFF | Penggantian oli transmisi akhir tiap 12.000 km/12 bulan (BeAT Hal.57, Vario Hal.59)
+
+=== TABLE 13 ===
+Nama Komponen | Jarak Tempuh | Durasi Hari | Kecepatan Rata-rata | Intensitas Berkendara | Dasar Alasan Teknis & Bukti Halaman
+Oli Mesin | ON | ON | ON | ON | Penggantian rutin per 4.000 km/4 bulan & pengaruh gaya berkendara (Supra X Hal.11-14, Revo Hal.11)
+Ban (Tire) | ON | ON | OFF | ON | Tipe Cast Wheel/Jari-jari dicek keausan & tekanan angin (Supra X Hal.39, Revo Hal.12)
+Filter Udara | ON | ON | OFF | OFF | Saringan elemen basah diganti rutin tanpa dibersihkan (Supra X Hal.38, Revo Hal.11)
+Busi | ON | ON | OFF | OFF | Pemeriksaan KPB 2 (4.000 km), penggantian pada 8.000 km (Supra X Hal.38, Revo Hal.11)
+Aki (Battery) | ON | ON | OFF | OFF | Pemeriksaan sistem kelistrikan & baterai bebas perawatan (Supra X Hal.39, Revo Hal.12)
+Rem (Kampas Rem) | ON | ON | ON | ON | Keausan tromol/cakram & penggantian minyak rem per 2 tahun (Supra X Hal.39, Revo Hal.12)
+Rantai Roda (Drive Chain) | ON | ON | OFF | ON | Pembersihan, penyetelan, & pelumasan wajib tiap 500 km (Supra X Hal.38, Revo Hal.11)
+
+=== TABLE 14 ===
+Nama Komponen | Jarak Tempuh | Durasi Hari | Kecepatan Rata-rata | Intensitas Berkendara | Dasar Alasan Teknis & Bukti Halaman
+Oli Mesin | ON | ON | ON | ON | Kapasitas 1,1L, diganti rutin per 4.000 km/6 bulan & rpm tinggi (CB150R Hal.30)
+Ban (Tire) | ON | ON | OFF | ON | Ban Tubeless depan/belakang dicek tekanan & keausan (CB150R Hal.31)
+Filter Udara | ON | ON | OFF | OFF | Penggantian berkala elemen saringan udara tipe viscous (CB150R Hal.30)
+Busi (NGK MR9C-9N) | ON | ON | OFF | OFF | Pemeriksaan tiap 6.000 km, penggantian rutin pada 12.000 km (CB150R Hal.30)
+Aki (Battery GTZ6V) | ON | ON | OFF | OFF | Baterai 12V-5Ah dicek fungsi sistem pengisian (CB150R Hal.31)
+Rem (Cakram Depan/Blk) | ON | ON | ON | ON | Pengereman ganda cakram & penggantian minyak rem per 2 tahun (CB150R Hal.31)
+Rantai Roda | ON | ON | OFF | ON | Pemeriksaan & pelumasan rutin tiap 500 km dengan SAE 80/90 (CB150R Hal.31)
+Cairan Pendingin (Coolant) | ON | ON | OFF | OFF | Radiator coolant diperiksa berkala, ganti total per 3 tahun (CB150R Hal.30)
+
+=== TABLE 15 ===
+Nama Komponen | Jarak Tempuh | Durasi Hari | Kecepatan Rata-rata | Intensitas Berkendara | Dasar Alasan Teknis & Bukti Halaman
+Oli Mesin | ON | ON | ON | ON | Servis lebih sering saat riding off-road, Note 4 (CRF150L Hal.35)
+Ban (Tire Tube Type) | ON | ON | OFF | ON | Pemeriksaan velg jari-jari & tekanan angin ban (CRF150L Hal.35)
+Filter Udara | ON | ON | OFF | OFF | Servis lebih sering di area basah/berdebu, Note 2 (CRF150L Hal.35)
+Busi (NGK CPR9EA-9) | ON | ON | OFF | OFF | Pemeriksaan & pembersihan celah elektroda per 4.000 km (CRF150L Hal.34)
+Aki (Battery GTZ5S) | ON | ON | OFF | OFF | Baterai 12V-3.5Ah diperiksa keandalan starter (CRF150L Hal.35)
+Rem (Hydraulic Disc) | ON | ON | ON | ON | Ketebalan pad rem cakram & penggantian minyak rem (CRF150L Hal.35)
+Rantai & Chain Slider | ON | ON | OFF | ON | Pelumasan rantai & cek keausan slider akibat lumpur/pasir (CRF150L Hal.35)
+
+=== TABLE 16 ===
+Variabel Input | Satuan | Rentang Nilai | Himpunan Linguistik | Deskripsi
+Jarak Tempuh (Mileage) | Kilometer (km) | 0 - 5.000+ | Rendah, Menengah, Tinggi | Akumulasi jarak sejak servis terakhir.
+Durasi Hari (Days Since) | Hari | 0 - 180+ | Baru, Sedang, Lama | Waktu yang berlalu sejak penggantian komponen.
+Kecepatan Rata-rata | km/jam | 0 - 120 | Lambat, Sedang, Cepat | Agresivitas berkendara (riding behavior).
+Intensitas Berkendara | Score (0-10) | 0 - 10 | Rendah, Sedang, Tinggi | Frekuensi penggunaan kendaraan harian, turut mempertimbangkan data g-force MPU6050.
+
+=== TABLE 17 ===
+Nama Variabel Input | Semesta Pembicaraan | Himpunan Fuzzy | Tipe Kurva | Parameter Batas (a, b, c)
+1. Jarak Tempuh (X1) | 0 - 5000 km | Rendah | Linier Turun | a = 1000, b = 2500
+1. Jarak Tempuh (X1) | 0 - 5000 km | Menengah | Segitiga | a = 1000, b = 2500, c = 4000
+1. Jarak Tempuh (X1) | 0 - 5000 km | Tinggi | Linier Naik | a = 2500, b = 4000
+2. Durasi Hari (X2) | 0 - 180 Hari | Baru | Linier Turun | a = 30, b = 90
+2. Durasi Hari (X2) | 0 - 180 Hari | Sedang | Segitiga | a = 30, b = 90, c = 150
+2. Durasi Hari (X2) | 0 - 180 Hari | Lama | Linier Naik | a = 90, b = 150
+3. Kecepatan Rata-rata (X3) | 0 - 120 km/jam | Lambat | Linier Turun | a = 20, b = 60
+3. Kecepatan Rata-rata (X3) | 0 - 120 km/jam | Sedang | Segitiga | a = 20, b = 60, c = 100
+3. Kecepatan Rata-rata (X3) | 0 - 120 km/jam | Cepat | Linier Naik | a = 60, b = 100
+4. Intensitas Berkendara (X4) | 0 - 10 Score | Rendah | Linier Turun | a = 2, b = 5
+4. Intensitas Berkendara (X4) | 0 - 10 Score | Sedang | Segitiga | a = 2, b = 5, c = 8
+4. Intensitas Berkendara (X4) | 0 - 10 Score | Tinggi | Linier Naik | a = 5, b = 8
+
+=== TABLE 18 ===
+Tipe Motor | Komponen | WARN (km) | CRITICAL (km) | RESET (Hari) | Bukti Rujukan Buku Manual
+Matic (BeAT/Vario) | Oli Mesin | 2.500 | 4.000 | 120 | BeAT Hal.55, Vario Hal.57
+ | Filter Udara | 12.000 | 16.000 | 365 | BeAT Hal.56, Vario Hal.58
+ | Busi | 6.000 | 8.000 | 240 | BeAT Hal.55, Vario Hal.57
+ | Drive Belt (V-Belt) | 18.000 | 24.000 | 730 | Vario Hal.58
+ | Oli Gardan (Final Drive) | 8.000 | 12.000 | 365 | BeAT Hal.57, Vario Hal.59
+Manual (Supra X/Revo) | Oli Mesin | 2.500 | 4.000 | 120 | Supra X Hal.11-14, Revo Hal.11
+ | Busi | 6.000 | 8.000 | 240 | Revo Hal.11
+ | Rantai Roda | 500 | 1.000 | 30 | Supra X Hal.38, Revo Hal.11
+ | Kampas/Minyak Rem | 4.000 | 8.000 | 730 | Supra X Hal.39
+Sport (CB150R) | Oli Mesin (1,1L) | 3.000 | 4.000 | 120 | CB150R Hal.30
+ | Radiator Coolant | 12.000 | 24.000 | 1.095 | CB150R Hal.30
+ | Busi (MR9C-9N) | 6.000 | 12.000 | 365 | CB150R Hal.30
+ | Rantai Roda | 500 | 1.000 | 30 | CB150R Hal.31
+Adventure (CRF150L) | Oli Mesin (Off-Road) | 1.500 | 2.500 | 90 | CRF150L Hal.35 Note 4
+ | Filter Udara | 4.000 | 8.000 | 180 | CRF150L Hal.35 Note 2
+ | Rantai Roda & Slider | 300 | 500 | 15 | CRF150L Hal.35 Note 4
+ | Busi (CPR9EA-9) | 4.000 | 8.000 | 240 | CRF150L Hal.34
+
+=== TABLE 19 ===
+Variabel Output | Rentang Skor | Status Linguistik | Tindakan yang Disarankan
+Normal (Aman) | 0% - 40% | Good | Komponen dalam kondisi prima, belum perlu servis.
+Warning (Perhatian) | 41% - 75% | Warning | Keausan mulai terjadi, persiapkan servis dalam waktu dekat.
+Critical (Bahaya) | 76% - 100% | Critical | Harus segera diservis/diganti untuk menghindari kerusakan fatal.
+
+=== TABLE 20 ===
+ID | Skenario Pengujian | Prosedur / Data Uji | Hasil yang Diharapkan
+BE-01 | Registrasi & verifikasi OTP | Kirim request register dengan data valid & tidak valid | Sistem membuat akun baru dan menolak data tidak valid dengan pesan error yang sesuai
+BE-02 | Autentikasi login (token) | Login dengan kredensial benar/salah | Token JWT/Sanctum diterbitkan untuk kredensial benar, ditolak untuk kredensial salah
+BE-03 | Ingesti data telemetri IoT | Kirim payload dari device ID terdaftar & tidak terdaftar | Data tersimpan ke trip_points untuk device terdaftar, ditolak untuk device asing
+BE-04 | Kalkulasi rekomendasi perawatan | Panggil endpoint rekomendasi untuk motor dengan data akumulasi tertentu | Respons berisi skor Fuzzy dan status komponen sesuai perhitungan
+
+=== TABLE 21 ===
+ID | Skenario Pengujian | Prosedur / Data Uji | Hasil yang Diharapkan
+FZ-01 | Fuzzifikasi nilai crisp ke derajat keanggotaan | Input nilai X1-X4 pada rentang Low/Medium/High | Derajat keanggotaan sistem sama dengan hasil perhitungan manual (toleransi 0.01)
+FZ-02 | Evaluasi rule base (inferensi) | Input kombinasi X1-X4 yang memicu beberapa rule sekaligus | Rule yang aktif dan nilai alpha-predikat sesuai hasil trace manual
+FZ-03 | Defuzzifikasi Centroid | Agregasi seluruh output rule aktif | Skor akhir (z*) sistem sama dengan hasil perhitungan manual Persamaan (3.4)
+FZ-04 | Toggle variabel per tipe motor | Ubah tipe motor aktif pada satu akun | Variabel input yang diproses berubah sesuai Tabel 3.1-3.4
+
+==

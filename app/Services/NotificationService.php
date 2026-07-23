@@ -371,7 +371,7 @@ class NotificationService
     {
         // Variabel umum
         $defaults = [
-            'app_name' => config('app.name', 'MotoTracker'),
+            'app_name' => config('app.name', 'TringGo'),
             'date_now' => now()->format('d M Y'),
         ];
 
@@ -418,7 +418,7 @@ class NotificationService
             'duration'       => '45 menit',
             'avg_speed'      => '35',
             'user_name'      => 'Budi Santoso',
-            'app_name'       => config('app.name', 'MotoTracker'),
+            'app_name'       => config('app.name', 'TringGo'),
             'date_now'       => now()->format('d M Y'),
         ];
     }

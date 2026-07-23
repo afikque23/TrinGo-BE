@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kode OTP - MotoTracker</title>
+    <title>Kode OTP - TringGo</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -113,7 +113,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏍️ MotoTracker</h1>
+            <h1>🏍️ TringGo</h1>
         </div>
         
         <div class="content">
@@ -125,11 +125,11 @@
                 @endif
                 
                 @if($type === 'password_reset')
-                    <p>Kami menerima permintaan untuk mereset password akun MotoTracker Anda. Gunakan kode OTP berikut untuk melanjutkan proses reset password:</p>
+                    <p>Kami menerima permintaan untuk mereset password akun TringGo Anda. Gunakan kode OTP berikut untuk melanjutkan proses reset password:</p>
                 @elseif($type === 'phone_verification')
-                    <p>Gunakan kode OTP berikut untuk memverifikasi nomor telepon Anda di aplikasi MotoTracker:</p>
+                    <p>Gunakan kode OTP berikut untuk memverifikasi nomor telepon Anda di aplikasi TringGo:</p>
                 @else
-                    <p>Terima kasih telah mendaftar di MotoTracker! Gunakan kode OTP berikut untuk memverifikasi email Anda dan mengaktifkan akun:</p>
+                    <p>Terima kasih telah mendaftar di TringGo! Gunakan kode OTP berikut untuk memverifikasi email Anda dan mengaktifkan akun:</p>
                 @endif
             </div>
 
@@ -141,7 +141,7 @@
 
             <div class="info">
                 <p><strong>⚠️ Informasi Keamanan:</strong></p>
-                <p>• Jangan bagikan kode ini kepada siapapun termasuk staff MotoTracker</p>
+                <p>• Jangan bagikan kode ini kepada siapapun termasuk staff TringGo</p>
                 <p>• Kode OTP hanya berlaku untuk sekali penggunaan</p>
                 <p>• Kode akan kadaluarsa dalam 10 menit</p>
                 <p>• Jika Anda tidak merasa melakukan permintaan ini, abaikan email ini</p>
@@ -155,7 +155,7 @@
         </div>
 
         <div class="footer">
-            <p>&copy; {{ date('Y') }} MotoTracker - Motorcycle Management System</p>
+            <p>&copy; {{ date('Y') }} TringGo - Motorcycle Management System</p>
             <p>Email ini dikirim secara otomatis, mohon tidak membalas email ini.</p>
         </div>
     </div>

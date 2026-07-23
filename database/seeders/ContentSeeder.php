@@ -30,12 +30,12 @@ class ContentSeeder extends Seeder
                         'content' => 'Berlaku sejak: 30 Januari 2026'
                     ],
                     [
-                        'section' => 'Selamat Datang di MotoTracker',
-                        'content' => 'Dengan menggunakan aplikasi MotoTracker, Anda menyetujui syarat dan ketentuan berikut. Harap baca dengan seksama sebelum menggunakan layanan kami.'
+                        'section' => 'Selamat Datang di TringGo',
+                        'content' => 'Dengan menggunakan aplikasi TringGo, Anda menyetujui syarat dan ketentuan berikut. Harap baca dengan seksama sebelum menggunakan layanan kami.'
                     ],
                     [
                         'section' => '1. Penerimaan Ketentuan',
-                        'content' => 'Dengan membuat akun atau menggunakan MotoTracker, Anda menyatakan bahwa:',
+                        'content' => 'Dengan membuat akun atau menggunakan TringGo, Anda menyatakan bahwa:',
                         'items' => [
                             'Anda berusia minimal 17 tahun atau memiliki izin dari orang tua/wali',
                             'Anda memiliki kapasitas hukum untuk menyetujui perjanjian ini',
@@ -50,7 +50,7 @@ class ContentSeeder extends Seeder
                             'Anda bertanggung jawab penuh atas keamanan akun dan password Anda',
                             'Jangan bagikan kredensial login Anda kepada siapapun',
                             'Segera laporkan aktivitas mencurigakan atau akses tidak sah',
-                            'MotoTracker tidak bertanggung jawab atas kerugian akibat kelalaian keamanan akun'
+                            'TringGo tidak bertanggung jawab atas kerugian akibat kelalaian keamanan akun'
                         ]
                     ],
                     [
@@ -69,7 +69,7 @@ class ContentSeeder extends Seeder
                     ],
                     [
                         'section' => '3. Penggunaan Layanan — Batasan Layanan',
-                        'content' => 'Aplikasi ini disediakan "sebagaimana adanya". MotoTracker tidak menjamin:',
+                        'content' => 'Aplikasi ini disediakan "sebagaimana adanya". TringGo tidak menjamin:',
                         'items' => [
                             'Akurasi 100% prediksi maintenance (gunakan sebagai referensi)',
                             'GPS tracking selalu presisi (bergantung pada sinyal dan hardware)',
@@ -103,14 +103,14 @@ class ContentSeeder extends Seeder
                     ],
                     [
                         'section' => '6. Hak Kekayaan Intelektual',
-                        'content' => 'Semua konten, fitur, dan fungsionalitas aplikasi MotoTracker (termasuk tetapi tidak terbatas pada desain, logo, teks, grafik, dan kode) adalah milik eksklusif MotoTracker dan dilindungi oleh hak cipta internasional.',
+                        'content' => 'Semua konten, fitur, dan fungsionalitas aplikasi TringGo (termasuk tetapi tidak terbatas pada desain, logo, teks, grafik, dan kode) adalah milik eksklusif TringGo dan dilindungi oleh hak cipta internasional.',
                         'items' => [
                             'Data Anda adalah milik Anda. Kami tidak mengklaim kepemilikan atas konten yang Anda upload atau buat di aplikasi.'
                         ]
                     ],
                     [
                         'section' => '7. Batasan Tanggung Jawab',
-                        'content' => 'MotoTracker tidak bertanggung jawab atas:',
+                        'content' => 'TringGo tidak bertanggung jawab atas:',
                         'items' => [
                             'Kerusakan kendaraan akibat kelalaian maintenance (gunakan rekomendasi kami sebagai panduan)',
                             'Kehilangan data akibat penghapusan browser cache atau factory reset',
@@ -135,11 +135,11 @@ class ContentSeeder extends Seeder
                     ],
                     [
                         'section' => '📧 Pertanyaan Legal',
-                        'content' => 'Untuk pertanyaan terkait syarat dan ketentuan, hubungi kami di: legal@mototracker.id'
+                        'content' => 'Untuk pertanyaan terkait syarat dan ketentuan, hubungi kami di: legal@tringgo.id'
                     ],
                     [
                         'section' => 'Footer',
-                        'content' => '© 2026 MotoTracker. All Rights Reserved. Dengan menggunakan aplikasi ini, Anda menyetujui syarat dan ketentuan di atas.'
+                        'content' => '© 2026 TringGo. All Rights Reserved. Dengan menggunakan aplikasi ini, Anda menyetujui syarat dan ketentuan di atas.'
                     ]
                 ]),
                 'status' => 'published',
@@ -156,7 +156,7 @@ class ContentSeeder extends Seeder
                     ],
                     [
                         'section' => 'Komitmen Privasi Kami',
-                        'content' => 'Di MotoTracker, kami sangat menghargai privasi Anda. Kebijakan ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi pribadi Anda.'
+                        'content' => 'Di TringGo, kami sangat menghargai privasi Anda. Kebijakan ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi pribadi Anda.'
                     ],
                     [
                         'section' => '1. Informasi yang Kami Kumpulkan — Informasi Akun',
@@ -236,11 +236,11 @@ class ContentSeeder extends Seeder
                     ],
                     [
                         'section' => '📧 Hubungi Kami',
-                        'content' => 'Jika Anda memiliki pertanyaan tentang kebijakan privasi ini, silakan hubungi kami di: privacy@mototracker.id'
+                        'content' => 'Jika Anda memiliki pertanyaan tentang kebijakan privasi ini, silakan hubungi kami di: privacy@tringgo.id'
                     ],
                     [
                         'section' => 'Footer',
-                        'content' => '© 2026 MotoTracker. Kebijakan ini dapat diperbarui sewaktu-waktu. Anda akan diberi tahu melalui email jika ada perubahan signifikan.'
+                        'content' => '© 2026 TringGo. Kebijakan ini dapat diperbarui sewaktu-waktu. Anda akan diberi tahu melalui email jika ada perubahan signifikan.'
                     ]
                 ]),
                 'status' => 'published',
@@ -253,10 +253,10 @@ class ContentSeeder extends Seeder
                 'body' => json_encode([
                     [
                         'section' => '📖 Selamat Datang!',
-                        'content' => 'Panduan lengkap untuk memaksimalkan pengalaman Anda dengan MotoTracker. Pilih topik di bawah untuk mempelajari fitur-fitur aplikasi.'
+                        'content' => 'Panduan lengkap untuk memaksimalkan pengalaman Anda dengan TringGo. Pilih topik di bawah untuk mempelajari fitur-fitur aplikasi.'
                     ],
                     [
-                        'section' => 'Memulai dengan MotoTracker',
+                        'section' => 'Memulai dengan TringGo',
                         'content' => '',
                         'items' => [
                             'Membuat Akun — Daftar dengan email dan password. Verifikasi email Anda melalui kode OTP yang dikirimkan. Setelah verifikasi, lengkapi profil Anda dengan informasi dasar.',
@@ -323,24 +323,24 @@ class ContentSeeder extends Seeder
                     ],
                     [
                         'section' => 'Bantuan',
-                        'content' => 'Masih ada pertanyaan? Hubungi kami di support@mototracker.id'
+                        'content' => 'Masih ada pertanyaan? Hubungi kami di support@tringgo.id'
                     ]
                 ]),
                 'status' => 'published',
                 'order' => 3
             ],
             [
-                'title' => 'Tentang MotoTracker',
-                'slug' => 'tentang-mototracker',
+                'title' => 'Tentang TringGo',
+                'slug' => 'tentang-tringgo',
                 'type' => 'about',
                 'body' => json_encode([
                     [
-                        'section' => 'MotoTracker',
+                        'section' => 'TringGo',
                         'content' => 'Your Smart Motorcycle Companion<br />Version 1.0.0 • Build 2026.01.30'
                     ],
                     [
                         'section' => 'Tentang Aplikasi',
-                        'content' => 'MotoTracker adalah aplikasi manajemen sepeda motor yang lengkap, dirancang khusus untuk pengendara motor di Indonesia. Dengan fitur GPS tracking, smart maintenance scheduling, dan predictive analytics, kami membantu Anda menjaga motor tetap dalam kondisi prima.'
+                        'content' => 'TringGo adalah aplikasi manajemen sepeda motor yang lengkap, dirancang khusus untuk pengendara motor di Indonesia. Dengan fitur GPS tracking, smart maintenance scheduling, dan predictive analytics, kami membantu Anda menjaga motor tetap dalam kondisi prima.'
                     ]
                 ]),
                 'status' => 'published',
@@ -448,7 +448,7 @@ class ContentSeeder extends Seeder
                         'content' => '',
                         'items' => [
                             'Live Chat — Respon instan dari tim support (Tersedia)',
-                            'Email Support — support@mototracker.id (Tersedia)',
+                            'Email Support — support@tringgo.id (Tersedia)',
                             'Telepon — +62 812-3456-7890 (Segera)'
                         ]
                     ],
@@ -456,7 +456,7 @@ class ContentSeeder extends Seeder
                         'section' => 'Sumber Daya',
                         'content' => '',
                         'items' => [
-                            'Panduan Pengguna — Tutorial lengkap menggunakan MotoTracker',
+                            'Panduan Pengguna — Tutorial lengkap menggunakan TringGo',
                             'Kebijakan Privasi — Cara kami melindungi data Anda',
                             'Syarat & Ketentuan — Aturan penggunaan aplikasi'
                         ]

@@ -50,7 +50,7 @@ class NotificationService {
 
     // Channel untuk Service Reminders (HIGH priority - akan pop-up)
     const AndroidNotificationChannel serviceChannel = AndroidNotificationChannel(
-      'mototracker_service', // ID harus sama dengan backend
+      'tringgo_service', // ID harus sama dengan backend
       'Service Reminders',
       description: 'Pengingat servis motor',
       importance: Importance.high, // ← PENTING: HIGH importance
@@ -61,7 +61,7 @@ class NotificationService {
 
     // Channel untuk Trip Notifications (HIGH priority - akan pop-up)
     const AndroidNotificationChannel tripChannel = AndroidNotificationChannel(
-      'mototracker_trip', // ID harus sama dengan backend
+      'tringgo_trip', // ID harus sama dengan backend
       'Trip Notifications',
       description: 'Notifikasi perjalanan selesai',
       importance: Importance.high, // ← PENTING: HIGH importance
@@ -72,7 +72,7 @@ class NotificationService {
 
     // Channel untuk Alerts (MAX priority - akan pop-up dengan suara keras)
     const AndroidNotificationChannel alertChannel = AndroidNotificationChannel(
-      'mototracker_alert', // ID harus sama dengan backend
+      'tringgo_alert', // ID harus sama dengan backend
       'Alert Notifications',
       description: 'Peringatan penting',
       importance: Importance.max, // ← CRITICAL alerts
@@ -83,7 +83,7 @@ class NotificationService {
 
     // Channel untuk Insights (LOW priority - TIDAK pop-up)
     const AndroidNotificationChannel insightChannel = AndroidNotificationChannel(
-      'mototracker_insight', // ID harus sama dengan backend
+      'tringgo_insight', // ID harus sama dengan backend
       'Insights',
       description: 'Tips dan insight berkendara',
       importance: Importance.low, // ← Low importance, tidak pop-up
@@ -156,7 +156,7 @@ class NotificationService {
         notification.body,
         NotificationDetails(
           android: AndroidNotificationDetails(
-            'mototracker_$categoryKey', // Match channel ID
+            'tringgo_$categoryKey', // Match channel ID
             'Notifications',
             channelDescription: 'App notifications',
             importance: Importance.high, // ← PENTING untuk heads-up
@@ -239,7 +239,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MotoTracker',
+      title: 'TringGo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -267,7 +267,7 @@ class MyApp extends StatelessWidget {
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
   <application
-      android:label="MotoTracker"
+      android:label="TringGo"
       android:name="${applicationName}"
       android:icon="@mipmap/ic_launcher">
 
@@ -276,7 +276,7 @@ class MyApp extends StatelessWidget {
     <!-- ========================================== -->
     <meta-data
         android:name="com.google.firebase.messaging.default_notification_channel_id"
-        android:value="mototracker_trip" />
+        android:value="tringgo_trip" />
 
     <meta-data
         android:name="com.google.firebase.messaging.default_notification_icon"
@@ -336,7 +336,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('MotoTracker')),
+      appBar: AppBar(title: Text('TringGo')),
       body: Center(child: Text('Home Page')),
     );
   }
@@ -351,7 +351,7 @@ Jika heads-up notification **masih tidak muncul** setelah setup di atas:
 
 ### 1. ✅ Check Phone Settings
 
-**Android Settings → Apps → MotoTracker → Notifications**
+**Android Settings → Apps → TringGo → Notifications**
 
 - Pastikan **semua channels enabled**
 - Pastikan **"Pop on screen"** atau **"Floating notification"** enabled
@@ -393,7 +393,7 @@ Jika masih `"NORMAL"`, berarti backend belum update. Check `FcmNotificationServi
 
 **Settings → Battery → Battery Optimization**
 
-- Cari app "MotoTracker"
+- Cari app "TringGo"
 - Set to **"Don't optimize"**
 
 Battery optimization bisa block heads-up notifications!
@@ -425,10 +425,10 @@ Harus muncul pop-up notification di HP!
 
 | Backend Category | Flutter Channel ID    | Importance        |
 | ---------------- | --------------------- | ----------------- |
-| `service`        | `mototracker_service` | `Importance.high` |
-| `trip`           | `mototracker_trip`    | `Importance.high` |
-| `alert`          | `mototracker_alert`   | `Importance.max`  |
-| `insight`        | `mototracker_insight` | `Importance.low`  |
+| `service`        | `tringgo_service` | `Importance.high` |
+| `trip`           | `tringgo_trip`    | `Importance.high` |
+| `alert`          | `tringgo_alert`   | `Importance.max`  |
+| `insight`        | `tringgo_insight` | `Importance.low`  |
 
 **Channel ID harus SAMA** antara backend (FcmNotificationService.php) dan Flutter (NotificationService.dart)!
 

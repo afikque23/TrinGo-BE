@@ -142,7 +142,7 @@ Jika ada controller yang handle manual distance/odometer update dan kirim notifi
 ```env
 # Firebase Cloud Messaging
 FCM_CREDENTIALS_PATH=storage/app/firebase/service-account.json
-FCM_PROJECT_ID=mototracker-76e10
+FCM_PROJECT_ID=tringgo-76e10
 ```
 
 ### Service Account File

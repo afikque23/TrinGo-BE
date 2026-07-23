@@ -1,6 +1,6 @@
 @extends('layouts.sidebar')
 
-@section('title', 'Jenis Service - MotoTracker Admin')
+@section('title', 'Jenis Service - TringGo Admin')
 
 @section('page-title', 'Manajemen Jenis Service')
 

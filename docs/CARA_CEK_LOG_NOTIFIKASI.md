@@ -141,7 +141,7 @@ Pastikan di Flutter ada:
 
 ```dart
 const AndroidNotificationChannel tripChannel = AndroidNotificationChannel(
-  'mototracker_trip', // Harus sama dengan backend!
+  'tringgo_trip', // Harus sama dengan backend!
   'Trip Notifications',
   importance: Importance.high, // ← WAJIB HIGH/MAX untuk pop-up!
 );

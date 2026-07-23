@@ -2,7 +2,7 @@
 
 ## 📋 Overview
 
-Sistem manajemen konten dinamis untuk MotoTracker yang memungkinkan admin mengelola konten statis aplikasi mobile.
+Sistem manajemen konten dinamis untuk TringGo yang memungkinkan admin mengelola konten statis aplikasi mobile.
 
 ## 🚀 Quick Start
 
@@ -30,7 +30,7 @@ Ini akan membuat 6 sample content:
 - Syarat dan Ketentuan (terms)
 - Kebijakan Privasi (privacy)
 - Panduan Pengguna (guide)
-- Tentang MotoTracker (about)
+- Tentang TringGo (about)
 - FAQ (faq)
 - Cara Sistem Bekerja (system_info)
 
@@ -99,7 +99,7 @@ curl -X POST "http://localhost:8000/api/auth/login" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
   -d '{
-    "email": "admin@mototracker.com",
+    "email": "admin@tringgo.com",
     "password": "your_password"
   }'
 ```

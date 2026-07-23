@@ -1,6 +1,6 @@
 @extends('layouts.sidebar')
 
-@section('title', 'Konfigurasi Fuzzy - MotoTracker Admin')
+@section('title', 'Konfigurasi Fuzzy - TringGo Admin')
 
 @section('page-title', 'Fuzzy Logic')
 

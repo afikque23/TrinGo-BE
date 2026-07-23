@@ -437,7 +437,7 @@ class NotificationHandler {
 
     // Android notification details
     final androidDetails = AndroidNotificationDetails(
-      'mototracker_$categoryKey',
+      'tringgo_$categoryKey',
       categoryKey.toUpperCase(),
       channelDescription: 'Notifications for $categoryKey',
       importance: Importance.high,

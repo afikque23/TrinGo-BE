@@ -1,6 +1,6 @@
 @extends('layouts.sidebar')
 
-@section('title', 'Monitoring Tips Perawatan - MotoTracker')
+@section('title', 'Monitoring Tips Perawatan - TringGo')
 @section('page-title', 'Monitoring Tips Perawatan')
 
 @push('styles')

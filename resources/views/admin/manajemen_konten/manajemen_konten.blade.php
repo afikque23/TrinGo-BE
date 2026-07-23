@@ -1,6 +1,6 @@
 @extends('layouts.sidebar')
 
-@section('title', 'Manajemen Konten - MotoTracker')
+@section('title', 'Manajemen Konten - TringGo')
 @section('page-title', 'Manajemen Konten')
 
 @push('styles')
@@ -163,10 +163,10 @@
     
     getDescriptionByType(type) {
         const descriptions = {
-            'terms': 'Aturan penggunaan aplikasi MotoTracker',
+            'terms': 'Aturan penggunaan aplikasi TringGo',
             'privacy': 'Cara kami mengumpulkan dan melindungi data Anda',
             'guide': 'Tutorial lengkap penggunaan fitur aplikasi',
-            'about': 'Informasi aplikasi MotoTracker',
+            'about': 'Informasi aplikasi TringGo',
             'faq': 'Pertanyaan yang sering diajukan (FAQ)',
             'system_info': 'Transparansi algoritma dan logika sistem',
             'support': 'Pusat bantuan, kontak, dan dukungan pengguna'
@@ -223,14 +223,14 @@
         1: [
             {
                 id: 1,
-                title: 'Selamat Datang di MotoTracker',
-                items: ['Dengan menggunakan aplikasi MotoTracker, Anda menyatakan bahwa Anda telah membaca, memahami, dan menyetujui untuk terikat oleh Syarat dan Ketentuan ini.']
+                title: 'Selamat Datang di TringGo',
+                items: ['Dengan menggunakan aplikasi TringGo, Anda menyatakan bahwa Anda telah membaca, memahami, dan menyetujui untuk terikat oleh Syarat dan Ketentuan ini.']
             },
             {
                 id: 2,
                 title: '1. Penerimaan Ketentuan',
                 items: [
-                    'Dengan membuat akun atau menggunakan MotoTracker, Anda menyatakan bahwa:',
+                    'Dengan membuat akun atau menggunakan TringGo, Anda menyatakan bahwa:',
                     'Anda memiliki hak penuh untuk memiliki dan menggunakan kendaraan yang terdaftar',
                     'Anda memiliki kapasitas hukum untuk menyetujui perjanjian yang mengikat',
                     'Informasi yang Anda berikan adalah akurat dan lengkap',

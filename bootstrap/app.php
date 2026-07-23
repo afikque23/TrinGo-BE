@@ -26,14 +26,22 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: []);
     })
     ->withSchedule(function (Schedule $schedule) {
-        // Check service schedule reminders daily at 8 AM
+        // Check service schedule reminders daily at 07:00 AM (Sebelum aktivitas)
         $schedule->command('reminders:check-service-schedules')
-            ->dailyAt('08:00')
+            ->dailyAt('07:00')
             ->timezone('Asia/Jakarta');
         
-        // Also check every 6 hours for more frequent updates
+        $schedule->job(new \App\Jobs\CheckFuzzyWarningJob)
+            ->dailyAt('07:00')
+            ->timezone('Asia/Jakarta');
+        
+        // Also check at 17:00 PM (Setelah aktivitas/sore hari)
         $schedule->command('reminders:check-service-schedules')
-            ->everySixHours()
+            ->dailyAt('17:00')
+            ->timezone('Asia/Jakarta');
+            
+        $schedule->job(new \App\Jobs\CheckFuzzyWarningJob)
+            ->dailyAt('17:00')
             ->timezone('Asia/Jakarta');
     })
     ->withExceptions(function (Exceptions $exceptions) {

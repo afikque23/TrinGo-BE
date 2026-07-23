@@ -1,7 +1,7 @@
 {
     "info": {
         "name": "Content Management API",
-        "description": "API endpoints untuk Content Management System MotoTracker",
+        "description": "API endpoints untuk Content Management System TringGo",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "variable": [

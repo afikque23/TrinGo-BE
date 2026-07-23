@@ -22,7 +22,7 @@
 
 ## 🎯 Overview
 
-Sistem notifikasi dinamis MotoTracker mengirim notifikasi ke Flutter melalui:
+Sistem notifikasi dinamis TringGo mengirim notifikasi ke Flutter melalui:
 
 1. **Push Notification (FCM)** — pesan muncul di status bar meski app tertutup
 2. **In-App Notification** — disimpan di database, ditampilkan di halaman notifikasi
@@ -84,7 +84,7 @@ dependencies:
 1. Buka [Firebase Console](https://console.firebase.google.com/)
 2. Buat project baru atau gunakan yang sudah ada
 3. Tambahkan app Android:
-    - Package name: `com.yourapp.mototracker` (sesuaikan)
+    - Package name: `com.yourapp.tringgo` (sesuaikan)
     - Download `google-services.json` → letakkan di `android/app/`
 4. Tambahkan app iOS (opsional):
     - Download `GoogleService-Info.plist` → letakkan di `ios/Runner/`
@@ -119,7 +119,7 @@ Buat file `android/app/src/main/res/values/strings.xml`:
 
 ```xml
 <resources>
-    <string name="default_notification_channel_id">mototracker_default</string>
+    <string name="default_notification_channel_id">tringgo_default</string>
 </resources>
 ```
 
@@ -128,7 +128,7 @@ Di `AndroidManifest.xml`, tambahkan di dalam `<application>`:
 ```xml
 <meta-data
     android:name="com.google.firebase.messaging.default_notification_channel_id"
-    android:value="mototracker_default" />
+    android:value="tringgo_default" />
 
 <!-- Custom icon (opsional) -->
 <meta-data
@@ -656,7 +656,7 @@ class NotificationService {
     if (androidPlugin != null) {
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          'mototracker_service',
+          'tringgo_service',
           'Servis & Perawatan',
           description: 'Notifikasi pengingat servis kendaraan',
           importance: Importance.high,
@@ -664,7 +664,7 @@ class NotificationService {
       );
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          'mototracker_trip',
+          'tringgo_trip',
           'Perjalanan',
           description: 'Notifikasi terkait perjalanan',
           importance: Importance.defaultImportance,
@@ -672,7 +672,7 @@ class NotificationService {
       );
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          'mototracker_system',
+          'tringgo_system',
           'Sistem',
           description: 'Notifikasi sistem & update',
           importance: Importance.low,
@@ -710,7 +710,7 @@ class NotificationService {
     if (notification == null) return;
 
     final categoryKey = message.data['category_key'] ?? 'system';
-    final channelId = 'mototracker_$categoryKey';
+    final channelId = 'tringgo_$categoryKey';
 
     await _localNotifications.show(
       message.hashCode,
@@ -1106,7 +1106,7 @@ Saat Laravel mengirim push notification, Flutter akan terima data ini:
     "android": {
         "priority": "HIGH",
         "notification": {
-            "channel_id": "mototracker_service",
+            "channel_id": "tringgo_service",
             "sound": "default"
         }
     }
@@ -2107,5 +2107,5 @@ Variabel yang bisa digunakan di template pesan admin. Di Flutter, ini sudah otom
 | `{duration}`       | 45 menit         | Durasi perjalanan         |
 | `{avg_speed}`      | 35               | Kecepatan rata-rata       |
 | `{user_name}`      | Budi Santoso     | Nama pengguna             |
-| `{app_name}`       | MotoTracker      | Nama aplikasi             |
+| `{app_name}`       | TringGo      | Nama aplikasi             |
 | `{date_now}`       | 19 Feb 2026      | Tanggal sekarang          |
