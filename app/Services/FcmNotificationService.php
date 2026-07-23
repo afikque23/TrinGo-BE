@@ -70,11 +70,13 @@ class FcmNotificationService
                 return false;
             }
 
-            // Tambahkan category_key ke data
+            // Tambahkan title dan body ke dalam data agar menjadi Data-Only Message
+            $data['title'] = $title;
+            $data['body'] = $body;
             $data['category_key'] = $categoryKey;
             $data['click_action'] = 'NOTIFICATION_CLICK';
 
-            // Kirim request ke FCM
+            // Kirim request ke FCM (Hanya mengirim blok 'data', blok 'notification' dihapus)
             /** @var \Illuminate\Http\Client\Response $response */
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $accessToken,
@@ -82,25 +84,14 @@ class FcmNotificationService
             ])->post("https://fcm.googleapis.com/v1/projects/{$this->projectId}/messages:send", [
                 'message' => [
                     'token' => $deviceToken,
-                    'notification' => [
-                        'title' => $title,
-                        'body' => $body,
-                    ],
                     'data' => array_map('strval', $data), // FCM requires all data values to be strings
                     'android' => [
-                        // Set HIGH priority untuk high/critical agar muncul heads-up notification
                         'priority' => in_array($priority, ['high', 'critical']) ? 'HIGH' : 'NORMAL',
-                        'notification' => [
-                            'channel_id' => 'tringgo_' . $categoryKey,
-                            'sound' => 'default',
-                            'notification_priority' => $priority === 'critical' ? 'PRIORITY_MAX' : 'PRIORITY_HIGH',
-                        ],
                     ],
                     'apns' => [
                         'payload' => [
                             'aps' => [
-                                'sound' => 'default',
-                                'badge' => 1,
+                                'content-available' => 1,
                             ],
                         ],
                     ],

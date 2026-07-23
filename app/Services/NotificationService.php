@@ -192,6 +192,19 @@ class NotificationService
     {
         // Buat variabel contoh untuk preview
         $sampleVariables = $this->getSampleVariables();
+        
+        // [MODIFIKASI] Gunakan data asli user dan kendaraan milik user jika ada
+        $sampleVariables['user_name'] = $admin->name ?? $sampleVariables['user_name'];
+        
+        $vehicle = \App\Models\Vehicle::where('user_id', $admin->id)->first();
+        if ($vehicle) {
+            $vehicleName = $vehicle->title ?? trim(($vehicle->make ?? '') . ' ' . ($vehicle->model ?? ''));
+            $sampleVariables['vehicle_name'] = $vehicleName ?: 'Motor Anda';
+            $sampleVariables['vehicle_plate'] = $vehicle->plate_number ?? $sampleVariables['vehicle_plate'];
+            $sampleVariables['vehicle_type'] = $vehicle->tipe_motor ?? $sampleVariables['vehicle_type'];
+            $sampleVariables['current_km'] = number_format($vehicle->odometer ?? 0);
+            $sampleVariables['vehicle_year'] = (string) ($vehicle->year ?? $sampleVariables['vehicle_year']);
+        }
 
         $message = $this->parseTemplate($template->message_template, $sampleVariables);
         $title = "[TEST] " . $this->generateTitle($template, $sampleVariables);

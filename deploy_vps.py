@@ -30,7 +30,16 @@ files_to_upload = [
     # Fuzzy Simulator (Pengujian BAB 4)
     "app/Http/Controllers/Admin/FuzzyLogicController.php",
     "resources/views/admin/fuzzy/simulator.blade.php",
-    "routes/web.php"
+    "routes/web.php",
+    # Fuzzy Notification Updates
+    "bootstrap/app.php",
+    "app/Jobs/CheckFuzzyWarningJob.php",
+    "app/Events/VehicleStatusChecked.php",
+    "app/Listeners/CheckCriticalFuzzyStatusListener.php",
+    "app/Http/Controllers/TripController.php",
+    "database/seeders/NotificationTemplateSeederUpdate.php",
+    "storage/app/firebase/service-account.json",
+    "app/Services/NotificationService.php"
 ]
 
 local_base = "c:/laragon/www/motorcycle_management"
@@ -38,10 +47,14 @@ remote_base = "/var/www/motorcycle_management"
 
 try:
     print(f"Connecting to {hostname}...")
-    transport = paramiko.Transport((hostname, 22))
-    transport.connect(username=username, password=password)
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    try:
+        client.connect(hostname, username=username, password=password, disabled_algorithms={'pubkeys': ['rsa-sha2-256', 'rsa-sha2-512']})
+    except TypeError:
+        client.connect(hostname, username=username, password=password)
     
-    sftp = paramiko.SFTPClient.from_transport(transport)
+    sftp = client.open_sftp()
     
     for file_path in files_to_upload:
         local_path = os.path.join(local_base, file_path)
@@ -73,7 +86,6 @@ try:
     if err: print("--- STDERR ---\n", err)
     
     client.close()
-    transport.close()
     print("Deployment completed!")
 
 except Exception as e:
