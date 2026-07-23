@@ -60,7 +60,7 @@ Route::prefix('auth')->name('api.auth.')->group(function () {
 Route::prefix('public')->group(function () {
     Route::get('/contents', [ContentController::class, 'publicIndex']);
     Route::get('/contents/{type}', [ContentController::class, 'getByType']);
-    
+
     // Public Tips - Browse without authentication
     Route::get('/tips', [TipsController::class, 'index']);
     Route::get('/tips/{tip}', [TipsController::class, 'show']);
@@ -85,7 +85,7 @@ Route::middleware(['auth:sanctum,web'])->group(function () {
 
     // Master Data - Reminder Options
     Route::get('/reminder-options', [ReminderOptionController::class, 'index']);
-    
+
     // Vehicle Management
     Route::get('/vehicles/primary', [VehicleController::class, 'getPrimary']);
     Route::get('/vehicles/primary/service-metrics', [VehicleController::class, 'getServiceMetrics']);
@@ -98,6 +98,7 @@ Route::middleware(['auth:sanctum,web'])->group(function () {
         Route::get('/home-insight', [RecommendationController::class, 'homeInsight']);
         Route::get('/service-recommendation', [RecommendationController::class, 'serviceRecommendation']);
         Route::get('/scores', [RecommendationController::class, 'scores']);
+        Route::post('/fuzzy-service-complete', [RecommendationController::class, 'markServiceComplete']);
 
         // Tracking endpoints
         Route::post('/tracking/start', [\App\Http\Controllers\Api\TrackingController::class, 'start']);
@@ -204,3 +205,5 @@ Route::get('/health', function () {
         'timestamp' => now(),
     ]);
 });
+
+Route::get('/debug-configs', function() { return \App\Models\ComponentConfig::get(['name', 'reset_interval']); });

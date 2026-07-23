@@ -73,6 +73,26 @@ class FuzzyLogicController extends Controller
             'active_vars'    => 'required|array|min:1',
         ]);
 
+        $ruleVars = $component->fuzzyRules()
+            ->get(['var1', 'var2'])
+            ->flatMap(fn ($r) => [$r->var1, $r->var2])
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        $missingRuleVars = collect($validated['active_vars'])
+            ->filter(fn ($var) => !in_array($var, $ruleVars, true))
+            ->values()
+            ->all();
+
+        if (!empty($missingRuleVars)) {
+            return response()->json([
+                'message' => 'Variabel aktif harus dipakai minimal pada satu rule.',
+                'missing_rule_vars' => $missingRuleVars,
+            ], 422);
+        }
+
         $old = $component->only(['warn', 'critical', 'reset_interval', 'active_vars']);
         $component->update($validated);
 
@@ -89,6 +109,42 @@ class FuzzyLogicController extends Controller
             'med_a'    => 'required|numeric', 'med_b'    => 'required|numeric', 'med_c'    => 'required|numeric',
             'high_a'   => 'required|numeric', 'high_b'   => 'required|numeric', 'high_c'   => 'required|numeric',
         ]);
+
+        $lowA = (float) $validated['low_a'];
+        $lowB = (float) $validated['low_b'];
+        $lowC = (float) $validated['low_c'];
+        $medA = (float) $validated['med_a'];
+        $medB = (float) $validated['med_b'];
+        $medC = (float) $validated['med_c'];
+        $highA = (float) $validated['high_a'];
+        $highB = (float) $validated['high_b'];
+        $highC = (float) $validated['high_c'];
+
+        if (!($lowA <= $lowB && $lowB <= $lowC)) {
+            return response()->json([
+                'message' => 'Parameter LOW tidak valid. Gunakan urutan low_a <= low_b <= low_c.',
+            ], 422);
+        }
+
+        if (!($medA <= $medB && $medB <= $medC)) {
+            return response()->json([
+                'message' => 'Parameter MEDIUM tidak valid. Gunakan urutan med_a <= med_b <= med_c.',
+            ], 422);
+        }
+
+        $isHighOpenEnded = $highC === 999.0;
+        $isHighOrdered = ($highA <= $highB) && ($highB <= $highC);
+        if (!($isHighOpenEnded || $isHighOrdered)) {
+            return response()->json([
+                'message' => 'Parameter HIGH tidak valid. Gunakan high_a <= high_b <= high_c atau high_c = 999 untuk batas atas terbuka.',
+            ], 422);
+        }
+
+        if (!($lowB <= $medB && $medB <= $highB)) {
+            return response()->json([
+                'message' => 'Urutan batas fuzzy tidak konsisten. Gunakan low_b <= med_b <= high_b.',
+            ], 422);
+        }
 
         $mf = FuzzyVariable::updateOrCreate(
             ['component_config_id' => $component->id, 'var_key' => $validated['var_key']],

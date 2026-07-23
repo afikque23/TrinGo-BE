@@ -3,10 +3,13 @@
 namespace App\Services;
 
 use App\Models\AiRecommendationCache;
+use App\Models\ComponentConfig;
+use App\Models\MotorType;
 use App\Models\Vehicle;
 use App\Services\Fuzzy\FuzzyEngine;
 use App\Services\Fuzzy\FuzzyEngineV2;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class RecommendationService
 {
@@ -127,12 +130,24 @@ class RecommendationService
             }
         }
 
+        $enriched = $this->enrichSectionsWithComponentProgress(
+            $sections,
+            $vehicle,
+            $inputs,
+            $statuses,
+            $motorType,
+        );
+        $sections = $enriched['sections'] ?? $sections;
+        $effectiveStatuses = $enriched['component_statuses'] ?? $statuses;
+        $monitoringSummary = $this->buildMonitoringSummary($effectiveStatuses, $motorType);
+
         return [
             'vehicle_id' => $vehicle->id,
             'motor_type' => $motorType,
             'inputs' => $inputs,
             'component_scores' => $this->roundScores($scores),
-            'component_statuses' => $statuses,
+            'component_statuses' => $effectiveStatuses,
+            'monitoring_summary' => $monitoringSummary,
             'thresholds' => $thresholds,
             'sections' => $sections,
             'used_cache' => $usedCache,
@@ -204,7 +219,7 @@ class RecommendationService
 
         $totalDistanceKm = (float) ($trips->sum('distance_meters') / 1000);
         $intensityKmPerDay = $totalDistanceKm > 0 ? round($totalDistanceKm / 30, 1) : 0.0;
-        
+
         $elevationGainM = (float) $trips->sum('elevation_gain');
 
         $weightedSpeedSum = 0.0;
@@ -273,6 +288,393 @@ class RecommendationService
         }
         ksort($out);
         return $out;
+    }
+
+    private function buildMonitoringSummary(array $statuses, string $motorTypeSlug): array
+    {
+        $critical = 0;
+        $warning = 0;
+        $normal = 0;
+
+        foreach ($statuses as $status) {
+            $normalized = strtolower((string) $status);
+            if ($normalized === 'critical') {
+                $critical++;
+            } elseif ($normalized === 'warning') {
+                $warning++;
+            } else {
+                $normal++;
+            }
+        }
+
+        $configuredTotal = $this->loadActiveComponentsForMotorType($motorTypeSlug)->count();
+        $statusTotal = $critical + $warning + $normal;
+
+        return [
+            'total' => max($configuredTotal, $statusTotal),
+            'critical' => $critical,
+            'warning' => $warning,
+            'normal' => $normal,
+        ];
+    }
+
+    private function enrichSectionsWithComponentProgress(
+        ?array $sections,
+        Vehicle $vehicle,
+        array $inputs,
+        array $statuses,
+        string $motorTypeSlug,
+    ): array {
+        $sections = is_array($sections) ? $sections : [];
+        $configuredComponents = $this->loadActiveComponentsForMotorType($motorTypeSlug);
+        if ($configuredComponents->isEmpty()) {
+            return [
+                'sections' => $sections,
+                'component_statuses' => $statuses,
+            ];
+        }
+
+        $currentOdometer = (int) ($vehicle->odometer ?? 0);
+        $defaultDistanceSinceServiceKm = (float) max(0, $currentOdometer);
+        $defaultDurationSinceServiceDays = $vehicle->created_at
+            ? (float) max(0, $vehicle->created_at->diffInDays(now()))
+            : (float) ($inputs['duration_since_service_days'] ?? 0);
+
+        $rawRecommendations = $sections['rekomendasi_komponen'] ?? [];
+        $recommendations = is_array($rawRecommendations) ? $rawRecommendations : [];
+
+        $existingByName = [];
+        foreach ($recommendations as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $name = strtolower(trim((string) ($item['komponen'] ?? '')));
+            if ($name === '') {
+                continue;
+            }
+            $existingByName[$name] = $item;
+        }
+
+        $histories = $vehicle->serviceHistories()
+            ->orderByDesc('performed_at')
+            ->orderByDesc('id')
+            ->get(['id', 'service_type', 'odometer', 'performed_at']);
+
+        $output = [];
+        $effectiveStatuses = [];
+        foreach ($configuredComponents as $componentConfig) {
+            $componentName = trim((string) $componentConfig->name);
+            if ($componentName === '') {
+                continue;
+            }
+
+            $existing = $existingByName[strtolower($componentName)] ?? [];
+            $status = $this->resolveComponentStatus($statuses, $componentName, (int) $componentConfig->id);
+
+            $matchedHistory = $this->matchHistoryForComponent($histories, $componentName);
+            $targetKm = (float) ($componentConfig->critical ?? 0);
+
+            $baselineKm = $matchedHistory?->odometer;
+            $distanceFromScheduleKm = $baselineKm !== null
+                ? max(0.0, (float) ($currentOdometer - (int) $baselineKm))
+                : $defaultDistanceSinceServiceKm;
+
+            $durationFromScheduleDays = $matchedHistory?->performed_at
+                ? (float) max(0, $matchedHistory->performed_at->diffInDays(now()))
+                : $defaultDurationSinceServiceDays;
+
+            $componentInputs = $inputs;
+            $componentInputs['distance_since_service_km'] = $distanceFromScheduleKm;
+            $componentInputs['duration_since_service_days'] = $durationFromScheduleDays;
+
+            $requiredVariables = $this->buildRequiredVariables($componentConfig, $componentInputs);
+            $thresholdStatus = $this->resolveStatusFromRequiredVariables($requiredVariables);
+            $effectiveStatus = $thresholdStatus ?? $status;
+
+            $remainingKm = $targetKm > 0
+                ? max(0.0, $targetKm - $distanceFromScheduleKm)
+                : null;
+
+            $item = [
+                'komponen' => $componentName,
+                'prioritas' => $effectiveStatus,
+                'saran' => $existing['saran'] ?? $this->defaultSuggestionForStatus($effectiveStatus),
+                'estimasi_waktu' => $existing['estimasi_waktu'] ?? '-',
+                'active_vars' => $componentConfig->active_vars ?? [],
+                'required_variables' => $requiredVariables,
+                'component_config_id' => (int) $componentConfig->id,
+                'schedule_id' => null,
+                'jarak_sejak_servis_km' => round($distanceFromScheduleKm, 1),
+                'hingga_servis_berikutnya_km' => $remainingKm !== null ? round($remainingKm, 1) : null,
+                'target_servis_km' => $targetKm > 0 ? round($targetKm, 1) : null,
+                'status_fuzzy' => $effectiveStatus,
+                'is_service_due' => $remainingKm !== null ? $remainingKm <= 0.0 : false,
+            ];
+
+            $output[] = array_merge($existing, $item);
+
+            $statusKey = $this->componentKeyFromName($componentName, (int) $componentConfig->id);
+            $effectiveStatuses[$statusKey] = $effectiveStatus;
+        }
+
+        $sections['rekomendasi_komponen'] = $output;
+
+        return [
+            'sections' => $sections,
+            'component_statuses' => $effectiveStatuses,
+        ];
+    }
+
+    private function resolveStatusFromRequiredVariables(array $requiredVariables): ?string
+    {
+        if (empty($requiredVariables)) {
+            return null;
+        }
+
+        $hasWarning = false;
+        foreach ($requiredVariables as $variable) {
+            $status = strtolower((string) ($variable['status_by_threshold'] ?? ''));
+            if ($status === 'critical') {
+                return 'critical';
+            }
+            if ($status === 'warning') {
+                $hasWarning = true;
+            }
+        }
+
+        return $hasWarning ? 'warning' : 'normal';
+    }
+
+    private function loadActiveComponentsForMotorType(string $motorTypeSlug)
+    {
+        $motorType = MotorType::query()
+            ->where('slug', strtolower(trim($motorTypeSlug)))
+            ->with([
+                'componentConfigs' => function ($q) {
+                    $q->where('is_active', true)
+                        ->with(['fuzzyVariables'])
+                        ->orderBy('name');
+                },
+            ])
+            ->first();
+
+        return $motorType?->componentConfigs ?? collect();
+    }
+
+    private function buildRequiredVariables(ComponentConfig $componentConfig, array $inputs): array
+    {
+        $required = [];
+        $fuzzyVarByKey = $componentConfig->fuzzyVariables->keyBy('var_key');
+
+        foreach (($componentConfig->active_vars ?? []) as $activeVar) {
+            $definition = $this->resolveVariableDefinition((string) $activeVar);
+            $valueKey = $definition['value_key'];
+            $value = $inputs[$valueKey] ?? $inputs[(string) $activeVar] ?? null;
+            $numericValue = is_numeric($value) ? (float) $value : null;
+
+            $fuzzyVar = $fuzzyVarByKey->get((string) $activeVar);
+            $warningThreshold = $fuzzyVar?->med_b;
+            $criticalThreshold = $fuzzyVar?->high_b;
+
+            $toWarning = ($numericValue !== null && $warningThreshold !== null)
+                ? round((float) $warningThreshold - $numericValue, 1)
+                : null;
+            $toCritical = ($numericValue !== null && $criticalThreshold !== null)
+                ? round((float) $criticalThreshold - $numericValue, 1)
+                : null;
+
+            $variableStatus = 'unknown';
+            if ($numericValue !== null) {
+                if ($criticalThreshold !== null && $numericValue >= (float) $criticalThreshold) {
+                    $variableStatus = 'critical';
+                } elseif ($warningThreshold !== null && $numericValue >= (float) $warningThreshold) {
+                    $variableStatus = 'warning';
+                } else {
+                    $variableStatus = 'normal';
+                }
+            }
+
+            $required[] = [
+                'key' => (string) $activeVar,
+                'label' => $definition['label'],
+                'unit' => $definition['unit'],
+                'value' => $numericValue ?? $value,
+                'formatted_value' => $this->formatVariableValue($value, $definition['unit']),
+                'warning_threshold' => $warningThreshold !== null ? (float) $warningThreshold : null,
+                'critical_threshold' => $criticalThreshold !== null ? (float) $criticalThreshold : null,
+                'formatted_warning_threshold' => $this->formatVariableValue($warningThreshold, $definition['unit']),
+                'formatted_critical_threshold' => $this->formatVariableValue($criticalThreshold, $definition['unit']),
+                'to_warning' => $toWarning,
+                'to_critical' => $toCritical,
+                'formatted_to_warning' => $this->formatDeltaValue($toWarning, $definition['unit']),
+                'formatted_to_critical' => $this->formatDeltaValue($toCritical, $definition['unit']),
+                'status_by_threshold' => $variableStatus,
+            ];
+        }
+
+        return $required;
+    }
+
+    private function formatDeltaValue(?float $delta, ?string $unit): string
+    {
+        if ($delta === null) {
+            return '-';
+        }
+
+        $abs = abs($delta);
+        $precision = abs($abs - round($abs)) < 0.05 ? 0 : 1;
+        $formatted = number_format($abs, $precision, '.', ',');
+        $suffix = $unit ? (' ' . $unit) : '';
+
+        if ($delta > 0) {
+            return 'Sisa ' . $formatted . $suffix . ' menuju batas';
+        }
+
+        if ($delta < 0) {
+            return 'Melewati batas ' . $formatted . $suffix;
+        }
+
+        return 'Pas batas';
+    }
+
+    private function resolveVariableDefinition(string $rawKey): array
+    {
+        $normalized = strtolower(trim($rawKey));
+
+        return match ($normalized) {
+            'jarak', 'jarak_tempuh', 'mileage', 'distance_since_service_km', 'distance' => [
+                'label' => 'Jarak Tempuh Sejak Servis',
+                'unit' => 'km',
+                'value_key' => 'distance_since_service_km',
+            ],
+            'durasi', 'duration_since_service_days', 'days_since_service' => [
+                'label' => 'Durasi Sejak Servis',
+                'unit' => 'hari',
+                'value_key' => 'duration_since_service_days',
+            ],
+            'kecepatan', 'avg_speed_kph', 'speed' => [
+                'label' => 'Kecepatan Rata-rata Berkendara',
+                'unit' => 'km/jam',
+                'value_key' => 'avg_speed_kph',
+            ],
+            'intensitas', 'intensity_km_per_day' => [
+                'label' => 'Intensitas Pemakaian',
+                'unit' => 'km/hari',
+                'value_key' => 'intensity_km_per_day',
+            ],
+            'suhu', 'ambient_temp_c', 'temperature' => [
+                'label' => 'Suhu Lingkungan',
+                'unit' => '°C',
+                'value_key' => 'ambient_temp_c',
+            ],
+            'ketinggian', 'elevation_gain_m', 'elevation' => [
+                'label' => 'Kondisi Tanjakan (Elevasi)',
+                'unit' => 'm',
+                'value_key' => 'elevation_gain_m',
+            ],
+            'odometer', 'odo' => [
+                'label' => 'Odometer',
+                'unit' => 'km',
+                'value_key' => 'odometer',
+            ],
+            default => [
+                'label' => Str::headline(str_replace(['_', '-'], ' ', $normalized ?: $rawKey)),
+                'unit' => null,
+                'value_key' => $normalized ?: $rawKey,
+            ],
+        };
+    }
+
+    private function formatVariableValue(mixed $value, ?string $unit): string
+    {
+        if ($value === null || $value === '') {
+            return '-';
+        }
+
+        if (!is_numeric($value)) {
+            return (string) $value;
+        }
+
+        $number = (float) $value;
+        $precision = abs($number - round($number)) < 0.05 ? 0 : 1;
+        $formatted = number_format($number, $precision, '.', ',');
+
+        return $unit ? ($formatted . ' ' . $unit) : $formatted;
+    }
+
+    private function resolveComponentStatus(array $statuses, string $componentName, int $fallbackId): string
+    {
+        $candidates = [
+            $this->componentKeyFromName($componentName, $fallbackId),
+            strtolower(trim($componentName)),
+            Str::slug($componentName, '_'),
+        ];
+
+        foreach ($candidates as $key) {
+            if ($key !== '' && array_key_exists($key, $statuses)) {
+                return strtolower((string) $statuses[$key]);
+            }
+        }
+
+        return 'normal';
+    }
+
+    private function componentKeyFromName(string $name, int $fallbackId): string
+    {
+        $name = trim($name);
+
+        $map = [
+            'Oli Mesin' => 'engine_oil',
+            'Ban' => 'tires',
+            'Filter Udara' => 'air_filter',
+            'Busi' => 'spark_plug',
+            'Aki' => 'battery',
+            'Rem' => 'brake',
+            'CVT/Belt' => 'cvt_belt',
+            'CVT / Belt' => 'cvt_belt',
+            'Roller CVT' => 'cvt_roller',
+            'Oli Gardan' => 'final_drive_oil',
+            'Rantai' => 'chain',
+            'Kopling' => 'clutch',
+            'Kampas Kopling' => 'clutch',
+        ];
+
+        if ($name !== '' && array_key_exists($name, $map)) {
+            return $map[$name];
+        }
+
+        $slug = Str::slug($name, '_');
+        return $slug !== '' ? $slug : ('component_' . $fallbackId);
+    }
+
+    private function matchHistoryForComponent($histories, string $componentName)
+    {
+        $component = strtolower(trim($componentName));
+        if ($component === '') {
+            return null;
+        }
+
+        foreach ($histories as $history) {
+            $serviceType = strtolower(trim((string) ($history->service_type ?? '')));
+            if ($serviceType === '') {
+                continue;
+            }
+
+            if (str_contains($serviceType, $component) || str_contains($component, $serviceType)) {
+                return $history;
+            }
+        }
+
+        return null;
+    }
+
+    private function defaultSuggestionForStatus(string $status): string
+    {
+        return match ($status) {
+            'critical' => 'Segera lakukan servis pada komponen ini untuk mencegah kerusakan lanjutan.',
+            'warning' => 'Jadwalkan pemeriksaan komponen ini dalam waktu dekat.',
+            default => 'Lanjutkan pemantauan berkala pada komponen ini.',
+        };
     }
 
 }
