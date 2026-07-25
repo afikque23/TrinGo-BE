@@ -25,7 +25,7 @@ class UpdateVehicleRequest extends FormRequest
         $vehicleId = $vehicleParam instanceof Vehicle ? $vehicleParam->getKey() : $vehicleParam;
         
         return [
-            'device_id' => ['nullable', 'string', 'max:128', Rule::unique('vehicles', 'device_id')->ignore($vehicleId)],
+            'device_id' => ['nullable', 'string', 'max:128', Rule::unique('vehicles', 'device_id')->ignore($vehicleId)->whereNull('deleted_at')],
             'title' => ['sometimes', 'required', 'string', 'max:200'],
             'make' => ['nullable', 'string', 'max:100'],
             'model' => ['nullable', 'string', 'max:100'],

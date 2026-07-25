@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreVehicleRequest extends FormRequest
 {
@@ -20,7 +21,7 @@ class StoreVehicleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'device_id' => ['nullable', 'string', 'max:128', 'unique:vehicles,device_id'],
+            'device_id' => ['nullable', 'string', 'max:128', Rule::unique('vehicles', 'device_id')->whereNull('deleted_at')],
             'title' => ['required', 'string', 'max:200'],
             'make' => ['nullable', 'string', 'max:100'],
             'model' => ['nullable', 'string', 'max:100'],
