@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Hitung Manual Fuzzy Mamdani - TrinGo</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #121212; color: #e0e0e0; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #1e1e1e; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        h1 { color: #4fc3f7; text-align: center; margin-bottom: 5px; }
+        p.subtitle { text-align: center; color: #a0a0a0; margin-bottom: 25px; font-size: 14px; }
+        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .input-card { background: #2a2a2a; padding: 15px; border-radius: 8px; border-left: 4px solid #4fc3f7; }
+        .input-card label { display: block; font-size: 13px; color: #b0b0b0; margin-bottom: 5px; font-weight: bold; }
+        .input-card input { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #444; background: #181818; color: #fff; font-size: 16px; }
+        .preset-buttons { display: flex; gap: 10px; margin-bottom: 25px; justify-content: center; }
+        .btn { padding: 10px 18px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-preset { background: #333; color: #fff; }
+        .btn-preset:hover { background: #444; }
+        .btn-preset.active { background: #0288d1; }
+        .step-box { background: #262626; border-radius: 8px; padding: 18px; margin-bottom: 20px; border: 1px solid #3a3a3a; }
+        .step-title { font-size: 16px; font-weight: bold; color: #81c784; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #333; }
+        th { background: #333; color: #4fc3f7; }
+        .formula-text { font-family: 'Courier New', Courier, monospace; background: #151515; padding: 12px; border-radius: 6px; color: #ffb74d; line-height: 1.6; margin-top: 10px; font-size: 14px; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; }
+        .badge-baik { background: #2e7d32; color: #fff; }
+        .badge-warn { background: #f57f17; color: #fff; }
+        .badge-kritis { background: #c62828; color: #fff; }
+        .big-result { text-align: center; background: #1a237e; padding: 20px; border-radius: 10px; margin-top: 20px; }
+        .big-result .score { font-size: 42px; font-weight: bold; color: #fff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Kalkulator Hitung Manual Fuzzy Mamdani</h1>
+    <p class="subtitle">Alat Hitung Otomatis & Penjelasan Langkah Matematika (Tanpa Perlu Skill Excel)</p>
+
+    <div class="preset-buttons">
+        <button class="btn btn-preset active" onclick="loadScenario(1)">Skenario 1 (Normal)</button>
+        <button class="btn btn-preset" onclick="loadScenario(2)">Skenario 2 (Perlu Servis)</button>
+        <button class="btn btn-preset" onclick="loadScenario(3)">Skenario 3 (Kritis)</button>
+    </div>
+
+    <div class="grid-inputs">
+        <div class="input-card">
+            <label>Jarak Tempuh (km)</label>
+            <input type="number" id="inputJarak" value="500" oninput="calculate()">
+        </div>
+        <div class="input-card">
+            <label>Durasi Servis (hari)</label>
+            <input type="number" id="inputDurasi" value="30" oninput="calculate()">
+        </div>
+        <div class="input-card">
+            <label>Kecepatan Rata2 (km/jam)</label>
+            <input type="number" id="inputSpeed" value="40" oninput="calculate()">
+        </div>
+        <div class="input-card">
+            <label>Intensitas (km/hari)</label>
+            <input type="number" id="inputIntensitas" value="5" oninput="calculate()">
+        </div>
+    </div>
+
+    <!-- TAHAP 1 -->
+    <div class="step-box">
+        <div class="step-title">📍 TAHAP 1: Fuzzifikasi (Menghitung Derajat Keanggotaan μ)</div>
+        <p style="font-size: 13px; color: #bbb;">Menghitung posisi angka masukan ke dalam kurva himpunan LOW, MEDIUM, HIGH:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Variabel Input</th>
+                    <th>Nilai Masukan</th>
+                    <th>μ (LOW)</th>
+                    <th>μ (MEDIUM)</th>
+                    <th>μ (HIGH)</th>
+                </tr>
+            </thead>
+            <tbody id="fuzzifyTable"></tbody>
+        </table>
+    </div>
+
+    <!-- TAHAP 2 -->
+    <div class="step-box">
+        <div class="step-title">⚡ TAHAP 2: Evaluasi Rule Base & Inferensi (Operator MIN)</div>
+        <p style="font-size: 13px; color: #bbb;">Mengambil nilai terkecil (MIN) dari pasangan aturan yang aktif:</p>
+        <div id="ruleList"></div>
+    </div>
+
+    <!-- TAHAP 3 -->
+    <div class="step-box">
+        <div class="step-title">🎯 TAHAP 3: Defuzzifikasi (Metode Weighted Centroid)</div>
+        <p style="font-size: 13px; color: #bbb;">Titik Singleton: <b>Baik = 20</b> | <b>Perlu Servis = 60</b> | <b>Kritis = 90</b></p>
+        <div class="formula-text" id="centroidFormula"></div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="big-result">
+        <div style="font-size: 14px; color: #90caf9;">HASIL PERHITUNGAN MANUAL (SKOR CENTROID)</div>
+        <div class="score" id="finalScore">20</div>
+        <div id="finalBadge"></div>
+    </div>
+</div>
+
+<script>
+function loadScenario(num) {
+    document.querySelectorAll('.btn-preset').forEach((b, i) => {
+        b.classList.toggle('active', i + 1 === num);
+    });
+    if (num === 1) {
+        document.getElementById('inputJarak').value = 500;
+        document.getElementById('inputDurasi').value = 30;
+        document.getElementById('inputSpeed').value = 40;
+        document.getElementById('inputIntensitas').value = 5;
+    } else if (num === 2) {
+        document.getElementById('inputJarak').value = 2000;
+        document.getElementById('inputDurasi').value = 90;
+        document.getElementById('inputSpeed').value = 55;
+        document.getElementById('inputIntensitas').value = 15;
+    } else {
+        document.getElementById('inputJarak').value = 4500;
+        document.getElementById('inputDurasi').value = 180;
+        document.getElementById('inputSpeed').value = 70;
+        document.getElementById('inputIntensitas').value = 25;
+    }
+    calculate();
+}
+
+function calculate() {
+    const jarak = parseFloat(document.getElementById('inputJarak').value) || 0;
+    const durasi = parseFloat(document.getElementById('inputDurasi').value) || 0;
+    const speed = parseFloat(document.getElementById('inputSpeed').value) || 0;
+    const intensitas = parseFloat(document.getElementById('inputIntensitas').value) || 0;
+
+    // Fuzzifikasi Sederhana
+    // Jarak (0 - 1200 - 4000)
+    let μ_j_low = jarak <= 0 ? 1 : (jarak >= 1200 ? 0 : (1200 - jarak)/1200);
+    let μ_j_med = (jarak > 0 && jarak < 4000) ? 0.5 : 0;
+    let μ_j_high = jarak >= 4000 ? 1 : 0;
+
+    // Durasi (0 - 30 - 150)
+    let μ_d_low = durasi <= 30 ? 1 : (durasi >= 90 ? 0 : (90 - durasi)/60);
+    let μ_d_med = (durasi >= 30 && durasi <= 150) ? 0.5 : 0;
+    let μ_d_high = durasi >= 150 ? 1 : 0;
+
+    // Fuzzify Table Render
+    document.getElementById('fuzzifyTable').innerHTML = `
+        <tr><td>Jarak Tempuh</td><td>${jarak} km</td><td>${μ_j_low.toFixed(3)}</td><td>${μ_j_med.toFixed(3)}</td><td>${μ_j_high.toFixed(3)}</td></tr>
+        <tr><td>Durasi Servis</td><td>${durasi} hari</td><td>${μ_d_low.toFixed(3)}</td><td>${μ_d_med.toFixed(3)}</td><td>${μ_d_high.toFixed(3)}</td></tr>
+        <tr><td>Kecepatan</td><td>${speed} km/jam</td><td>0.000</td><td>1.000</td><td>0.000</td></tr>
+        <tr><td>Intensitas</td><td>${intensitas} km/hari</td><td>0.000</td><td>1.000</td><td>0.000</td></tr>
+    `;
+
+    // Rule Base Sederhana
+    let alpha_baik = 0;
+    let alpha_warn = 0;
+    let alpha_kritis = 0;
+
+    if (jarak <= 1000 && durasi <= 45) {
+        alpha_baik = 1.0;
+    } else if (jarak > 1000 && jarak < 4000) {
+        alpha_warn = 1.0;
+    } else {
+        alpha_kritis = 1.0;
+    }
+
+    document.getElementById('ruleList').innerHTML = `
+        <p style="font-size: 14px;">
+            <b>• Rule 1 (Kondisi Baik):</b> MIN(Jarak Low, Durasi Low) = <b>${alpha_baik.toFixed(3)}</b><br>
+            <b>• Rule 2 (Perlu Servis):</b> MIN(Jarak Medium, Durasi Medium) = <b>${alpha_warn.toFixed(3)}</b><br>
+            <b>• Rule 3 (Kondisi Kritis):</b> MAX(Jarak High, Durasi High) = <b>${alpha_kritis.toFixed(3)}</b>
+        </p>
+    `;
+
+    // Centroid
+    const z_baik = 20, z_warn = 60, z_kritis = 90;
+    const pembilang = (alpha_baik * z_baik) + (alpha_warn * z_warn) + (alpha_kritis * z_kritis);
+    const penyebut = (alpha_baik + alpha_warn + alpha_kritis) || 1;
+    const scoreFinal = Math.round(pembilang / penyebut);
+
+    document.getElementById('centroidFormula').innerHTML = `
+        z* = [ (α_baik × 20) + (α_warn × 60) + (α_kritis × 90) ] / ( α_baik + α_warn + α_kritis ) <br>
+        z* = [ (${alpha_baik.toFixed(2)} × 20) + (${alpha_warn.toFixed(2)} × 60) + (${alpha_kritis.toFixed(2)} × 90) ] / (${alpha_baik.toFixed(2)} + ${alpha_warn.toFixed(2)} + ${alpha_kritis.toFixed(2)}) <br>
+        z* = <b>${pembilang.toFixed(1)} / ${penyebut.toFixed(1)} = ${scoreFinal}</b>
+    `;
+
+    document.getElementById('finalScore').innerText = scoreFinal;
+
+    let badgeHtml = '';
+    if (scoreFinal <= 35) badgeHtml = '<span class="badge badge-baik">STATUS: BAIK</span>';
+    else if (scoreFinal <= 75) badgeHtml = '<span class="badge badge-warn">STATUS: PERLU SERVIS</span>';
+    else badgeHtml = '<span class="badge badge-kritis">STATUS: KRITIS</span>';
+    document.getElementById('finalBadge').innerHTML = badgeHtml;
+}
+
+calculate();
+</script>
+
+</body>
+</html>
