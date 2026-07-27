@@ -21,7 +21,15 @@ class StoreVehicleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'device_id' => ['nullable', 'string', 'max:128', Rule::unique('vehicles', 'device_id')->whereNull('deleted_at')],
+            // device_id boleh dipakai lebih dari 1 motor dalam akun yang SAMA,
+            // tetapi tidak boleh dipakai akun LAIN.
+            'device_id' => [
+                'nullable',
+                'string',
+                'max:128',
+                Rule::unique('vehicles', 'device_id')
+                    ->where(fn ($query) => $query->where('user_id', '!=', auth()->id())),
+            ],
             'title' => ['required', 'string', 'max:200'],
             'make' => ['nullable', 'string', 'max:100'],
             'model' => ['nullable', 'string', 'max:100'],
@@ -45,7 +53,7 @@ class StoreVehicleRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'device_id.unique' => 'Device ID sudah terpakai oleh kendaraan lain',
+            'device_id.unique' => 'Device ID sudah terpakai oleh akun lain',
             'title.required' => 'Nama kendaraan wajib diisi',
             'title.max' => 'Nama kendaraan maksimal 200 karakter',
             'tipe_motor.required' => 'Tipe motor wajib dipilih',

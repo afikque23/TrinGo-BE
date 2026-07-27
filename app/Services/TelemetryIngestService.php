@@ -88,27 +88,32 @@ class TelemetryIngestService
 
         $telemetryAt = $this->parseTelemetryAt($data);
 
+        // Cari semua kendaraan yang terikat dengan device_id ini
         $matches = Vehicle::query()
             ->where('device_id', $deviceId)
-            ->orderBy('id')
-            ->limit(2)
             ->get();
 
-        if ($matches->count() > 1) {
-            Log::warning('Multiple vehicles share the same device_id. Using the lowest id match.', [
-                'topic' => $topic,
-                'device_id' => $deviceId,
-                'vehicle_ids' => $matches->pluck('id')->all(),
-            ]);
-        }
-
-        $vehicle = $matches->first();
-        if (!$vehicle) {
+        if ($matches->isEmpty()) {
             Log::warning('Telemetry received for unknown device_id.', [
-                'topic' => $topic,
+                'topic'     => $topic,
                 'device_id' => $deviceId,
             ]);
             return;
+        }
+
+        // Prioritas 1: motor yang ditetapkan sebagai is_primary = 1
+        // Prioritas 2: motor terbaru (id terbesar) yang terikat device_id ini
+        $vehicle = $matches->firstWhere('is_primary', true)
+            ?? $matches->sortByDesc('id')->first();
+
+        if ($matches->count() > 1) {
+            Log::info('Multiple vehicles share device_id. Routing telemetry to primary/latest.', [
+                'topic'          => $topic,
+                'device_id'      => $deviceId,
+                'routed_to'      => $vehicle->id,
+                'is_primary'     => (bool) $vehicle->is_primary,
+                'all_vehicle_ids'=> $matches->pluck('id')->all(),
+            ]);
         }
 
         $vehicle->forceFill([

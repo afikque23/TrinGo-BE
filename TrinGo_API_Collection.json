@@ -1,0 +1,501 @@
+{
+	"info": {
+		"_postman_id": "tringo-api-collection-v1",
+		"name": "TrinGo API - Pengujian BAB 4 (Tabel 4.5)",
+		"description": "Collection Postman untuk Pengujian RESTful API Sistem TrinGo (12 Skenario Pengujian Tabel 4.5)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01. Auth - Register",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Penguji TA\",\n    \"email\": \"penguji.ta@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/auth/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				},
+				"description": "Skenario 2: Registrasi akun baru dengan data lengkap"
+			},
+			"response": []
+		},
+		{
+			"name": "02. Auth - Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"if (jsonData.access_token) {",
+							"    pm.environment.set(\"bearer_token\", jsonData.access_token);",
+							"    console.log(\"Bearer token saved successfully!\");",
+							"} else if (jsonData.data && jsonData.data.access_token) {",
+							"    pm.environment.set(\"bearer_token\", jsonData.data.access_token);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"penguji.ta@example.com\",\n    \"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/auth/login",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				},
+				"description": "Skenario 1: Login dengan email & password valid"
+			},
+			"response": []
+		},
+		{
+			"name": "03. Vehicles - Tambah Kendaraan",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"if (jsonData.data && jsonData.data.id) {",
+							"    pm.environment.set(\"motor_id\", jsonData.data.id);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"Vario 160\",\n    \"make\": \"Honda\",\n    \"model\": \"Vario 160 ABS\",\n    \"tipe_motor\": \"matic\",\n    \"year\": 2023,\n    \"vin\": \"H 1234 TA\",\n    \"odometer\": 12500,\n    \"device_id\": \"DEV-01\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/vehicles",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"vehicles"
+					]
+				},
+				"description": "Skenario 3: Tambah kendaraan baru dengan device_id IoT ESP32"
+			},
+			"response": []
+		},
+		{
+			"name": "04. Vehicles - Get Primary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"if (jsonData.data && jsonData.data.id) {",
+							"    pm.environment.set(\"motor_id\", jsonData.data.id);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/vehicles/primary",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"vehicles",
+						"primary"
+					]
+				},
+				"description": "Skenario 4: Ambil data kendaraan utama pengguna"
+			},
+			"response": []
+		},
+		{
+			"name": "05. Tracking - Start Sesi",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/motors/{{motor_id}}/tracking/start",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"motors",
+						"{{motor_id}}",
+						"tracking",
+						"start"
+					]
+				},
+				"description": "Skenario 5: Mulai sesi tracking perjalanan"
+			},
+			"response": []
+		},
+		{
+			"name": "06. Tracking - Last Location",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/motors/{{motor_id}}/tracking/last-location",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"motors",
+						"{{motor_id}}",
+						"tracking",
+						"last-location"
+					]
+				},
+				"description": "Skenario 6: Ambil koordinat GPS terakhir dari IoT"
+			},
+			"response": []
+		},
+		{
+			"name": "07. Fuzzy - Get Scores",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/motors/{{motor_id}}/scores",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"motors",
+						"{{motor_id}}",
+						"scores"
+					]
+				},
+				"description": "Skenario 7: Ambil skor Fuzzy per komponen kendaraan"
+			},
+			"response": []
+		},
+		{
+			"name": "08. Fuzzy + AI - Service Recommendation",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/motors/{{motor_id}}/service-recommendation",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"motors",
+						"{{motor_id}}",
+						"service-recommendation"
+					]
+				},
+				"description": "Skenario 8: Ambil rekomendasi servis + narasi Gemini AI"
+			},
+			"response": []
+		},
+		{
+			"name": "09. AI - Home Insight",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/motors/{{motor_id}}/home-insight",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"motors",
+						"{{motor_id}}",
+						"home-insight"
+					]
+				},
+				"description": "Skenario 9: Ambil insight ringkasan kondisi motor"
+			},
+			"response": []
+		},
+		{
+			"name": "10. Service Schedules - Primary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"if (jsonData.data && jsonData.data.length > 0) {",
+							"    pm.environment.set(\"schedule_id\", jsonData.data[0].id);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/service-schedules/primary",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"service-schedules",
+						"primary"
+					]
+				},
+				"description": "Skenario 10: Ambil jadwal servis kendaraan utama"
+			},
+			"response": []
+		},
+		{
+			"name": "11. Service Schedules - Complete Schedule",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"performed_at\": \"2026-07-24\",\n    \"odometer\": 12500,\n    \"service_provider\": \"AHASS Semarang\",\n    \"cost\": 150000,\n    \"notes\": \"Servis berkala ganti oli\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/service-schedules/{{schedule_id}}/complete",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"service-schedules",
+						"{{schedule_id}}",
+						"complete"
+					]
+				},
+				"description": "Skenario 11: Tandai jadwal servis sebagai selesai"
+			},
+			"response": []
+		},
+		{
+			"name": "12. Auth Test - Unauthorized 401 (Tanpa Token)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/notifications",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"notifications"
+					]
+				},
+				"description": "Skenario 12: Akses endpoint terproteksi tanpa Authorization header (Expected Response: 401 Unauthorized)"
+			},
+			"response": []
+		}
+	]
+}
