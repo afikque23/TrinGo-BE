@@ -372,6 +372,7 @@ class TripController extends Controller
             $trip = Trip::create([
                 'vehicle_id' => $validated['vehicle_id'],
                 'started_by' => $user?->id ?? null,
+                'status' => 'completed',
                 'start_at' => $tripDate,
                 'end_at' => $endAt,
                 'duration_minutes' => $durationMinutes,
