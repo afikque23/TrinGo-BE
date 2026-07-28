@@ -25,6 +25,7 @@ class AddManualDistanceRequest extends FormRequest
             'vehicle_id' => 'required|integer|exists:vehicles,id',
             'distance_km' => 'required|numeric|min:0.01|max:9999',
             'trip_date' => 'required|date|before_or_equal:today',
+            'duration_minutes' => 'required|integer|min:1|max:1440',
             'notes' => 'nullable|string|max:1000',
         ];
     }
@@ -44,6 +45,9 @@ class AddManualDistanceRequest extends FormRequest
             'distance_km.max' => 'Jarak maksimal 9999 km',
             'trip_date.required' => 'Tanggal perjalanan harus diisi',
             'trip_date.before_or_equal' => 'Tanggal perjalanan tidak boleh di masa depan',
+            'duration_minutes.required' => 'Durasi perjalanan harus diisi',
+            'duration_minutes.min' => 'Durasi perjalanan minimal 1 menit',
+            'duration_minutes.max' => 'Durasi perjalanan maksimal 24 jam',
             'notes.max' => 'Catatan maksimal 1000 karakter',
         ];
     }

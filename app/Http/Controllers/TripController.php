@@ -357,8 +357,14 @@ class TripController extends Controller
             $endOdometer = $startOdometer + $distanceKm;
             
             // Create a simple trip record for manual distance
-            // Use trip_date for both start and end time
+            // Calculate end_at based on duration
             $tripDate = \Carbon\Carbon::parse($validated['trip_date']);
+            $durationMinutes = $validated['duration_minutes'];
+            $endAt = $tripDate->copy()->addMinutes($durationMinutes);
+            
+            // Calculate avg speed
+            $hours = $durationMinutes / 60;
+            $avgSpeedKph = $hours > 0 ? round($distanceKm / $hours, 2) : 0;
             
             /** @var \Illuminate\Contracts\Auth\Guard $auth */
             $auth = auth();
@@ -367,11 +373,12 @@ class TripController extends Controller
                 'vehicle_id' => $validated['vehicle_id'],
                 'started_by' => $user?->id ?? null,
                 'start_at' => $tripDate,
-                'end_at' => $tripDate,
+                'end_at' => $endAt,
+                'duration_minutes' => $durationMinutes,
                 'distance_meters' => (int) ($distanceKm * 1000),
                 'start_odometer' => $startOdometer,
                 'end_odometer' => $endOdometer,
-                'avg_speed_kph' => null,
+                'avg_speed_kph' => $avgSpeedKph,
                 'max_speed_kph' => null,
                 'notes' => $validated['notes'] ?? 'Jarak manual ditambahkan',
             ]);
