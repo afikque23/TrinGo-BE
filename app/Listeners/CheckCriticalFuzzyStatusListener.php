@@ -35,24 +35,23 @@ class CheckCriticalFuzzyStatusListener
         try {
             $fuzzyData = $this->recommendationService->getVehicleFuzzySnapshot($vehicle);
             
-            // Track lowest health score component (most critical) to only send one notification per vehicle
-            $lowestHealthScore = 100;
-            $criticalComponent = null;
-
+            $criticalComponents = [];
             $statuses = $fuzzyData['component_statuses'] ?? [];
             $scores = $fuzzyData['component_scores'] ?? [];
+            $lowestHealthScore = 100;
 
             foreach ($statuses as $component => $status) {
                 if ($status === 'critical') {
+                    $namaKomponen = ucwords(str_replace('_', ' ', (string) $component));
+                    $criticalComponents[] = $namaKomponen;
                     $score = $scores[$component] ?? 100;
                     if ($score < $lowestHealthScore) {
                         $lowestHealthScore = $score;
-                        $criticalComponent = $component;
                     }
                 }
             }
 
-            if ($criticalComponent) {
+            if (!empty($criticalComponents)) {
                 $user = $vehicle->user ?? ($vehicle->user_id ? \App\Models\User::find($vehicle->user_id) : null);
 
                 if (!$user) {
@@ -62,12 +61,13 @@ class CheckCriticalFuzzyStatusListener
 
                 // Konversi kembali healthScore (0-100, 100=bagus) menjadi urgencyScore (0-100, 100=kritis) untuk notifikasi
                 $urgencyScore = 100 - $lowestHealthScore;
+                $serviceName = implode(', ', $criticalComponents);
 
                 // Notifikasi dikirim saat itu juga secara real-time
                 $this->notificationService->sendFromTemplate(
                     $template,
                     [
-                        'service_name' => ucfirst(str_replace('_', ' ', $criticalComponent)),
+                        'service_name' => $serviceName,
                         'fuzzy_score' => round($urgencyScore),
                     ],
                     $user,
@@ -75,7 +75,7 @@ class CheckCriticalFuzzyStatusListener
                     $vehicle
                 );
                 
-                Log::info("Fuzzy critical alert sent for Vehicle {$vehicle->id} (User {$user->id}) on component {$criticalComponent}");
+                Log::info("Critical alert sent for Vehicle {$vehicle->id} (User {$user->id}) on components: {$serviceName}");
             }
             
         } catch (\Exception $e) {

@@ -195,8 +195,8 @@ class GeminiService
         // Ringkasan
         $prioritasUtama = $kritisItems[0] ?? $warningItems[0] ?? null;
         $ringkasan = $prioritasUtama
-            ? "Motor memerlukan perhatian pada {$prioritasUtama}. Jadwalkan servis agar performa dan keamanan berkendara tetap terjaga."
-            : 'Kondisi motor secara keseluruhan masih baik. Tetap lakukan pemeriksaan rutin sesuai jadwal.';
+            ? "Motor Anda memerlukan perhatian khusus pada komponen {$prioritasUtama} yang saat ini terindikasi berada dalam kondisi kritis. Penundaan pemeriksaan dapat menyebabkan penurunan performa mesin dan risiko keausan komponen lainnya secara berantai. Disarankan untuk segera melakukan inspeksi dan penanganan di bengkel terpercaya agar keamanan berkendara tetap terjamin."
+            : 'Kondisi kendaraan secara keseluruhan saat ini berada dalam keadaan yang cukup baik dan stabil. Tetap pertahankan pola pemeliharaan rutin sesuai rekomendasi pabrikan untuk mencegah penurunan fungsi komponen. Lakukan pemeriksaan berkala secara mandiri maupun pada jadwal servis resmi berikutnya.';
 
         // Rekomendasi komponen
         $rekomendasiKomponen = [];
@@ -208,9 +208,9 @@ class GeminiService
                 'komponen' => $nama,
                 'prioritas' => $status,
                 'saran' => match ($status) {
-                    'critical' => "Segera bawa motor ke bengkel untuk memeriksa {$nama}.",
-                    'warning' => "Rencanakan pemeriksaan {$nama} dalam 2–4 minggu ke depan.",
-                    default => "{$nama} dalam kondisi baik (skor {$score}). Pantau kembali saat jadwal servis berikutnya.",
+                    'critical' => "Komponen {$nama} membutuhkan perbaikan atau penggantian segera karena telah mencapai batas kritis keausan. Mengabaikan kondisi ini berpotensi merusak komponen terkait lainnya dan mengganggu kenyamanan berkendara. Segera bawa kendaraan Anda ke bengkel resmi terdekat untuk penanganan teknis.",
+                    'warning' => "Kondisi {$nama} telah mendekati ambang batas toleransi penggunaan normal. Disarankan untuk memasukkan komponen ini ke dalam daftar prioritas pemeriksaan pada servis berikutnya. Hal ini penting untuk mencegah penurunan kinerja kendaraan yang lebih parah.",
+                    default => "{$nama} saat ini dalam kondisi optimal (skor {$score}) dan berfungsi dengan sangat baik. Lanjutkan pola berkendara secara normal dan lakukan pemantauan secara periodik. Tidak diperlukan tindakan perbaikan darurat untuk komponen ini saat ini.",
                 },
                 'estimasi_waktu' => match ($status) {
                     'critical' => 'secepatnya',
@@ -231,6 +231,13 @@ class GeminiService
             'insight_sistem' => [
                 'label' => $polaLabel,
                 'isi' => "Pola berkendara {$polaLabel}. Lakukan pemeriksaan berkala agar kondisi komponen motor tetap terjaga.",
+            ],
+            'smart_maintenance' => [
+                'prediksi_servis' => $prioritasUtama
+                    ? "Berdasarkan intensitas pemakaian saat ini, kendaraan diproyeksikan membutuhkan perawatan pada {$prioritasUtama} dalam 1–2 minggu ke depan."
+                    : "Kondisi motor tergolong prima. Diperkirakan servis rutin berikutnya sekitar 1–2 bulan ke depan.",
+                'fokus_komponen' => count($kritisItems) > 0 ? $kritisItems : ($warningItems ?: ['Oli Mesin']),
+                'saran_adaptif' => "Lakukan pengecekan rutin tekanan ban dan pelumasan rantai/CVT secara berkala untuk menjaga efisiensi dan keamanan berkendara.",
             ],
             'ringkasan_kondisi' => $ringkasan,
             'rekomendasi_komponen' => $rekomendasiKomponen,

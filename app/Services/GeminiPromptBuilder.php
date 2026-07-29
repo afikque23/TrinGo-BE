@@ -105,11 +105,12 @@ class GeminiPromptBuilder
         // ── Instruksi output ──────────────────────────────────────────────────
         $lines[] = '== INSTRUKSI ==';
         $lines[] = '1. Balas HANYA dengan JSON valid. Tanpa markdown, tanpa backtick, tanpa penjelasan di luar JSON.';
-        $lines[] = '2. Bahasa Indonesia. Ringkas, jelas, ramah — seperti mekanik yang dipercaya.';
+        $lines[] = '2. Bahasa Indonesia. Edukatif, mendalam, rinci, dan ramah — seperti mekanik profesional yang dipercaya.';
         $lines[] = '3. Jangan sebut nama model AI, nama sistem internal, atau kata "fuzzy".';
         $lines[] = '4. Gunakan bahasa rekomendasi (hindari klaim pasti seperti "pasti rusak").';
         $lines[] = '5. Setiap "saran" pada rekomendasi_komponen harus actionable — beri tahu APA yang harus dilakukan dan KAPAN.';
         $lines[] = '6. Komponen dengan status=normal yang skornya tinggi (mendekati 100) boleh dikelompokkan dalam 1 entri jika sarannya sama.';
+        $lines[] = '7. PENTING & WAJIB: Setiap deskripsi pada "ringkasan_kondisi" dan "isi" HARUS ditulis minimal 3 hingga 4 kalimat lengkap.';
         $lines[] = '';
 
         // ── Struktur JSON output ──────────────────────────────────────────────
@@ -129,6 +130,13 @@ class GeminiPromptBuilder
         $lines[] = '  "insight_sistem": {';
         $lines[] = '    "label": "Penggunaan Ringan|Penggunaan Moderat|Penggunaan Berat",';
         $lines[] = '    "isi": "3–4 kalimat analisa detail pola berkendara dan dampaknya ke kondisi komponen motor secara menyeluruh."';
+        $lines[] = '  },';
+
+        // HOME — Smart Maintenance Prediktif & Adaptif
+        $lines[] = '  "smart_maintenance": {';
+        $lines[] = '    "prediksi_servis": "1–2 kalimat estimasi rentang waktu kapan motor harus ke bengkel berdasarkan pola pemakaian harian.",';
+        $lines[] = '    "fokus_komponen": ["Daftar nama komponen yang berstatus critical atau warning, diurutkan dari yang paling mendesak"],';
+        $lines[] = '    "saran_adaptif": "2–3 kalimat saran pemeliharaan preventif yang disesuaikan dengan pola berkendara dan keausan komponen."';
         $lines[] = '  },';
 
         // SERVICE — Ringkasan kondisi keseluruhan

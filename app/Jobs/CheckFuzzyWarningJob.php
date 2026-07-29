@@ -39,36 +39,41 @@ class CheckFuzzyWarningJob implements ShouldQueue
             try {
                 $fuzzyData = $recommendationService->getVehicleFuzzySnapshot($vehicle);
                 
-                // Track highest warning score component to only send one notification per vehicle
+                $warningComponents = [];
                 $highestWarningScore = 0;
-                $warningComponent = null;
+                $statuses = $fuzzyData['component_statuses'] ?? [];
+                $scores = $fuzzyData['component_scores'] ?? [];
 
-                foreach ($fuzzyData['component_scores'] as $component => $score) {
-                    if ($score >= 40 && $score < 75) {
+                foreach ($statuses as $component => $status) {
+                    if ($status === 'warning') {
+                        $namaKomponen = ucwords(str_replace('_', ' ', (string) $component));
+                        $warningComponents[] = $namaKomponen;
+                        $score = $scores[$component] ?? 0;
                         if ($score > $highestWarningScore) {
                             $highestWarningScore = $score;
-                            $warningComponent = $component;
                         }
                     }
                 }
 
-                if ($warningComponent) {
+                if (!empty($warningComponents)) {
                     $user = $vehicle->user ?? ($vehicle->user_id ? \App\Models\User::find($vehicle->user_id) : null);
                     if (!$user) {
                         continue;
                     }
 
+                    $serviceName = implode(', ', $warningComponents);
+
                     $notificationService->sendFromTemplate(
                         $template,
                         [
-                            'service_name' => ucfirst(str_replace('_', ' ', $warningComponent)),
+                            'service_name' => $serviceName,
                             'fuzzy_score' => round($highestWarningScore),
                         ],
                         $user,
                         $vehicle->device_id,
                         $vehicle
                     );
-                    Log::info("Fuzzy warning sent for Vehicle {$vehicle->id} on component {$warningComponent}");
+                    Log::info("Warning notification sent for Vehicle {$vehicle->id} on components: {$serviceName}");
                 }
                 
             } catch (\Exception $e) {

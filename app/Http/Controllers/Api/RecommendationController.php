@@ -46,6 +46,7 @@ class RecommendationController extends Controller
             $data = [
                 'wawasan_pintar' => $sections['wawasan_pintar'] ?? [],
                 'insight_sistem' => $sections['insight_sistem'] ?? null,
+                'smart_maintenance' => $sections['smart_maintenance'] ?? null,
                 'fuzzy_scores' => $result['component_scores'] ?? [],
                 'fuzzy_statuses' => $result['component_statuses'] ?? [],
                 'monitored_summary' => $result['monitoring_summary'] ?? null,

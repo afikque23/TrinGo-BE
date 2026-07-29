@@ -14,18 +14,18 @@ class NotificationTemplateSeederUpdate extends Seeder
     {
         $templates = [
             [
-                'name' => 'Peringatan Servis (Fuzzy Warning)',
+                'name' => 'Peringatan Servis',
                 'category_key' => 'service',
                 'trigger_type' => 'fuzzy_warning',
                 'channel' => 'push',
                 'priority' => 'high',
-                'message_template' => 'Halo {user_name}, komponen {service_name} motor {vehicle_name} Anda menunjukkan indikasi perlu pengecekan (Skor: {fuzzy_score}). Jadwalkan servis segera!',
+                'message_template' => 'Halo {user_name}, komponen {service_name} motor {vehicle_name} Anda memerlukan pengecekan. Jadwalkan servis segera!',
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'name' => 'Kondisi Kritis (Fuzzy Critical)',
+                'name' => 'Kondisi Kritis',
                 'category_key' => 'alert',
                 'trigger_type' => 'fuzzy_critical',
                 'channel' => 'push',
