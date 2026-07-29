@@ -1,0 +1,376 @@
+{
+	"info": {
+		"_postman_id": "a9b8c7d6-e5f4-4a3b-8c2d-1e0f9a8b7c6d",
+		"name": "TrinGo - Gemini AI Testing (Tabel 4.8)",
+		"description": "Collection Postman Otomatis untuk Pengujian Integrasi Rekomendasi AI (Gemini API) Subbab 4.3.5 Laporan TA",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://tringgo.site/api/v1/motorcycle",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "283|xToyndQVjEdN5tpCIl8XM4KN4vSAvZqb4DOqw25Ve3a9ced3",
+			"type": "string"
+		},
+		{
+			"key": "motor_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "motor_id_sport",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "0. Auth - Login (Otomatis Simpan Token)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"if (jsonData.success && jsonData.data && jsonData.data.access_token) {",
+							"    pm.collectionVariables.set('token', jsonData.data.access_token);",
+							"    console.log('Token otomatis tersimpan:', jsonData.data.access_token);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"ajisakaramadhan2004@gmail.com\",\n    \"password\": \"password\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/auth/login",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				},
+				"description": "Jalankan request ini untuk otomatis memperbarui token."
+			},
+			"response": []
+		},
+		{
+			"name": "0.1. Cek & Otomatis Set Motor ID User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"var list = jsonData.data || jsonData;",
+							"if (Array.isArray(list) && list.length > 0) {",
+							"    pm.collectionVariables.set('motor_id', list[0].id.toString());",
+							"    console.log('motor_id otomatis di-set ke:', list[0].id);",
+							"    var sport = list.find(function(v) { return v.tipe_motor === 'sport'; });",
+							"    if (sport) {",
+							"        pm.collectionVariables.set('motor_id_sport', sport.id.toString());",
+							"    } else {",
+							"        pm.collectionVariables.set('motor_id_sport', list[0].id.toString());",
+							"    }",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/vehicles",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"vehicles"
+					]
+				},
+				"description": "Jalankan request ini untuk mengambil ID motor nyata milik user 7."
+			},
+			"response": []
+		},
+		{
+			"name": "GM-01 & GM-02: Pengiriman Prompt & Urgensi Narasi",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/motors/{{motor_id}}/service-recommendation",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"motors",
+						"{{motor_id}}",
+						"service-recommendation"
+					]
+				},
+				"description": "Pengujian GM-01 (Response <= 30 detik) dan GM-02 (Urgensi narasi sesuai skor Fuzzy)"
+			},
+			"response": []
+		},
+		{
+			"name": "GM-04 (Run 1): Call Pertama (Fetch & Cache)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/motors/{{motor_id}}/home-insight",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"motors",
+						"{{motor_id}}",
+						"home-insight"
+					]
+				},
+				"description": "Panggilan pertama untuk memicu kuota Gemini API dan membuat cache."
+			},
+			"response": []
+		},
+		{
+			"name": "GM-04 (Run 2): Call Kedua (Verifikasi Caching)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/motors/{{motor_id}}/home-insight",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"motors",
+						"{{motor_id}}",
+						"home-insight"
+					]
+				},
+				"description": "Panggilan kedua. Perhatikan waktu respon jauh lebih cepat (~35ms) & metadata used_cache = true."
+			},
+			"response": []
+		},
+		{
+			"name": "GM-05 (A): Endpoint Home Insight",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/motors/{{motor_id}}/home-insight",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"motors",
+						"{{motor_id}}",
+						"home-insight"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GM-05 (B): Endpoint Service Recommendation",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/motors/{{motor_id}}/service-recommendation",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"motors",
+						"{{motor_id}}",
+						"service-recommendation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GM-05 (C): Endpoint Scores",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/motors/{{motor_id}}/scores",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"motors",
+						"{{motor_id}}",
+						"scores"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GM-06: Variasi Tipe Motor",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/motors/{{motor_id_sport}}/service-recommendation",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"motors",
+						"{{motor_id_sport}}",
+						"service-recommendation"
+					]
+				},
+				"description": "Cek respon narasi untuk memastikan nama tipe motor dan komponen spesifiknya disebutkan dengan benar."
+			},
+			"response": []
+		}
+	]
+}

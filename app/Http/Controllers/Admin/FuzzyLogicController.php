@@ -362,6 +362,9 @@ class FuzzyLogicController extends Controller
             ->where('is_active', true)
             ->get();
 
+        // ── Ukur waktu pemrosesan Fuzzy Mamdani ─────────────────────────────
+        $fuzzyStartMs = round(microtime(true) * 1000);
+
         $results = [];
         foreach ($components as $comp) {
             $engineInputs = [
@@ -376,9 +379,23 @@ class FuzzyLogicController extends Controller
             ];
         }
 
+        $fuzzyEndMs  = round(microtime(true) * 1000);
+        $fuzzyTimeMs = $fuzzyEndMs - $fuzzyStartMs;
+        // ────────────────────────────────────────────────────────────────────
+
+        \Illuminate\Support\Facades\Log::info('[Simulator] Fuzzy processing time', [
+            'motor_type'    => $motorTypeSlug,
+            'component_count' => count($components),
+            'fuzzy_time_ms' => $fuzzyTimeMs,
+        ]);
+
         return response()->json([
-            'inputs'  => $inputs,
-            'results' => $results,
+            'inputs'         => $inputs,
+            'results'        => $results,
+            'timing_ms'      => [
+                'fuzzy_processing_ms' => $fuzzyTimeMs,
+                'note' => 'Waktu pemrosesan Fuzzy Mamdani di server Laravel (ms)',
+            ],
         ]);
     }
 
@@ -417,6 +434,9 @@ class FuzzyLogicController extends Controller
         ]);
 
         $vehicle->update(['odometer' => $endOdo]);
+
+        // Trigger pemicu notifikasi kondisi kritis (Fuzzy Critical Alert) real-time
+        \App\Events\VehicleStatusChecked::dispatch($vehicle->fresh());
 
         return response()->json([
             'message' => 'Trip dummy berhasil diinjeksi.',

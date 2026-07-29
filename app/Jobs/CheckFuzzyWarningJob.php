@@ -53,13 +53,18 @@ class CheckFuzzyWarningJob implements ShouldQueue
                 }
 
                 if ($warningComponent) {
+                    $user = $vehicle->user ?? ($vehicle->user_id ? \App\Models\User::find($vehicle->user_id) : null);
+                    if (!$user) {
+                        continue;
+                    }
+
                     $notificationService->sendFromTemplate(
                         $template,
                         [
                             'service_name' => ucfirst(str_replace('_', ' ', $warningComponent)),
                             'fuzzy_score' => round($highestWarningScore),
                         ],
-                        $vehicle->user,
+                        $user,
                         $vehicle->device_id,
                         $vehicle
                     );

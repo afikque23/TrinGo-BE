@@ -39,7 +39,14 @@ files_to_upload = [
     "app/Http/Controllers/TripController.php",
     "database/seeders/NotificationTemplateSeederUpdate.php",
     "storage/app/firebase/service-account.json",
-    "app/Services/NotificationService.php"
+    "app/Services/NotificationService.php",
+    # Validasi Device ID (Multi-Motor)
+    "app/Http/Requests/StoreVehicleRequest.php",
+    "app/Http/Requests/UpdateVehicleRequest.php",
+    # Event Listener Fix: Notifikasi Critical FCM
+    "app/Providers/AppServiceProvider.php",
+    "app/Listeners/CheckCriticalFuzzyStatusListener.php",
+    "app/Http/Controllers/Admin/FuzzyLogicController.php",
 ]
 
 local_base = "c:/laragon/www/motorcycle_management"

@@ -6,13 +6,10 @@ use App\Events\VehicleStatusChecked;
 use App\Models\NotificationTemplate;
 use App\Services\NotificationService;
 use App\Services\RecommendationService;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class CheckCriticalFuzzyStatusListener implements ShouldQueue
+class CheckCriticalFuzzyStatusListener
 {
-    use InteractsWithQueue;
 
     public function __construct(
         private NotificationService $notificationService,
@@ -52,6 +49,13 @@ class CheckCriticalFuzzyStatusListener implements ShouldQueue
             }
 
             if ($criticalComponent) {
+                $user = $vehicle->user ?? ($vehicle->user_id ? \App\Models\User::find($vehicle->user_id) : null);
+
+                if (!$user) {
+                    Log::warning("CheckCriticalFuzzyStatusListener: Vehicle {$vehicle->id} has no valid user owner. Skipping notification.");
+                    return;
+                }
+
                 // Notifikasi dikirim saat itu juga secara real-time
                 $this->notificationService->sendFromTemplate(
                     $template,
@@ -59,12 +63,12 @@ class CheckCriticalFuzzyStatusListener implements ShouldQueue
                         'service_name' => ucfirst(str_replace('_', ' ', $criticalComponent)),
                         'fuzzy_score' => round($highestCriticalScore),
                     ],
-                    $vehicle->user,
+                    $user,
                     $vehicle->device_id,
                     $vehicle
                 );
                 
-                Log::info("Fuzzy critical alert sent for Vehicle {$vehicle->id} on component {$criticalComponent}");
+                Log::info("Fuzzy critical alert sent for Vehicle {$vehicle->id} (User {$user->id}) on component {$criticalComponent}");
             }
             
         } catch (\Exception $e) {

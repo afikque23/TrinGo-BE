@@ -120,7 +120,7 @@ class GeminiPromptBuilder
         $lines[] = '  "wawasan_pintar": [';
         $lines[] = '    {';
         $lines[] = '      "judul": "Judul singkat max 5 kata, kata kerja aktif. Contoh: Ganti Oli Segera",';
-        $lines[] = '      "isi": "1–2 kalimat penjelasan spesifik kenapa ini mendesak sekarang.",';
+        $lines[] = '      "isi": "2–3 kalimat penjelasan rinci dan mendalam kenapa ini mendesak sekarang.",';
         $lines[] = '      "prioritas": "critical|warning|normal"';
         $lines[] = '    }';
         $lines[] = '  ],';
@@ -128,24 +128,24 @@ class GeminiPromptBuilder
         // HOME — Insight Sistem
         $lines[] = '  "insight_sistem": {';
         $lines[] = '    "label": "Penggunaan Ringan|Penggunaan Moderat|Penggunaan Berat",';
-        $lines[] = '    "isi": "2–3 kalimat analisa pola berkendara dan dampaknya ke kondisi motor secara umum."';
+        $lines[] = '    "isi": "3–4 kalimat analisa detail pola berkendara dan dampaknya ke kondisi komponen motor secara menyeluruh."';
         $lines[] = '  },';
 
         // SERVICE — Ringkasan kondisi keseluruhan
-        $lines[] = '  "ringkasan_kondisi": "2–3 kalimat ringkasan kondisi motor secara keseluruhan. Sebutkan komponen paling mendesak dan kondisi umum motor.",';
+        $lines[] = '  "ringkasan_kondisi": "3–4 kalimat ringkasan kondisi motor secara mendalam. Sebutkan komponen paling mendesak, potensi risiko jika ditunda, dan kondisi umum motor.",';
 
         // SERVICE — Rekomendasi per komponen
         $lines[] = '  "rekomendasi_komponen": [';
         $lines[] = '    {';
         $lines[] = '      "komponen": "Nama komponen persis seperti di daftar skor di atas",';
         $lines[] = '      "prioritas": "critical|warning|normal",';
-        $lines[] = '      "saran": "1–2 kalimat saran spesifik: apa yang harus dilakukan dan kapan.",';
+        $lines[] = '      "saran": "2–3 kalimat saran spesifik: tindakan teknis yang harus dilakukan, alasan, dan kapan waktu terbaik ke bengkel.",';
         $lines[] = '      "estimasi_waktu": "Contoh: dalam 1–2 minggu | bulan depan | 3 bulan lagi | aman hingga servis berikutnya"';
         $lines[] = '    }';
         $lines[] = '  ],';
 
         // Tips mandiri
-        $lines[] = '  "tips_mandiri": "1 kalimat tips perawatan yang bisa dilakukan sendiri tanpa ke bengkel."';
+        $lines[] = '  "tips_mandiri": "1–2 kalimat tips perawatan praktis yang bisa dilakukan sendiri tanpa ke bengkel."';
 
         $lines[] = '}';
 
