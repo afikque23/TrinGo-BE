@@ -35,14 +35,18 @@ class CheckCriticalFuzzyStatusListener
         try {
             $fuzzyData = $this->recommendationService->getVehicleFuzzySnapshot($vehicle);
             
-            // Track highest critical score component to only send one notification per vehicle
-            $highestCriticalScore = 0;
+            // Track lowest health score component (most critical) to only send one notification per vehicle
+            $lowestHealthScore = 100;
             $criticalComponent = null;
 
-            foreach ($fuzzyData['component_scores'] as $component => $score) {
-                if ($score >= 75) {
-                    if ($score > $highestCriticalScore) {
-                        $highestCriticalScore = $score;
+            $statuses = $fuzzyData['component_statuses'] ?? [];
+            $scores = $fuzzyData['component_scores'] ?? [];
+
+            foreach ($statuses as $component => $status) {
+                if ($status === 'critical') {
+                    $score = $scores[$component] ?? 100;
+                    if ($score < $lowestHealthScore) {
+                        $lowestHealthScore = $score;
                         $criticalComponent = $component;
                     }
                 }
@@ -56,12 +60,15 @@ class CheckCriticalFuzzyStatusListener
                     return;
                 }
 
+                // Konversi kembali healthScore (0-100, 100=bagus) menjadi urgencyScore (0-100, 100=kritis) untuk notifikasi
+                $urgencyScore = 100 - $lowestHealthScore;
+
                 // Notifikasi dikirim saat itu juga secara real-time
                 $this->notificationService->sendFromTemplate(
                     $template,
                     [
                         'service_name' => ucfirst(str_replace('_', ' ', $criticalComponent)),
-                        'fuzzy_score' => round($highestCriticalScore),
+                        'fuzzy_score' => round($urgencyScore),
                     ],
                     $user,
                     $vehicle->device_id,

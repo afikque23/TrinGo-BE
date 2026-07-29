@@ -28,7 +28,7 @@ class StoreVehicleRequest extends FormRequest
                 'string',
                 'max:128',
                 Rule::unique('vehicles', 'device_id')
-                    ->where(fn ($query) => $query->where('user_id', '!=', auth()->id())),
+                    ->where(fn ($query) => $query->where('user_id', '!=', \Illuminate\Support\Facades\Auth::id())),
             ],
             'title' => ['required', 'string', 'max:200'],
             'make' => ['nullable', 'string', 'max:100'],
