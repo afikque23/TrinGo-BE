@@ -89,6 +89,9 @@ class VehicleController extends Controller
             // Load relationships
             $vehicle->load('serviceIntervals');
             
+            // Trigger fuzzy check so user gets immediate notifications for critical components
+            \App\Events\VehicleStatusChecked::dispatch($vehicle);
+            
             DB::commit();
             
             $message = $vehicle->is_primary 
@@ -207,6 +210,12 @@ class VehicleController extends Controller
                 // Generate new intervals
                 $this->generateServiceIntervals($vehicle);
             }
+            
+            // Regenerate cache
+            $this->forgetVehicleCache($vehicle->id);
+            
+            // Trigger fuzzy check on update as well
+            \App\Events\VehicleStatusChecked::dispatch($vehicle);
             
             // Load relationships
             $vehicle->load('serviceIntervals');
