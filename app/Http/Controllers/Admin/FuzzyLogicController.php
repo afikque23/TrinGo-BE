@@ -81,17 +81,9 @@ class FuzzyLogicController extends Controller
             ->values()
             ->all();
 
-        $missingRuleVars = collect($validated['active_vars'])
-            ->filter(fn ($var) => !in_array($var, $ruleVars, true))
-            ->values()
-            ->all();
+        // Optional: We can keep the logic but remove the hard validation
+        // to allow users to save active_vars and configure rules later.
 
-        if (!empty($missingRuleVars)) {
-            return response()->json([
-                'message' => 'Variabel aktif harus dipakai minimal pada satu rule.',
-                'missing_rule_vars' => $missingRuleVars,
-            ], 422);
-        }
 
         $old = $component->only(['warn', 'critical', 'reset_interval', 'active_vars']);
         $component->update($validated);
