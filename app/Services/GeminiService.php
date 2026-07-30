@@ -147,6 +147,7 @@ class GeminiService
         array $scores,
         array $statuses,
         float $intensitas = 0,
+        bool $isNewData = false,
     ): array {
         $kritisItems = [];
         $warningItems = [];
@@ -163,30 +164,39 @@ class GeminiService
 
         // Wawasan pintar — ambil yang paling mendesak
         $wawasanPintar = [];
-        foreach ($kritisItems as $nama) {
+        if ($isNewData) {
             $wawasanPintar[] = [
-                'judul' => "Servis {$nama} Segera",
-                'isi' => "{$nama} membutuhkan perhatian segera berdasarkan kondisi terkini motor Anda.",
-                'prioritas' => 'critical',
-            ];
-        }
-        foreach ($warningItems as $nama) {
-            $wawasanPintar[] = [
-                'judul' => "Pantau {$nama}",
-                'isi' => "{$nama} mendekati batas servis. Rencanakan pemeriksaan dalam waktu dekat.",
-                'prioritas' => 'warning',
-            ];
-        }
-        if (count($wawasanPintar) === 0) {
-            $wawasanPintar[] = [
-                'judul' => 'Kondisi Umum Baik',
-                'isi' => 'Kondisi motor masih aman. Tetap lakukan pengecekan rutin agar performa tetap stabil.',
+                'judul' => 'Motor Baru Ditambahkan',
+                'isi' => 'Selamat datang! Sistem belum memiliki riwayat servis untuk motor ini. Segera catat servis terakhir Anda agar AI dapat mulai memantau.',
                 'prioritas' => 'normal',
             ];
+        } else {
+            foreach ($kritisItems as $nama) {
+                $wawasanPintar[] = [
+                    'judul' => "Servis {$nama} Segera",
+                    'isi' => "{$nama} membutuhkan perhatian segera berdasarkan kondisi terkini motor Anda.",
+                    'prioritas' => 'critical',
+                ];
+            }
+            foreach ($warningItems as $nama) {
+                $wawasanPintar[] = [
+                    'judul' => "Pantau {$nama}",
+                    'isi' => "{$nama} mendekati batas servis. Rencanakan pemeriksaan dalam waktu dekat.",
+                    'prioritas' => 'warning',
+                ];
+            }
+            if (count($wawasanPintar) === 0) {
+                $wawasanPintar[] = [
+                    'judul' => 'Kondisi Umum Baik',
+                    'isi' => 'Kondisi motor masih aman. Tetap lakukan pengecekan rutin agar performa tetap stabil.',
+                    'prioritas' => 'normal',
+                ];
+            }
         }
 
         // Insight sistem
         $polaLabel = match (true) {
+            $isNewData => 'Belum Ada Data',
             $intensitas > 30 => 'Penggunaan Berat',
             $intensitas > 10 => 'Penggunaan Moderat',
             default => 'Penggunaan Ringan',
@@ -194,9 +204,13 @@ class GeminiService
 
         // Ringkasan
         $prioritasUtama = $kritisItems[0] ?? $warningItems[0] ?? null;
-        $ringkasan = $prioritasUtama
-            ? "Motor Anda memerlukan perhatian khusus pada komponen {$prioritasUtama} yang saat ini terindikasi berada dalam kondisi kritis. Penundaan pemeriksaan dapat menyebabkan penurunan performa mesin dan risiko keausan komponen lainnya secara berantai. Disarankan untuk segera melakukan inspeksi dan penanganan di bengkel terpercaya agar keamanan berkendara tetap terjamin."
-            : 'Kondisi kendaraan secara keseluruhan saat ini berada dalam keadaan yang cukup baik dan stabil. Tetap pertahankan pola pemeliharaan rutin sesuai rekomendasi pabrikan untuk mencegah penurunan fungsi komponen. Lakukan pemeriksaan berkala secara mandiri maupun pada jadwal servis resmi berikutnya.';
+        if ($isNewData) {
+            $ringkasan = 'Sistem belum memiliki data historis servis atau perjalanan untuk kendaraan ini. Silakan catat riwayat servis terakhir atau mulai berkendara menggunakan aplikasi agar AI kami dapat memberikan analisis kondisi yang akurat.';
+        } else {
+            $ringkasan = $prioritasUtama
+                ? "Motor Anda memerlukan perhatian khusus pada komponen {$prioritasUtama} yang saat ini terindikasi berada dalam kondisi kritis. Penundaan pemeriksaan dapat menyebabkan penurunan performa mesin dan risiko keausan komponen lainnya secara berantai. Disarankan untuk segera melakukan inspeksi dan penanganan di bengkel terpercaya agar keamanan berkendara tetap terjamin."
+                : 'Kondisi kendaraan secara keseluruhan saat ini berada dalam keadaan yang cukup baik dan stabil. Tetap pertahankan pola pemeliharaan rutin sesuai rekomendasi pabrikan untuk mencegah penurunan fungsi komponen. Lakukan pemeriksaan berkala secara mandiri maupun pada jadwal servis resmi berikutnya.';
+        }
 
         // Rekomendasi komponen
         $rekomendasiKomponen = [];
@@ -204,20 +218,29 @@ class GeminiService
             $nama = ucwords(str_replace('_', ' ', (string) $key));
             $score = round((float) ($scores[$key] ?? 0), 1);
 
-            $rekomendasiKomponen[] = [
-                'komponen' => $nama,
-                'prioritas' => $status,
-                'saran' => match ($status) {
-                    'critical' => "Komponen {$nama} membutuhkan perbaikan atau penggantian segera karena telah mencapai batas kritis keausan. Mengabaikan kondisi ini berpotensi merusak komponen terkait lainnya dan mengganggu kenyamanan berkendara. Segera bawa kendaraan Anda ke bengkel resmi terdekat untuk penanganan teknis.",
-                    'warning' => "Kondisi {$nama} telah mendekati ambang batas toleransi penggunaan normal. Disarankan untuk memasukkan komponen ini ke dalam daftar prioritas pemeriksaan pada servis berikutnya. Hal ini penting untuk mencegah penurunan kinerja kendaraan yang lebih parah.",
-                    default => "{$nama} saat ini dalam kondisi optimal (skor {$score}) dan berfungsi dengan sangat baik. Lanjutkan pola berkendara secara normal dan lakukan pemantauan secara periodik. Tidak diperlukan tindakan perbaikan darurat untuk komponen ini saat ini.",
-                },
-                'estimasi_waktu' => match ($status) {
-                    'critical' => 'secepatnya',
-                    'warning' => 'dalam 2–4 minggu',
-                    default => 'aman hingga servis berikutnya',
-                },
-            ];
+            if ($isNewData) {
+                $rekomendasiKomponen[] = [
+                    'komponen' => $nama,
+                    'prioritas' => 'normal',
+                    'saran' => "Status {$nama} disetel ke asumsi awal. Rekam data servis atau perjalanan untuk mendapatkan estimasi yang lebih presisi.",
+                    'estimasi_waktu' => 'aman hingga servis berikutnya',
+                ];
+            } else {
+                $rekomendasiKomponen[] = [
+                    'komponen' => $nama,
+                    'prioritas' => $status,
+                    'saran' => match ($status) {
+                        'critical' => "Komponen {$nama} membutuhkan perbaikan atau penggantian segera karena telah mencapai batas kritis keausan. Mengabaikan kondisi ini berpotensi merusak komponen terkait lainnya dan mengganggu kenyamanan berkendara. Segera bawa kendaraan Anda ke bengkel resmi terdekat untuk penanganan teknis.",
+                        'warning' => "Kondisi {$nama} telah mendekati ambang batas toleransi penggunaan normal. Disarankan untuk memasukkan komponen ini ke dalam daftar prioritas pemeriksaan pada servis berikutnya. Hal ini penting untuk mencegah penurunan kinerja kendaraan yang lebih parah.",
+                        default => "{$nama} saat ini dalam kondisi optimal (skor {$score}) dan berfungsi dengan sangat baik. Lanjutkan pola berkendara secara normal dan lakukan pemantauan secara periodik. Tidak diperlukan tindakan perbaikan darurat untuk komponen ini saat ini.",
+                    },
+                    'estimasi_waktu' => match ($status) {
+                        'critical' => 'secepatnya',
+                        'warning' => 'dalam 2–4 minggu',
+                        default => 'aman hingga servis berikutnya',
+                    },
+                ];
+            }
         }
 
         usort($rekomendasiKomponen, fn ($a, $b) =>
@@ -230,18 +253,26 @@ class GeminiService
             'wawasan_pintar' => $wawasanPintar,
             'insight_sistem' => [
                 'label' => $polaLabel,
-                'isi' => "Pola berkendara {$polaLabel}. Lakukan pemeriksaan berkala agar kondisi komponen motor tetap terjaga.",
+                'isi' => $isNewData 
+                    ? "Belum ada riwayat tercatat. Aplikasi membutuhkan data servis dan perjalanan untuk membuat pola pintar."
+                    : "Pola berkendara {$polaLabel}. Lakukan pemeriksaan berkala agar kondisi komponen motor tetap terjaga.",
             ],
             'smart_maintenance' => [
-                'prediksi_servis' => $prioritasUtama
-                    ? "Berdasarkan intensitas pemakaian saat ini, kendaraan diproyeksikan membutuhkan perawatan pada {$prioritasUtama} dalam 1–2 minggu ke depan."
-                    : "Kondisi motor tergolong prima. Diperkirakan servis rutin berikutnya sekitar 1–2 bulan ke depan.",
+                'prediksi_servis' => $isNewData
+                    ? "Prediksi servis akan muncul setelah Anda mencatatkan minimal 1 riwayat servis."
+                    : ($prioritasUtama
+                        ? "Berdasarkan intensitas pemakaian saat ini, kendaraan diproyeksikan membutuhkan perawatan pada {$prioritasUtama} dalam 1–2 minggu ke depan."
+                        : "Kondisi motor tergolong prima. Diperkirakan servis rutin berikutnya sekitar 1–2 bulan ke depan."),
                 'fokus_komponen' => count($kritisItems) > 0 ? $kritisItems : ($warningItems ?: ['Oli Mesin']),
-                'saran_adaptif' => "Lakukan pengecekan rutin tekanan ban dan pelumasan rantai/CVT secara berkala untuk menjaga efisiensi dan keamanan berkendara.",
+                'saran_adaptif' => $isNewData
+                    ? "Segera tambah riwayat servis pertama Anda agar asisten perawatan AI dapat mulai bekerja!"
+                    : "Lakukan pengecekan rutin tekanan ban dan pelumasan rantai/CVT secara berkala untuk menjaga efisiensi dan keamanan berkendara.",
             ],
             'ringkasan_kondisi' => $ringkasan,
             'rekomendasi_komponen' => $rekomendasiKomponen,
-            'tips_mandiri' => 'Periksa tekanan ban dan level oli secara mandiri setiap 2 minggu.',
+            'tips_mandiri' => $isNewData 
+                ? 'Tambahkan riwayat servis untuk mengaktifkan AI. Sementara itu, pantau tekanan ban secara mandiri.'
+                : 'Periksa tekanan ban dan level oli secara mandiri setiap 2 minggu.',
         ];
     }
 }

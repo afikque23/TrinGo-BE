@@ -16,6 +16,7 @@ files_to_upload = [
     "app/Services/Fuzzy/FuzzyEngineV2.php",
     "app/Services/RecommendationService.php",
     "app/Services/GeminiPromptBuilder.php",
+    "app/Services/GeminiService.php",
     "public/js/fuzzy/admin.js",
     "resources/views/admin/fuzzy/index.blade.php",
     "public/db-admin/index.php",
