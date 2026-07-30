@@ -215,7 +215,7 @@ class TrackingController extends Controller
 
         $startOdometer = $trip->start_odometer ?? ($vehicle->odometer ?? 0);
         $distanceKm = round($totalDistanceMeters / 1000, 2);
-        $endOdometer = (int) ($startOdometer + $distanceKm);
+        $endOdometer = $startOdometer + $distanceKm;
 
         $trip->update([
             'status' => 'completed',
