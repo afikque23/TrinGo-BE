@@ -111,6 +111,12 @@ class GeminiPromptBuilder
         $lines[] = '5. Setiap "saran" pada rekomendasi_komponen harus actionable — beri tahu APA yang harus dilakukan dan KAPAN.';
         $lines[] = '6. Komponen dengan status=normal yang skornya tinggi (mendekati 100) boleh dikelompokkan dalam 1 entri jika sarannya sama.';
         $lines[] = '7. PENTING & WAJIB: Setiap deskripsi pada "ringkasan_kondisi" dan "isi" HARUS ditulis minimal 3 hingga 4 kalimat lengkap.';
+        if ($inputs['is_new_data'] ?? false) {
+            $lines[] = '8. KONDISI KHUSUS: Motor ini baru saja ditambahkan dan belum ada riwayat servis atau data perjalanan (IoT).';
+            $lines[] = '   Buat respons selayaknya menyambut motor baru di sistem: sapa pengguna, beritahu bahwa sistem belum memiliki data historis,';
+            $lines[] = '   dan sarankan pengguna untuk segera mencatat riwayat servis terakhir atau mulai berkendara agar AI dapat belajar.';
+            $lines[] = '   Semua skor komponen mungkin menunjukkan normal atau menggunakan asumsi awal, jadi jelaskan hal ini di ringkasan kondisi.';
+        }
         $lines[] = '';
 
         // ── Struktur JSON output ──────────────────────────────────────────────

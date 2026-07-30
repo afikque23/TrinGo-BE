@@ -236,6 +236,8 @@ class RecommendationService
             ? round($weightedSpeedSum / $weightedDistanceSum, 1)
             : (float) ($vehicle->last_speed_kph ?? 0);
 
+        $isNewData = $vehicle->serviceHistories()->count() === 0 && $vehicle->trips()->count() === 0;
+
         return [
             'odometer' => $currentOdometer,
             'distance_since_service_km' => $distanceSinceServiceKm,
@@ -244,6 +246,7 @@ class RecommendationService
             'intensity_km_per_day' => $intensityKmPerDay,
             'elevation_gain_m' => $elevationGainM,
             'ambient_temp_c' => 28.0, // Default — parameter suhu tidak dipakai di sistem ini
+            'is_new_data' => $isNewData,
         ];
     }
 
