@@ -525,7 +525,14 @@ class RecommendationService
         }
 
         $abs = abs($delta);
-        $precision = abs($abs - round($abs)) < 0.05 ? 0 : 1;
+        
+        if (strtolower(trim((string)$unit)) === 'hari') {
+            $precision = 0;
+            $abs = round($abs);
+        } else {
+            $precision = abs($abs - round($abs)) < 0.05 ? 0 : 1;
+        }
+        
         $formatted = number_format($abs, $precision, '.', ',');
         $suffix = $unit ? (' ' . $unit) : '';
 
@@ -599,7 +606,14 @@ class RecommendationService
         }
 
         $number = (float) $value;
-        $precision = abs($number - round($number)) < 0.05 ? 0 : 1;
+        
+        if (strtolower(trim((string)$unit)) === 'hari') {
+            $precision = 0;
+            $number = round($number);
+        } else {
+            $precision = abs($number - round($number)) < 0.05 ? 0 : 1;
+        }
+        
         $formatted = number_format($number, $precision, '.', ',');
 
         return $unit ? ($formatted . ' ' . $unit) : $formatted;
