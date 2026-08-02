@@ -107,6 +107,7 @@ class RecommendationService
                             $scores,
                             $statuses,
                             (float) ($inputs['intensity_km_per_day'] ?? 0),
+                            (bool) ($inputs['is_new_data'] ?? false),
                         );
                         $usedCache = false;
                         $generatedAt = $generatedAt ?? now();
@@ -121,6 +122,7 @@ class RecommendationService
                         $scores,
                         $statuses,
                         (float) ($inputs['intensity_km_per_day'] ?? 0),
+                        (bool) ($inputs['is_new_data'] ?? false),
                     );
                     $usedCache = false;
                     $generatedAt = $generatedAt ?? now();
@@ -208,9 +210,9 @@ class RecommendationService
 
         if ($lastService && $lastService->performed_at) {
             $durationSinceServiceDays = (float) max(0, $lastService->performed_at->diffInDays(now()));
-        } elseif ($vehicle->created_at) {
-            $durationSinceServiceDays = (float) max(0, $vehicle->created_at->diffInDays(now()));
         }
+        // Jika belum ada riwayat servis, durasi dikembalikan 0 (bukan dari created_at).
+        // Variabel ini HANYA bermakna setelah user menambahkan riwayat servis pertama sebagai baseline.
 
         $from = now()->subDays(30);
         $trips = $vehicle->trips()
@@ -236,7 +238,12 @@ class RecommendationService
             ? round($weightedSpeedSum / $weightedDistanceSum, 1)
             : (float) ($vehicle->last_speed_kph ?? 0);
 
-        $isNewData = $vehicle->serviceHistories()->count() === 0 && $vehicle->trips()->count() === 0;
+        // is_new_data = true selama belum ada riwayat servis sama sekali.
+        // Meskipun sudah ada data trip IoT, tanpa riwayat servis maka variabel
+        // duration_since_service_days tidak memiliki baseline yang valid,
+        // sehingga AI harus tetap mengingatkan user untuk mengisi riwayat servis pertama.
+        $hasServiceHistory = $vehicle->serviceHistories()->count() > 0;
+        $isNewData = !$hasServiceHistory;
 
         return [
             'odometer' => $currentOdometer,

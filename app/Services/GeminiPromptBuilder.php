@@ -35,7 +35,6 @@ class GeminiPromptBuilder
             'matic' => 'Matic',
             'manual' => 'Manual/Bebek',
             'sport' => 'Sport',
-            'adventure' => 'Adventure',
             default => ucfirst($motorType),
         };
 
@@ -112,10 +111,11 @@ class GeminiPromptBuilder
         $lines[] = '6. Komponen dengan status=normal yang skornya tinggi (mendekati 100) boleh dikelompokkan dalam 1 entri jika sarannya sama.';
         $lines[] = '7. PENTING & WAJIB: Setiap deskripsi pada "ringkasan_kondisi" dan "isi" HARUS ditulis minimal 3 hingga 4 kalimat lengkap.';
         if ($inputs['is_new_data'] ?? false) {
-            $lines[] = '8. KONDISI KHUSUS: Motor ini baru saja ditambahkan dan belum ada riwayat servis atau data perjalanan (IoT).';
-            $lines[] = '   Buat respons selayaknya menyambut motor baru di sistem: sapa pengguna, beritahu bahwa sistem belum memiliki data historis,';
-            $lines[] = '   dan sarankan pengguna untuk segera mencatat riwayat servis terakhir atau mulai berkendara agar AI dapat belajar.';
-            $lines[] = '   Semua skor komponen mungkin menunjukkan normal atau menggunakan asumsi awal, jadi jelaskan hal ini di ringkasan kondisi.';
+            $lines[] = '8. KONDISI KHUSUS & MUTLAK: Motor ini baru saja ditambahkan dan belum ada riwayat servis atau data perjalanan (IoT).';
+            $lines[] = '   - Pada "wawasan_pintar", WAJIB buat entri khusus menyambut motor baru (judul: "Motor Baru Terdaftar" atau "Selamat Datang di TrinGo") dengan penjelasan menyapa pengguna dan menyarankan segera mencatat riwayat servis atau mulai berkendara.';
+            $lines[] = '   - Pada "insight_sistem", WAJIB isi "label" dengan "Belum Ada Data" dan "isi" dengan penjelasan bahwa AI membutuhkan data historis servis/trip untuk analisis pola berkendara.';
+            $lines[] = '   - Pada "smart_maintenance", "prediksi_servis" dan "saran_adaptif" HARUS berisi pesan bahwa prediksi adaptif akan aktif setelah pengguna mencatatkan riwayat servis pertama atau melakukan perjalanan.';
+            $lines[] = '   - Jelaskan pada "ringkasan_kondisi" bahwa semua komponen saat ini menggunakan asumsi awal pabrikan karena belum ada riwayat tercatat.';
         }
         $lines[] = '';
 

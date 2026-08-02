@@ -64,7 +64,7 @@ class FuzzyLogicSeeder extends Seeder
     public function run(): void
     {
         $types = [];
-        foreach (['matic' => 'Matic', 'manual' => 'Manual/Bebek', 'sport' => 'Sport', 'adventure' => 'Adventure'] as $slug => $name) {
+        foreach (['matic' => 'Matic', 'manual' => 'Manual/Bebek', 'sport' => 'Sport'] as $slug => $name) {
             $types[$slug] = MotorType::firstOrCreate(['slug' => $slug], ['name' => $name, 'is_active' => true]);
         }
 

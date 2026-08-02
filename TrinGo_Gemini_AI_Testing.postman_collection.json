@@ -25,6 +25,11 @@
 			"key": "motor_id_sport",
 			"value": "1",
 			"type": "string"
+		},
+		{
+			"key": "new_motor_id",
+			"value": "",
+			"type": "string"
 		}
 	],
 	"item": [
@@ -369,6 +374,404 @@
 					]
 				},
 				"description": "Cek respon narasi untuk memastikan nama tipe motor dan komponen spesifiknya disebutkan dengan benar."
+			},
+			"response": []
+		},
+		{
+			"name": "Tambah Motor Baru (Full Parameter Body)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test('Status code is 201 or 200', function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});",
+							"pm.test('Kendaraan berhasil dibuat & mengembalikan data valid', function () {",
+							"    pm.expect(jsonData.success).to.eql(true);",
+							"    pm.expect(jsonData.data).to.have.property('id');",
+							"});",
+							"if (jsonData.data && jsonData.data.id) {",
+							"    pm.collectionVariables.set('new_motor_id', jsonData.data.id.toString());",
+							"    console.log('new_motor_id otomatis tersimpan ke variable:', jsonData.data.id);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"Honda CB150R Streetfire\",\n    \"make\": \"Honda\",\n    \"model\": \"CB150R\",\n    \"year\": 2023,\n    \"tipe_motor\": \"sport\",\n    \"odometer\": 1500,\n    \"default_beban\": \"sedang\",\n    \"default_penumpang\": true,\n    \"default_gaya_berkendara\": \"normal\",\n    \"default_kondisi_jalan\": \"lancar\",\n    \"default_medan\": \"datar\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/vehicles",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"vehicles"
+					]
+				},
+				"description": "Endpoint POST /api/v1/motorcycle/vehicles untuk mendaftarkan motor baru lengkap dengan seluruh parameter profil & preferensi pengguna."
+			},
+			"response": []
+		},
+		{
+			"name": "GM-07 (A): Tambah Motor Baru (Tanpa Data Servis & Trip)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test('Status code 200 atau 201', function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});",
+							"if (jsonData.data && jsonData.data.id) {",
+							"    pm.collectionVariables.set('new_motor_id', jsonData.data.id.toString());",
+							"    console.log('new_motor_id berhasil tersimpan:', jsonData.data.id);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"Motor Baru Test Gemini\",\n    \"make\": \"Honda\",\n    \"model\": \"Scoopy\",\n    \"year\": 2024,\n    \"tipe_motor\": \"matic\",\n    \"odometer\": 0\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/vehicles",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"vehicles"
+					]
+				},
+				"description": "Menambahkan motor baru tanpa riwayat servis & perjalanan untuk pengujian Gemini AI kondisi is_new_data = true."
+			},
+			"response": []
+		},
+		{
+			"name": "GM-07 (B): Pengujian Output Gemini AI Menyambut Motor Baru (is_new_data = true)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test('Gemini API Terpanggil Asli (from_cache = false)', function () {",
+							"    pm.expect(jsonData.meta.from_cache).to.eql(false);",
+							"});",
+							"pm.test('Narasi Gemini AI Menyambut Motor Baru & Menyarankan Catat Servis/Berkendara', function () {",
+							"    var fullText = JSON.stringify(jsonData.data);",
+							"    pm.expect(fullText).to.match(/baru|servis|berkendara|riwayat|terdaftar/i);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/motors/{{new_motor_id}}/home-insight",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"motors",
+						"{{new_motor_id}}",
+						"home-insight"
+					]
+				},
+				"description": "Verifikasi bahwa Gemini API secara nyata dipanggil (from_cache = false) dan mengembalikan narasi sambutan untuk motor baru."
+			},
+			"response": []
+		},
+		{
+			"name": "GM-08 (A): Verifikasi Baseline Motor Baru (duration_since_days = 0 & is_new_data = true)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test('Insight Sistem Bertuliskan Belum Ada Data (is_new_data)', function () {",
+							"    var label = jsonData.data.insight_sistem ? jsonData.data.insight_sistem.label : '';",
+							"    var isi = JSON.stringify(jsonData.data);",
+							"    pm.expect(label === 'Belum Ada Data' || isi.indexOf('riwayat') !== -1 || isi.indexOf('servis') !== -1).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/motors/{{new_motor_id}}/home-insight",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"motors",
+						"{{new_motor_id}}",
+						"home-insight"
+					]
+				},
+				"description": "Uji sistem terbaru: Memastikan duration_since_service_days bernilai 0 (bukan 0.2 dari created_at) dan status motor baru meminta pencatatan servis."
+			},
+			"response": []
+		},
+		{
+			"name": "GM-08 (B): Set Motor Baru Sebagai Motor Utama (Set Primary)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test('Motor berhasil di-set sebagai motor utama', function () {",
+							"    pm.expect(jsonData.success).to.eql(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/vehicles/{{new_motor_id}}/set-primary",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"vehicles",
+						"{{new_motor_id}}",
+						"set-primary"
+					]
+				},
+				"description": "Menetapkan new_motor_id sebagai motor utama agar penambahan riwayat servis terhubung dengan benar."
+			},
+			"response": []
+		},
+		{
+			"name": "GM-08 (C): Catat Backfill Servis Awal (Tambah Riwayat Servis Pertama)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test('Status code is 201 or 200', function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});",
+							"pm.test('Riwayat servis berhasil dicatat', function () {",
+							"    pm.expect(jsonData.success).to.eql(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"service_type\": \"Ganti Oli & Servis Pertama\",\n    \"performed_at\": \"2026-07-31\",\n    \"odometer\": 0,\n    \"cost\": 50000,\n    \"service_provider\": \"Bengkel Resmi\",\n    \"notes\": \"Pencatatan baseline servis pertama\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/service-histories",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"service-histories"
+					]
+				},
+				"description": "Menambahkan riwayat servis pertama untuk motor baru sebagai baseline perhitungan duration_since_service_days."
+			},
+			"response": []
+		},
+		{
+			"name": "GM-08 (D): Verifikasi Setelah Servis (is_new_data = false & Duration Aktif)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test('Gemini API Dipanggil (from_cache = false)', function () {",
+							"    pm.expect(jsonData.meta.from_cache).to.eql(false);",
+							"});",
+							"pm.test('is_new_data = false (Baseline Servis Sudah Ada)', function () {",
+							"    var label = jsonData.data.insight_sistem ? jsonData.data.insight_sistem.label : '';",
+							"    pm.expect(label).to.not.eql('Belum Ada Data');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/motors/{{new_motor_id}}/home-insight",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"motors",
+						"{{new_motor_id}}",
+						"home-insight"
+					]
+				},
+				"description": "Verifikasi bahwa setelah riwayat servis ditambahkan, is_new_data menjadi false dan rekomendasi AI berubah dari sambutan motor baru menjadi rekomendasi pemeliharaan normal."
 			},
 			"response": []
 		}

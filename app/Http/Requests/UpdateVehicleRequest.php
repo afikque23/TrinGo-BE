@@ -38,7 +38,7 @@ class UpdateVehicleRequest extends FormRequest
             'make' => ['nullable', 'string', 'max:100'],
             'model' => ['nullable', 'string', 'max:100'],
             'year' => ['nullable', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'tipe_motor' => ['sometimes', 'required', 'in:matic,manual,sport,adventure'],
+            'tipe_motor' => ['sometimes', 'required', 'in:matic,manual,sport'],
             'vin' => ['nullable', 'string', 'max:64', Rule::unique('vehicles')->ignore($vehicleId)],
             'odometer' => ['nullable', 'integer', 'min:0'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'], // Max 5MB

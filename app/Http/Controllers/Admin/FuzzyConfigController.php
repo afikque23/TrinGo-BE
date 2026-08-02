@@ -18,7 +18,7 @@ use Illuminate\View\View;
 
 class FuzzyConfigController extends Controller
 {
-    private const MOTOR_TYPES = ['matic', 'manual', 'sport', 'adventure'];
+    private const MOTOR_TYPES = ['matic', 'manual', 'sport'];
 
     private function normalizeMotorType(?string $motorType): string
     {

@@ -88,7 +88,8 @@ class TrackingController extends Controller
         $endAt = Carbon::now();
         $startAt = Carbon::parse($trip->start_at);
         // Simpan durasi sebagai menit bulat agar konsisten di seluruh UI dan riwayat trip.
-        $durationMinutes = (int) round($startAt->diffInSeconds($endAt) / 60);
+        $durationSeconds = $startAt->diffInSeconds($endAt);
+        $durationMinutes = (int) round($durationSeconds / 60);
 
         // Calculate distance and speed from trip points
         $points = TripPoint::where('trip_id', $trip->id)->orderBy('sequence')->get();
@@ -186,12 +187,19 @@ class TrackingController extends Controller
         $clientAvgSpeedKph = (float) $request->input('client_avg_speed_kph', 0);
         $clientMaxSpeedKph = (float) $request->input('client_max_speed_kph', 0);
 
-        $avgSpeedKph = $countSpeed > 0 ? round($sumSpeed / $countSpeed, 2) : null;
+        $distanceKm = round($totalDistanceMeters / 1000, 2);
+
+        $avgSpeedKph = $countSpeed > 0 ? round($sumSpeed / $countSpeed, 1) : null;
         $maxSpeedKph = $maxSpeedKph > 0 ? $maxSpeedKph : null;
 
-        if (($avgSpeedKph === null || $avgSpeedKph <= 0) && $clientAvgSpeedKph > 0) {
-            $avgSpeedKph = round($clientAvgSpeedKph, 2);
+        if ($avgSpeedKph === null || $avgSpeedKph <= 0) {
+            if ($durationSeconds > 0 && $distanceKm > 0) {
+                $avgSpeedKph = round($distanceKm / ($durationSeconds / 3600), 1);
+            } elseif ($clientAvgSpeedKph > 0) {
+                $avgSpeedKph = round($clientAvgSpeedKph, 1);
+            }
         }
+
         if (($maxSpeedKph === null || $maxSpeedKph <= 0) && $clientMaxSpeedKph > 0) {
             $maxSpeedKph = round($clientMaxSpeedKph, 2);
         }
@@ -214,7 +222,6 @@ class TrackingController extends Controller
         $elevationGainM = (int) round($elevationGainM);
 
         $startOdometer = $trip->start_odometer ?? ($vehicle->odometer ?? 0);
-        $distanceKm = round($totalDistanceMeters / 1000, 2);
         $endOdometer = (int) ($startOdometer + $distanceKm);
 
         $trip->update([
