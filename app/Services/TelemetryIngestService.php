@@ -310,11 +310,16 @@ class TelemetryIngestService
     /**
      * @param array<string,mixed> $data
      */
-    private function getSpeedKph(array $data): ?float
+    private function getSpeedKph(array $data): float
     {
-        $speedKph = $this->getNumeric($data, ['speed_kph', 'speed_kmh', 'speed_km_h', 'speedKph']);
+        $speedKph = $this->getNumeric($data, ['speed_kph', 'speed_kmh', 'speed']);
         if ($speedKph !== null) {
             return $speedKph;
+        }
+
+        $speedKphFallback = $this->getNumeric($data, ['speed_km_h', 'speedKph']);
+        if ($speedKphFallback !== null) {
+            return $speedKphFallback;
         }
 
         $speedMps = $this->getNumeric($data, ['speed_mps', 'speedMps']);
@@ -322,7 +327,7 @@ class TelemetryIngestService
             return $speedMps * 3.6;
         }
 
-        return $this->getNumeric($data, ['speed']);
+        return 0.0;
     }
 
     /**

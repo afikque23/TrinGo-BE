@@ -49,6 +49,7 @@ files_to_upload = [
     "app/Providers/AppServiceProvider.php",
     "app/Listeners/CheckCriticalFuzzyStatusListener.php",
     "app/Http/Controllers/Admin/FuzzyLogicController.php",
+    "app/Http/Controllers/Api/TrackingController.php",
 ]
 
 local_base = "c:/laragon/www/motorcycle_management"

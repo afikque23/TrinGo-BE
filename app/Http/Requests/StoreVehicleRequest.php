@@ -34,7 +34,7 @@ class StoreVehicleRequest extends FormRequest
             'make' => ['nullable', 'string', 'max:100'],
             'model' => ['nullable', 'string', 'max:100'],
             'year' => ['nullable', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'tipe_motor' => ['required', 'in:matic,manual,sport,adventure'],
+            'tipe_motor' => ['required', 'in:matic,manual,sport'],
             'vin' => ['nullable', 'string', 'max:64', 'unique:vehicles,vin'],
             'odometer' => ['nullable', 'integer', 'min:0'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'], // Max 5MB
@@ -57,7 +57,7 @@ class StoreVehicleRequest extends FormRequest
             'title.required' => 'Nama kendaraan wajib diisi',
             'title.max' => 'Nama kendaraan maksimal 200 karakter',
             'tipe_motor.required' => 'Tipe motor wajib dipilih',
-            'tipe_motor.in' => 'Tipe motor harus salah satu dari: matic, manual, sport, atau adventure',
+            'tipe_motor.in' => 'Tipe motor harus salah satu dari: matic, manual, atau sport',
             'year.integer' => 'Tahun harus berupa angka',
             'year.min' => 'Tahun minimal 1900',
             'year.max' => 'Tahun tidak valid',
