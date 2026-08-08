@@ -204,6 +204,11 @@ class TrackingController extends Controller
             $maxSpeedKph = round($clientMaxSpeedKph, 2);
         }
 
+        // Sanity check: Max speed logikanya tidak mungkin lebih rendah dari Average speed
+        if ($maxSpeedKph !== null && $avgSpeedKph !== null && $maxSpeedKph < $avgSpeedKph) {
+            $maxSpeedKph = $avgSpeedKph;
+        }
+
         // Hitung elevation_gain dari baro_rel_alt_m (BMP280) — total kenaikan elevasi
         $elevationGainM = 0;
         $lastAlt = null;
@@ -222,7 +227,7 @@ class TrackingController extends Controller
         $elevationGainM = (int) round($elevationGainM);
 
         $startOdometer = $trip->start_odometer ?? ($vehicle->odometer ?? 0);
-        $endOdometer = (int) ($startOdometer + $distanceKm);
+        $endOdometer = $startOdometer + $distanceKm;
 
         $trip->update([
             'status' => 'completed',

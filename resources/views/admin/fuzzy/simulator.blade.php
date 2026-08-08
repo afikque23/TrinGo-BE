@@ -15,19 +15,18 @@
       </div>
       <div id="panel-manual" class="bg-[#111111] border border-[#1e2939] rounded-xl p-5 space-y-4">
         <label class="sim-label">Input Variabel (Manual)</label>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-3 gap-3">
           <div><label class="sim-label" style="font-size:9px;">Jarak Tempuh (km)</label><div class="sim-input-wrap"><input type="number" id="inp-jarak" class="sim-input" value="2500" min="0" step="50"><span class="sim-unit">km</span></div></div>
           <div><label class="sim-label" style="font-size:9px;">Durasi Sejak Servis (hari)</label><div class="sim-input-wrap"><input type="number" id="inp-durasi" class="sim-input" value="60" min="0"><span class="sim-unit">hari</span></div></div>
-          <div><label class="sim-label" style="font-size:9px;">Kecepatan Rata-rata (km/jam)</label><div class="sim-input-wrap"><input type="number" id="inp-kecepatan" class="sim-input" value="45" min="0" step="5"><span class="sim-unit">km/j</span></div></div>
           <div><label class="sim-label" style="font-size:9px;">Intensitas (km/hari)</label><div class="sim-input-wrap"><input type="number" id="inp-intensitas" class="sim-input" value="15" min="0" step="1"><span class="sim-unit">km/h</span></div></div>
         </div>
         <div>
           <label class="sim-label" style="font-size:9px;">Preset Skenario Cepat</label>
           <div class="flex flex-wrap gap-2 mt-1">
-            <button onclick="setPreset(500,20,30,5)" class="preset-btn">🟢 Normal Ringan</button>
-            <button onclick="setPreset(2500,60,45,15)" class="preset-btn">🟡 Warning Sedang</button>
-            <button onclick="setPreset(4500,120,90,30)" class="preset-btn">🔴 Critical Berat</button>
-            <button onclick="setPreset(3500,90,60,25)" class="preset-btn">📊 Campuran</button>
+            <button onclick="setPreset(500,20,5)" class="preset-btn">🟢 Normal Ringan</button>
+            <button onclick="setPreset(2500,60,15)" class="preset-btn">🟡 Warning Sedang</button>
+            <button onclick="setPreset(4500,120,30)" class="preset-btn">🔴 Critical Berat</button>
+            <button onclick="setPreset(3500,90,25)" class="preset-btn">📊 Campuran</button>
           </div>
         </div>
       </div>
@@ -56,12 +55,11 @@
           <span class="text-base">💉</span>
           <div><label class="sim-label" style="margin:0;">Inject Trip Dummy ke Database</label><p class="text-[10px] text-[#2d3748] leading-relaxed mt-0.5">Data ini akan masuk ke riwayat trip & BERPENGARUH pada rekomendasi di aplikasi mobile.</p></div>
         </div>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-3 gap-3">
           <div><label class="sim-label" style="font-size:9px;">Kendaraan Target</label><select id="inj-vehicle" class="sim-select"><option value="">-- Pilih --</option>@foreach($vehicles as $v)<option value="{{ $v->id }}">[{{ $v->id }}] {{ $v->title ?? ($v->make . ' ' . $v->model) }}</option>@endforeach</select></div>
           <div><label class="sim-label" style="font-size:9px;">Berapa Hari Lalu</label><div class="sim-input-wrap"><input type="number" id="inj-days-ago" class="sim-input" value="1" min="0" max="30"><span class="sim-unit">hari</span></div></div>
           <div><label class="sim-label" style="font-size:9px;">Jarak Perjalanan</label><div class="sim-input-wrap"><input type="number" id="inj-distance" class="sim-input" value="25" min="0.1" step="0.5"><span class="sim-unit">km</span></div></div>
-          <div><label class="sim-label" style="font-size:9px;">Kecepatan Rata-rata</label><div class="sim-input-wrap"><input type="number" id="inj-speed" class="sim-input" value="45" min="1"><span class="sim-unit">km/j</span></div></div>
-          <div class="col-span-2"><label class="sim-label" style="font-size:9px;">Durasi Perjalanan</label><div class="sim-input-wrap"><input type="number" id="inj-duration" class="sim-input" value="30" min="1"><span class="sim-unit">menit</span></div></div>
+          <div class="col-span-3"><label class="sim-label" style="font-size:9px;">Durasi Perjalanan</label><div class="sim-input-wrap"><input type="number" id="inj-duration" class="sim-input" value="30" min="1"><span class="sim-unit">menit</span></div></div>
         </div>
         <button onclick="injectTrip()" class="w-full py-2.5 rounded-lg text-sm font-semibold border border-amber-600/40 text-amber-500 hover:bg-amber-600/10 transition-colors flex items-center justify-center gap-2">💉 Inject Trip ke Database</button>
         <div id="inject-log" class="hidden space-y-1 max-h-32 overflow-y-auto"></div>
@@ -102,13 +100,13 @@
 <script>
 let currentMode='manual';
 function setMode(mode){currentMode=mode;document.getElementById('panel-manual').classList.toggle('hidden',mode!=='manual');document.getElementById('panel-vehicle').classList.toggle('hidden',mode!=='vehicle');document.getElementById('btn-mode-manual').classList.toggle('active',mode==='manual');document.getElementById('btn-mode-vehicle').classList.toggle('active',mode==='vehicle');}
-function setPreset(j,d,k,i){document.getElementById('inp-jarak').value=j;document.getElementById('inp-durasi').value=d;document.getElementById('inp-kecepatan').value=k;document.getElementById('inp-intensitas').value=i;}
+function setPreset(j,d,i){document.getElementById('inp-jarak').value=j;document.getElementById('inp-durasi').value=d;document.getElementById('inp-intensitas').value=i;}
 async function runSimulator(){
   document.getElementById('empty-state').classList.add('hidden');document.getElementById('result-area').classList.add('hidden');document.getElementById('result-inputs').classList.add('hidden');document.getElementById('loading-state').classList.remove('hidden');
   const motorType=document.getElementById('sel-motor-type').value;
   let body={motor_type:motorType,_token:'{{ csrf_token() }}'};
   if(currentMode==='vehicle'){const vid=document.getElementById('sel-vehicle').value;if(!vid){alert('Pilih kendaraan terlebih dahulu.');document.getElementById('loading-state').classList.add('hidden');document.getElementById('empty-state').classList.remove('hidden');return;}body.mode='vehicle';body.vehicle_id=vid;}
-  else{body.mode='manual';body.jarak=document.getElementById('inp-jarak').value;body.durasi=document.getElementById('inp-durasi').value;body.kecepatan=document.getElementById('inp-kecepatan').value;body.intensitas=document.getElementById('inp-intensitas').value;}
+  else{body.mode='manual';body.jarak=document.getElementById('inp-jarak').value;body.durasi=document.getElementById('inp-durasi').value;body.intensitas=document.getElementById('inp-intensitas').value;}
   try{
     const res=await fetch('{{ route("admin.fuzzy.simulator.run") }}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},body:JSON.stringify(body)});
     const data=await res.json();
@@ -118,7 +116,7 @@ async function runSimulator(){
   }catch(e){document.getElementById('loading-state').classList.add('hidden');document.getElementById('empty-state').classList.remove('hidden');alert('Error: '+e.message);}
 }
 function renderInputs(inputs){
-  const map=[['Jarak Tempuh',(inputs.jarak??inputs.distance_since_service_km??0).toFixed(1),'km'],['Durasi Servis',(inputs.durasi??inputs.duration_since_service_days??0).toFixed(0),'hari'],['Kecepatan Rata2',(inputs.kecepatan??inputs.avg_speed_kph??0).toFixed(1),'km/jam'],['Intensitas',(inputs.intensitas??inputs.intensity_km_per_day??0).toFixed(1),'km/hari']];
+  const map=[['Jarak Tempuh',(inputs.jarak??inputs.distance_since_service_km??0).toFixed(1),'km'],['Durasi Servis',(inputs.durasi??inputs.duration_since_service_days??0).toFixed(0),'hari'],['Intensitas',(inputs.intensitas??inputs.intensity_km_per_day??0).toFixed(1),'km/hari']];
   document.getElementById('result-inputs-grid').innerHTML=map.map(([l,v,u])=>`<div class="bg-[#0d0d0d] border border-[#1e2939] rounded-lg p-3"><div class="text-[9px] text-[#3d4a56] uppercase tracking-wider">${l}</div><div class="text-base font-bold text-[#8a919e] mt-0.5">${v} <span class="text-[10px] font-normal text-[#3d4a56]">${u}</span></div></div>`).join('');
   document.getElementById('result-inputs').classList.remove('hidden');
 }
@@ -137,7 +135,7 @@ function renderResults(results){
 }
 async function injectTrip(){
   const vid=document.getElementById('inj-vehicle').value;if(!vid){alert('Pilih kendaraan target terlebih dahulu.');return;}
-  const body={vehicle_id:vid,distance_km:document.getElementById('inj-distance').value,avg_speed_kph:document.getElementById('inj-speed').value,duration_minutes:document.getElementById('inj-duration').value,days_ago:document.getElementById('inj-days-ago').value,_token:'{{ csrf_token() }}'};
+  const body={vehicle_id:vid,distance_km:document.getElementById('inj-distance').value,avg_speed_kph:45,duration_minutes:document.getElementById('inj-duration').value,days_ago:document.getElementById('inj-days-ago').value,_token:'{{ csrf_token() }}'};
   try{
     const res=await fetch('{{ route("admin.fuzzy.simulator.inject") }}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},body:JSON.stringify(body)});
     const data=await res.json();

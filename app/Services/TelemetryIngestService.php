@@ -51,6 +51,14 @@ class TelemetryIngestService
         $mpuIsMoving = $this->getBool($data, ['mpu_is_moving']);
         $mpuGForce = $this->getNumeric($data, ['mpu_g_force']);
 
+        // Suhu mesin dari DS18B20 (monitoring only — tidak dipakai sebagai input fuzzy)
+        $engineTempC = $this->getNumeric($data, ['engine_temp_c']);
+        // Validasi: DS18B20 mengembalikan -127 jika tidak terdeteksi
+        if ($engineTempC !== null && $engineTempC < -50.0) {
+            $engineTempC = null;
+        }
+        $engineOverheat = $this->getBool($data, ['engine_overheat']);
+
         if ($hasFixBool === false) {
             $latitude = null;
             $longitude = null;
@@ -116,6 +124,31 @@ class TelemetryIngestService
             ]);
         }
 
+        // Hitung fallback kecepatan matematis jika kecepatan dari sensor kurang akurat di kecepatan rendah (< 5 km/h)
+        if ($speedKph < 5.0 && $latitude !== null && $longitude !== null && $vehicle->last_latitude !== null && $vehicle->last_longitude !== null) {
+            $distanceMeters = $this->calculateHaversineDistance((float)$vehicle->last_latitude, (float)$vehicle->last_longitude, $latitude, $longitude);
+            
+            // Jarak minimal 2 meter agar tidak terpengaruh GPS drift kecil
+            // Maksimal 100 meter per ping agar terhindar dari spike GPS jauh
+            if ($distanceMeters >= 2.0 && $distanceMeters <= 100.0) {
+                $lastTime = $vehicle->last_telemetry_at ?? $vehicle->last_telemetry_received_at;
+                $currentTime = $telemetryAt ?? $receivedAt;
+                
+                if ($lastTime && $currentTime) {
+                    $dtSeconds = $currentTime->getTimestamp() - $lastTime->getTimestamp();
+                    if ($dtSeconds > 0) {
+                        $mathSpeedKph = ($distanceMeters / $dtSeconds) * 3.6;
+                        // Ambil kecepatan terbesar jika sensor hardware under-reporting
+                        if ($mathSpeedKph > $speedKph) {
+                            $speedKph = $mathSpeedKph;
+                        }
+                    }
+                }
+            } elseif ($distanceMeters < 2.0 && $speedKph <= 0) {
+                $speedKph = 0.0;
+            }
+        }
+
         $vehicle->forceFill([
             'last_latitude' => $latitude,
             'last_longitude' => $longitude,
@@ -131,6 +164,12 @@ class TelemetryIngestService
             'last_grade_pct' => $gradePct,
             'last_telemetry_at' => $telemetryAt,
             'last_telemetry_received_at' => $receivedAt,
+            // Suhu mesin DS18B20 — hanya diperbarui jika sensor mengirim data valid
+            ...(($engineTempC !== null) ? [
+                'last_engine_temp_c' => round($engineTempC, 2),
+                'last_engine_overheat' => $engineOverheat ?? false,
+                'last_engine_temp_at' => $receivedAt,
+            ] : []),
         ])->save();
 
         if ((bool) config('mqtt.trip_points.enabled', false)) {

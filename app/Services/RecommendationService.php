@@ -252,8 +252,13 @@ class RecommendationService
             'avg_speed_kph' => $avgSpeedKph,
             'intensity_km_per_day' => $intensityKmPerDay,
             'elevation_gain_m' => $elevationGainM,
-            'ambient_temp_c' => 28.0, // Default — parameter suhu tidak dipakai di sistem ini
+            'ambient_temp_c' => 28.0, // Default — parameter suhu lingkungan tidak dipakai di fuzzy
             'is_new_data' => $isNewData,
+            // ── Suhu Mesin DS18B20 (monitoring only, bukan input fuzzy) ──────────
+            // Nilai null berarti sensor tidak terpasang atau belum pernah kirim data.
+            'engine_temp_c'      => $vehicle->last_engine_temp_c,
+            'engine_overheat'    => $vehicle->last_engine_overheat ?? false,
+            'engine_temp_at'     => $vehicle->last_engine_temp_at?->toDateTimeString(),
         ];
     }
 

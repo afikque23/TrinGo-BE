@@ -41,6 +41,10 @@ class Vehicle extends Model
         'last_grade_pct',
         'last_telemetry_at',
         'last_telemetry_received_at',
+        // Suhu mesin DS18B20 (monitoring only, bukan input fuzzy)
+        'last_engine_temp_c',
+        'last_engine_overheat',
+        'last_engine_temp_at',
         'is_primary',
         // Parameter default untuk kalkulasi jadwal servis
         'default_beban',
@@ -67,6 +71,10 @@ class Vehicle extends Model
         'last_grade_pct' => 'float',
         'last_telemetry_at' => 'datetime',
         'last_telemetry_received_at' => 'datetime',
+        // Suhu mesin DS18B20
+        'last_engine_temp_c' => 'float',
+        'last_engine_overheat' => 'boolean',
+        'last_engine_temp_at' => 'datetime',
         'is_primary' => 'boolean',
         'default_penumpang' => 'boolean',
     ];

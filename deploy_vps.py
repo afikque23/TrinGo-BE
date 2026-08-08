@@ -2,11 +2,25 @@ import paramiko
 import sys
 import os
 
-import getpass
-
 hostname = "203.194.115.228"
 username = "root"
-password = getpass.getpass(prompt="Masukkan Password ROOT VPS Anda: ")
+
+if len(sys.argv) > 1:
+    password = sys.argv[1]
+elif os.getenv("VPS_PASSWORD"):
+    password = os.getenv("VPS_PASSWORD")
+else:
+    try:
+        import getpass
+        if sys.stdin and sys.stdin.isatty():
+            password = getpass.getpass(prompt="Masukkan Password ROOT VPS Anda: ")
+        else:
+            password = "Tringgo123"
+    except Exception:
+        password = "Tringgo123"
+
+if not password:
+    password = "Tringgo123"
 
 # List of files to upload (relative to local root)
 files_to_upload = [
@@ -24,6 +38,7 @@ files_to_upload = [
     "app/Services/Fuzzy/FuzzyEngine.php",
     "app/Services/Fuzzy/DefaultFuzzyConfig.php",
     "resources/views/admin/fuzzy_config/edit.blade.php",
+    "resources/views/admin/fuzzy_config/index.blade.php",
     "app/Services/MqttService.php",
     "resources/views/admin/fuzzy/_modal_add_comp.blade.php",
     "resources/views/layouts/sidebar.blade.php",
@@ -48,8 +63,11 @@ files_to_upload = [
     # Event Listener Fix: Notifikasi Critical FCM
     "app/Providers/AppServiceProvider.php",
     "app/Listeners/CheckCriticalFuzzyStatusListener.php",
-    "app/Http/Controllers/Admin/FuzzyLogicController.php",
     "app/Http/Controllers/Api/TrackingController.php",
+    "database/migrations/2026_08_02_000000_change_odometer_to_decimal.php",
+    # Integrasi Suhu Mesin DS18B20
+    "app/Models/Vehicle.php",
+    "database/migrations/2026_08_07_000001_add_engine_temp_to_vehicles_table.php",
 ]
 
 local_base = "c:/laragon/www/motorcycle_management"
@@ -84,11 +102,8 @@ try:
     sftp.close()
     
     print("Files uploaded successfully. Clearing cache...")
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(hostname, username=username, password=password)
     
-    stdin, stdout, stderr = client.exec_command(f"cd {remote_base} && php artisan view:clear && php artisan cache:clear")
+    stdin, stdout, stderr = client.exec_command(f"cd {remote_base} && php artisan migrate --force && php artisan view:clear && php artisan cache:clear")
     out = stdout.read().decode()
     err = stderr.read().decode()
     

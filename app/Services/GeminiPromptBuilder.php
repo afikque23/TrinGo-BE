@@ -61,6 +61,41 @@ class GeminiPromptBuilder
         $lines[] = "Klasifikasi pola berkendara  : {$pola}";
         $lines[] = '';
 
+        // ── Suhu mesin DS18B20 ────────────────────────────────────────────────
+        $engineTempC   = $inputs['engine_temp_c']   ?? null;
+        $engineOverheat = (bool) ($inputs['engine_overheat'] ?? false);
+        $engineTempAt  = $inputs['engine_temp_at']  ?? null;
+
+        $lines[] = '== KONDISI SUHU MESIN (SENSOR DS18B20 — HANYA UNTUK NARASI) ==';
+        if ($engineTempC === null) {
+            $lines[] = 'Status sensor    : Tidak tersedia (sensor tidak terpasang atau belum ada data)';
+            $lines[] = 'INSTRUKSI SUHU   : Jangan membuat asumsi tentang kondisi suhu mesin. Abaikan seksi ini.';
+        } else {
+            $engineTempRounded = round((float) $engineTempC, 1);
+
+            $statusSuhu = match (true) {
+                $engineTempRounded >= 110.0 => 'KRITIS - OVERHEAT (≥ 110°C)',
+                $engineTempRounded >= 90.0  => 'Panas - Perlu Perhatian (90–109°C)',
+                default                    => 'Normal (< 90°C)',
+            };
+
+            $lines[] = "Suhu Mesin Terkini : {$engineTempRounded} °C";
+            $lines[] = "Status Suhu        : {$statusSuhu}";
+            if ($engineTempAt) {
+                $lines[] = "Waktu Pembacaan    : {$engineTempAt}";
+            }
+            $lines[] = '';
+            $lines[] = 'INSTRUKSI SUHU:';
+            $lines[] = '- Gunakan data suhu ini HANYA untuk memperkaya narasi dan konteks deskripsi kondisi motor.';
+            $lines[] = '- JANGAN gunakan suhu ini sebagai input penilaian skor atau menentukan status komponen.';
+            if ($engineTempRounded >= 110.0) {
+                $lines[] = '- WAJIB: Karena suhu dalam kondisi OVERHEAT KRITIS, buat entri khusus di "wawasan_pintar" dengan prioritas="critical" yang menyebutkan suhu kritis dan urgensi pendinginan mesin.';
+            } elseif ($engineTempRounded >= 90.0) {
+                $lines[] = '- Dianjurkan: Singgung kondisi suhu tinggi dalam narasi "insight_sistem" atau "saran_adaptif" sebagai peringatan preventif.';
+            }
+        }
+        $lines[] = '';
+
         // ── Skor komponen ─────────────────────────────────────────────────────
         // Skor 0–100: makin KECIL = makin mendesak untuk diservis (sesuai mapping statusFromScore)
         $lines[] = '== SKOR KONDISI KOMPONEN ==';
