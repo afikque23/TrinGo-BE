@@ -68,6 +68,7 @@ files_to_upload = [
     # Integrasi Suhu Mesin DS18B20
     "app/Models/Vehicle.php",
     "database/migrations/2026_08_07_000001_add_engine_temp_to_vehicles_table.php",
+    "app/Http/Resources/TripResource.php",
 ]
 
 local_base = "c:/laragon/www/motorcycle_management"

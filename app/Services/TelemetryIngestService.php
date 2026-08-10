@@ -187,6 +187,7 @@ class TelemetryIngestService
                 estDistanceM: $estDistanceM,
                 mpuIsMoving: $mpuIsMoving,
                 mpuGForce: $mpuGForce,
+                engineTempC: $engineTempC,
             );
         }
     }
@@ -205,6 +206,7 @@ class TelemetryIngestService
         ?float $estDistanceM = null,
         ?bool $mpuIsMoving = null,
         ?float $mpuGForce = null,
+        ?float $engineTempC = null,
     ): void {
         // Jangan simpan no-fix telemetry ke trip_points agar rute/jarak tidak tercemar.
         if ($hasFix === false || $latitude === null || $longitude === null) {
@@ -265,6 +267,7 @@ class TelemetryIngestService
             'mpu_is_moving' => $mpuIsMoving,
             'mpu_g_force' => $mpuGForce,
             'accuracy_meters' => $accuracyMeters,
+            'engine_temp_c' => $engineTempC !== null ? round($engineTempC, 2) : null,
             'recorded_at' => $recordedAt,
         ]);
     }

@@ -18,9 +18,9 @@ class TripResource extends JsonResource
             'id' => $this->id,
             'vehicle_id' => $this->vehicle_id,
             'vehicle' => [
-                'id' => $this->vehicle->id,
+                'id'    => $this->vehicle->id,
                 'title' => $this->vehicle->title,
-                'make' => $this->vehicle->make,
+                'make'  => $this->vehicle->make,
                 'model' => $this->vehicle->model,
             ],
             'started_by' => $this->started_by,
@@ -38,6 +38,14 @@ class TripResource extends JsonResource
             'points' => TripPointResource::collection($this->whenLoaded('points')),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
+            // Suhu mesin DS18B20 — diambil dari rata-rata trip, atau last known temperature dari vehicle
+            'engine_temp_c'   => $this->avg_temperature_c ?? $this->vehicle?->last_engine_temp_c,
+            'max_engine_temp_c' => $this->max_temperature_c,
+            'min_engine_temp_c' => $this->min_temperature_c,
+            'engine_overheat' => $this->vehicle?->last_engine_overheat ?? false,
+            'engine_temp_at'  => $this->vehicle?->last_engine_temp_at
+                                    ? $this->vehicle->last_engine_temp_at->toIso8601String()
+                                    : null,
         ];
     }
 }
