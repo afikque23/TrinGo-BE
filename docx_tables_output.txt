@@ -1,0 +1,224 @@
+﻿--- TABLE 0 ---
+Nama Komponen | Jarak Tempuh | Durasi Hari | Intensitas Berkendara | Dasar Alasan Teknis
+Oli Mesin | ON | ON | ON | Viskositas oli turun akibat km, durasi bulan, kemacetan stop&go, dan beban mesin
+Ban (Tire) | ON | ON | ON | Tekanan & kedalaman telapak ban aus akibat km dan beban guncangan
+Filter Udara | ON | ON | OFF | Elemen viscous diganti murni berdasarkan jarak & waktu
+Busi | ON | ON | OFF | Pengapian dicek KPB 2 dan diganti per 8.000 km
+Aki (Battery) | ON | ON | OFF | Tipe maintenance-free diperiksa tegangannya secara berkala
+Rem (Kampas Rem) | ON | ON | ON | Gesekan kampas dipengaruhi km, deselerasi (G-Force), & minyak rem 2 th
+CVT / Belt (Drive Belt) | ON | ON | ON | V-Belt aus oleh kilometrase dan entakan akselerasi
+Roller CVT | ON | ON | ON | Roller weight aus bersamaan Drive Belt per 8.000 km
+Oli Gardan (Final Drive) | ON | ON | OFF | Penggantian oli transmisi akhir tiap 12.000 km/12 bulan
+Cairan Pendingin (Coolant) | ON | ON | OFF | Radiator coolant diperiksa berkala berdasarkan jarak tempuh & durasi waktu, ganti total per 3 tahun
+
+--- TABLE 1 ---
+Nama Komponen | Jarak Tempuh | Durasi Hari | Intensitas Berkendara | Dasar Alasan Teknis
+Oli Mesin | ON | ON | ON | Penggantian rutin per 4.000 km/4 bulan & pengaruh gaya berkendara
+Ban (Tire) | ON | OFF | OFF | Tipe Cast Wheel/Jari-jari dicek keausan & tekanan angin
+Filter Udara | ON | OFF | ON | Saringan elemen basah diganti rutin tanpa dibersihkan
+Busi | ON | ON | OFF | Pemeriksaan KPB 2 (4.000 km), penggantian pada 8.000 km
+Aki (Battery) | OFF | ON | OFF | Pemeriksaan sistem kelistrikan & baterai bebas perawatan
+Rem (Kampas Rem) | ON | OFF | OFF | Keausan tromol/cakram & penggantian minyak rem per 2 tahun
+Rantai Roda (Drive Chain) | ON | OFF | ON | Pembersihan, penyetelan, & pelumasan wajib tiap 500 km
+
+--- TABLE 2 ---
+Nama Komponen | Jarak Tempuh | Durasi Hari | Intensitas Berkendara | Dasar Alasan Teknis & Bukti Halaman
+Oli Mesin | ON | ON | ON | Kapasitas 1,1L, diganti rutin per 4.000 km/6 bulan & rpm tinggi
+Ban (Tire) | ON | OFF | OFF | Ban Tubeless depan/belakang dicek tekanan & keausan
+Filter Udara | ON | OFF | ON | Penggantian berkala elemen saringan udara tipe viscous
+Busi (NGK MR9C-9N) | ON | ON | OFF | Pemeriksaan tiap 6.000 km, penggantian rutin pada 12.000 km
+Aki (Battery GTZ6V) | OFF | ON | OFF | Baterai 12V-5Ah dicek fungsi sistem pengisian
+Rem (Cakram Depan/Blk) | ON | OFF | OFF | Pengereman ganda cakram & penggantian minyak rem per 2 tahun
+Rantai Roda | ON | OFF | ON | Pemeriksaan & pelumasan rutin tiap 500 km dengan SAE 80/90
+Cairan Pendingin (Coolant) | ON | ON | OFF | Radiator coolant diperiksa berkala, ganti total per 3 tahun
+Kampas Kopling | ON | OFF | OFF | Keausan pelat kopling akibat gesekan berbanding lurus dengan jarak tempuh, khas motor sport manual
+
+--- TABLE 3 ---
+Variabel Input | Satuan | Rentang Nilai | Himpunan Linguistik | Deskripsi
+Jarak Tempuh (Mileage) | Kilometer (km) | 0 - 5.000 + | Rendah, Menengah, Tinggi | Akumulasi jarak sejak servis terakhir.
+Durasi Hari (Days Since) | Hari | 0 - 180+ | Baru, Sedang, Lama | Waktu yang berlalu sejak penggantian komponen.
+Intensitas Berkendara | Score (0-10) | 0 - 10 | Rendah, Sedang, Tinggi | Frekuensi penggunaan kendaraan harian, turut mempertimbangkan data g-force MPU6050.
+
+--- TABLE 4 ---
+Nama Variabel Input | Semesta Pembicaraan | Himpunan Fuzzy | Tipe Kurva | Parameter Batas (a, b, c)
+Jarak Tempuh (X1) | 0 - 5000 km | Rendah | Linier Turun | a = 1000, b = 2500
+Jarak Tempuh (X1) | 0 - 5000 km | Menengah | Segitiga | a = 1000, b = 2500, c = 4000
+Jarak Tempuh (X1) | 0 - 5000 km | Tinggi | Linier Naik | a = 2500, b = 4000
+Durasi Hari (X2) | 0 - 180 Hari | Baru | Linier Turun | a = 30, b = 90
+Durasi Hari (X2) | 0 - 180 Hari | Sedang | Segitiga | a = 30, b = 90, c = 150
+Durasi Hari (X2) | 0 - 180 Hari | Lama | Linier Naik | a = 90, b = 150
+Intensitas Berkendara (X4) | 0 - 10 Score | Rendah | Linier Turun | a = 2, b = 5
+Intensitas Berkendara (X4) | 0 - 10 Score | Sedang | Segitiga | a = 2, b = 5, c = 8
+Intensitas Berkendara (X4) | 0 - 10 Score | Tinggi | Linier Naik | a = 5, b = 8
+
+--- TABLE 5 ---
+Komponen | Variabel | Himpunan | a | b | c
+Oli Mesin | Jarak Tempuh (km) | LOW | 0 | 0 | 1500
+Oli Mesin | Jarak Tempuh (km) | MEDIUM | 1000 | 2500 | 4000
+Oli Mesin | Jarak Tempuh (km) | HIGH | 2500 | 4000 | 9999
+Oli Mesin | Durasi Hari | LOW | 0 | 0 | 60
+Oli Mesin | Durasi Hari | MEDIUM | 45 | 90 | 120
+Oli Mesin | Durasi Hari | HIGH | 90 | 120 | 999
+Oli Gardan (Final Drive) | Jarak Tempuh (km) | LOW | 0 | 0 | 3500
+Oli Gardan (Final Drive) | Jarak Tempuh (km) | MEDIUM | 2500 | 6000 | 8000
+Oli Gardan (Final Drive) | Jarak Tempuh (km) | HIGH | 6000 | 8000 | 9999
+Oli Gardan (Final Drive) | Durasi Hari | LOW | 0 | 0 | 300
+Oli Gardan (Final Drive) | Durasi Hari | MEDIUM | 250 | 540 | 730
+Oli Gardan (Final Drive) | Durasi Hari | HIGH | 540 | 730 | 999
+Filter Udara | Jarak Tempuh (km) | LOW | 0 | 0 | 7000
+Filter Udara | Jarak Tempuh (km) | MEDIUM | 5000 | 12000 | 16000
+Filter Udara | Jarak Tempuh (km) | HIGH | 12000 | 16000 | 99999
+Busi | Jarak Tempuh (km) | LOW | 0 | 0 | 3500
+Busi | Jarak Tempuh (km) | MEDIUM | 2500 | 6000 | 8000
+Busi | Jarak Tempuh (km) | HIGH | 6000 | 8000 | 9999
+Busi | Durasi Hari | LOW | 0 | 0 | 100
+Busi | Durasi Hari | MEDIUM | 80 | 180 | 240
+Busi | Durasi Hari | HIGH | 180 | 240 | 999
+CVT / Belt & Roller CVT | Jarak Tempuh (km) | LOW | 0 | 0 | 12000
+CVT / Belt & Roller CVT | Jarak Tempuh (km) | MEDIUM | 8000 | 20000 | 24000
+CVT / Belt & Roller CVT | Jarak Tempuh (km) | HIGH | 20000 | 24000 | 99999
+CVT / Belt & Roller CVT | Durasi Hari | LOW | 0 | 0 | 300
+CVT / Belt & Roller CVT | Durasi Hari | MEDIUM | 250 | 540 | 720
+CVT / Belt & Roller CVT | Durasi Hari | HIGH | 540 | 720 | 999
+Rem (Kampas Rem) | Jarak Tempuh (km) | LOW | 0 | 0 | 5000
+Rem (Kampas Rem) | Jarak Tempuh (km) | MEDIUM | 3000 | 8000 | 12000
+Rem (Kampas Rem) | Jarak Tempuh (km) | HIGH | 8000 | 12000 | 99999
+Ban | Jarak Tempuh (km) | LOW | 0 | 0 | 7000
+Ban | Jarak Tempuh (km) | MEDIUM | 5000 | 12000 | 15000
+Ban | Jarak Tempuh (km) | HIGH | 12000 | 15000 | 99999
+Aki (Baterai) | Durasi Hari | LOW | 0 | 0 | 300
+Aki (Baterai) | Durasi Hari | MEDIUM | 250 | 540 | 730
+Aki (Baterai) | Durasi Hari | HIGH | 540 | 730 | 999
+Cairan Pendingin (Coolant) | Jarak Tempuh (km) | LOW | 0 | 0 | 14000
+Cairan Pendingin (Coolant) | Jarak Tempuh (km) | MEDIUM | 10000 | 24000 | 36000
+Cairan Pendingin (Coolant) | Jarak Tempuh (km) | HIGH | 24000 | 36000 | 99999
+Cairan Pendingin (Coolant) | Durasi Hari | LOW | 0 | 0 | 400
+Cairan Pendingin (Coolant) | Durasi Hari | MEDIUM | 300 | 730 | 1095
+Cairan Pendingin (Coolant) | Durasi Hari | HIGH | 730 | 1095 | 9999
+
+--- TABLE 6 ---
+Komponen | Variabel | Himpunan | a | b | c
+Oli Mesin | Jarak Tempuh (km) | LOW | 0 | 0 | 1500
+Oli Mesin | Jarak Tempuh (km) | MEDIUM | 1000 | 2500 | 4000
+Oli Mesin | Jarak Tempuh (km) | HIGH | 2500 | 4000 | 9999
+Oli Mesin | Durasi Hari | LOW | 0 | 0 | 60
+Oli Mesin | Durasi Hari | MEDIUM | 45 | 90 | 120
+Oli Mesin | Durasi Hari | HIGH | 90 | 120 | 999
+Filter Udara | Jarak Tempuh (km) | LOW | 0 | 0 | 7000
+Filter Udara | Jarak Tempuh (km) | MEDIUM | 5000 | 12000 | 16000
+Filter Udara | Jarak Tempuh (km) | HIGH | 12000 | 16000 | 99999
+Rantai Roda | Jarak Tempuh (km) | LOW | 0 | 0 | 8000
+Rantai Roda | Jarak Tempuh (km) | MEDIUM | 5000 | 15000 | 20000
+Rantai Roda | Jarak Tempuh (km) | HIGH | 15000 | 20000 | 99999
+Busi | Jarak Tempuh (km) | LOW | 0 | 0 | 3500
+Busi | Jarak Tempuh (km) | MEDIUM | 2500 | 6000 | 8000
+Busi | Jarak Tempuh (km) | HIGH | 6000 | 8000 | 9999
+Busi | Durasi Hari | LOW | 0 | 0 | 100
+Busi | Durasi Hari | MEDIUM | 80 | 180 | 240
+Busi | Durasi Hari | HIGH | 180 | 240 | 999
+Kampas Kopling | Jarak Tempuh (km) | LOW | 0 | 0 | 12000
+Kampas Kopling | Jarak Tempuh (km) | MEDIUM | 8000 | 20000 | 24000
+Kampas Kopling | Jarak Tempuh (km) | HIGH | 20000 | 24000 | 99999
+Rem (Kampas Rem) | Jarak Tempuh (km) | LOW | 0 | 0 | 5000
+Rem (Kampas Rem) | Jarak Tempuh (km) | MEDIUM | 3000 | 8000 | 12000
+Rem (Kampas Rem) | Jarak Tempuh (km) | HIGH | 8000 | 12000 | 99999
+Ban | Jarak Tempuh (km) | LOW | 0 | 0 | 7000
+Ban | Jarak Tempuh (km) | MEDIUM | 5000 | 12000 | 15000
+Ban | Jarak Tempuh (km) | HIGH | 12000 | 15000 | 99999
+Aki (Baterai) | Durasi Hari | LOW | 0 | 0 | 300
+Aki (Baterai) | Durasi Hari | MEDIUM | 250 | 540 | 730
+Aki (Baterai) | Durasi Hari | HIGH | 540 | 730 | 999
+
+--- TABLE 7 ---
+Komponen | Variabel | Himpunan | a | b | c
+Oli Mesin | Jarak Tempuh (km) | LOW | 0 | 0 | 2500
+Oli Mesin | Jarak Tempuh (km) | MEDIUM | 2000 | 4000 | 6000
+Oli Mesin | Jarak Tempuh (km) | HIGH | 4000 | 6000 | 9999
+Oli Mesin | Durasi Hari | LOW | 0 | 0 | 90
+Oli Mesin | Durasi Hari | MEDIUM | 60 | 120 | 180
+Oli Mesin | Durasi Hari | HIGH | 120 | 180 | 999
+Filter Udara | Jarak Tempuh (km) | LOW | 0 | 0 | 8000
+Filter Udara | Jarak Tempuh (km) | MEDIUM | 6000 | 14000 | 18000
+Filter Udara | Jarak Tempuh (km) | HIGH | 14000 | 18000 | 99999
+Rantai Roda | Jarak Tempuh (km) | LOW | 0 | 0 | 8000
+Rantai Roda | Jarak Tempuh (km) | MEDIUM | 5000 | 15000 | 20000
+Rantai Roda | Jarak Tempuh (km) | HIGH | 15000 | 20000 | 99999
+Busi (NGK MR9C-9N) | Jarak Tempuh (km) | LOW | 0 | 0 | 5000
+Busi (NGK MR9C-9N) | Jarak Tempuh (km) | MEDIUM | 4000 | 9000 | 12000
+Busi (NGK MR9C-9N) | Jarak Tempuh (km) | HIGH | 9000 | 12000 | 99999
+Busi (NGK MR9C-9N) | Durasi Hari | LOW | 0 | 0 | 180
+Busi (NGK MR9C-9N) | Durasi Hari | MEDIUM | 120 | 270 | 360
+Busi (NGK MR9C-9N) | Durasi Hari | HIGH | 270 | 360 | 999
+Kampas Kopling | Jarak Tempuh (km) | LOW | 0 | 0 | 12000
+Kampas Kopling | Jarak Tempuh (km) | MEDIUM | 8000 | 20000 | 24000
+Kampas Kopling | Jarak Tempuh (km) | HIGH | 20000 | 24000 | 99999
+Rem (Cakram Depan/Blk) | Jarak Tempuh (km) | LOW | 0 | 0 | 7000
+Rem (Cakram Depan/Blk) | Jarak Tempuh (km) | MEDIUM | 5000 | 12000 | 15000
+Rem (Cakram Depan/Blk) | Jarak Tempuh (km) | HIGH | 12000 | 15000 | 99999
+Ban | Jarak Tempuh (km) | LOW | 0 | 0 | 7000
+Ban | Jarak Tempuh (km) | MEDIUM | 5000 | 12000 | 15000
+Ban | Jarak Tempuh (km) | HIGH | 12000 | 15000 | 99999
+Aki (Battery GTZ6V) | Durasi Hari | LOW | 0 | 0 | 300
+Aki (Battery GTZ6V) | Durasi Hari | MEDIUM | 250 | 540 | 730
+Aki (Battery GTZ6V) | Durasi Hari | HIGH | 540 | 730 | 999
+
+--- TABLE 8 ---
+Tipe Motor | Komponen | Warn Jarak (km) | Critical Jarak (km) | Warn Waktu (hari) | Critical Waktu (hari)
+Matic (BeAT/Vario) | Oli Mesin | 2.500 | 4.000 | 90 | 120
+Matic (BeAT/Vario) | Oli Gardan (Final Drive) | 6.000 | 8.000 | 540 | 730
+Matic (BeAT/Vario) | Filter Udara | 12.000 | 16.000 | - | -
+Matic (BeAT/Vario) | Busi | 6.000 | 8.000 | 180 | 240
+Matic (BeAT/Vario) | CVT / Belt & Roller CVT | 20.000 | 24.000 | 540 | 720
+Matic (BeAT/Vario) | Rem (Kampas Rem) | 8.000 | 12.000 | - | -
+Matic (BeAT/Vario) | Ban | 12.000 | 15.000 | - | -
+Matic (BeAT/Vario) | Aki (Baterai) | - | - | 540 | 730
+Matic (BeAT/Vario) | Cairan Pendingin (Coolant) | 24.000 | 36.000 | 730 | 1.095
+Manual (Supra X/Revo) | Oli Mesin | 2.500 | 4.000 | 90 | 120
+Manual (Supra X/Revo) | Filter Udara | 12.000 | 16.000 | - | -
+Manual (Supra X/Revo) | Rantai Roda | 15.000 | 20.000 | - | -
+Manual (Supra X/Revo) | Busi | 6.000 | 8.000 | 180 | 240
+Manual (Supra X/Revo) | Kampas Kopling | 20.000 | 24.000 | - | -
+Manual (Supra X/Revo) | Rem (Kampas Rem) | 8.000 | 12.000 | - | -
+Manual (Supra X/Revo) | Ban | 12.000 | 15.000 | - | -
+Manual (Supra X/Revo) | Aki (Baterai) | - | - | 540 | 730
+Sport (CB150R) | Oli Mesin | 4.000 | 6.000 | 120 | 180
+Sport (CB150R) | Filter Udara | 14.000 | 18.000 | - | -
+Sport (CB150R) | Rantai Roda | 15.000 | 20.000 | - | -
+Sport (CB150R) | Busi (NGK MR9C-9N) | 9.000 | 12.000 | 270 | 360
+Sport (CB150R) | Kampas Kopling | 20.000 | 24.000 | - | -
+Sport (CB150R) | Rem (Cakram Depan/Blk) | 12.000 | 15.000 | - | -
+Sport (CB150R) | Ban | 12.000 | 15.000 | - | -
+Sport (CB150R) | Aki (Battery GTZ6V) | - | - | 540 | 730
+
+--- TABLE 9 ---
+No | Kombinasi Logika (Kondisi IF) | Output (THEN) | Bobot
+1 | Jarak = high AND Waktu = high | Kritis (Bad) | 1.0
+2 | Jarak = high AND Waktu = medium | Kritis (Bad) | 0.9
+3 | Jarak = high AND Waktu = low | Kritis (Bad) | 0.8
+4 | Jarak = medium AND Waktu = high | Kritis (Bad) | 0.9
+5 | Jarak = medium AND Waktu = medium | Perlu Servis (Fair) | 1.0
+6 | Jarak = medium AND Waktu = low | Perlu Servis (Fair) | 0.8
+7 | Jarak = low AND Waktu = high | Kritis (Bad) | 0.8
+8 | Jarak = low AND Waktu = medium | Perlu Servis (Fair) | 0.8
+9 | Jarak = low AND Waktu = low | Baik (Good) | 1.0
+
+--- TABLE 10 ---
+Kombinasi Logika (Kondisi IF) | Output (THEN) | Bobot | Alasan Umum
+Jarak = high AND Intensitas = high | Kritis | 1.0 | Mutlak wajib ganti / aus berat.
+Jarak = medium AND Intensitas = high | Kritis | 0.9 | Intensitas berat membuat komponen aus lebih dini meski km belum maksimal.
+Jarak = low AND Intensitas = high | Perlu Servis | 0.7 | Pemakaian ekstrem terdeteksi.
+Waktu = high AND Intensitas = high | Kritis | 1.0 | Khusus komponen dengan variabel Durasi Hari aktif (mis. Oli Mesin): kadaluwarsa.
+Jarak = medium AND Intensitas = medium | Perlu Servis | 1.0 | Pemakaian normal, batas peringatan normal.
+
+--- TABLE 11 ---
+Kombinasi Logika (Kondisi IF) | Output (THEN) | Bobot
+Jarak/Waktu = high | Kritis (Bad) | 1.0
+Jarak/Waktu = medium | Perlu Servis (Fair) | 1.0
+Jarak/Waktu = low | Baik (Good) | 1.0
+
+--- TABLE 12 ---
+Variabel Output | Rentang Skor | Status Linguistik | Tindakan yang Disarankan
+Normal (Aman) | 0% - 40% | Good | Komponen dalam kondisi prima, belum perlu servis.
+Warning (Perhatian) | 41% - 75% | Warning | Keausan mulai terjadi, persiapkan servis dalam waktu dekat.
+Critical (Bahaya) | 76% - 100% | Critical | Harus segera diservis/diganti untuk menghindari kerusakan fatal.
+

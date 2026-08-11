@@ -116,7 +116,6 @@
         const labels = {
             'distance_since_service_km': 'Jarak Tempuh (km)',
             'duration_since_service_days': 'Durasi Servis (Hari)',
-            'avg_speed_kph': 'Kecepatan Rata-rata (km/jam)',
             'intensity_km_per_day': 'Intensitas Berkendara (Score)'
         };
 

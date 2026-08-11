@@ -40,7 +40,7 @@ class UpdateVehicleRequest extends FormRequest
             'year' => ['nullable', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
             'tipe_motor' => ['sometimes', 'required', 'in:matic,manual,sport'],
             'vin' => ['nullable', 'string', 'max:64', Rule::unique('vehicles')->ignore($vehicleId)],
-            'odometer' => ['nullable', 'integer', 'min:0'],
+            'odometer' => ['nullable', 'numeric', 'min:0'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'], // Max 5MB
             // Parameter default untuk kalkulasi jadwal servis
             'default_beban'           => ['nullable', 'in:ringan,sedang,berat'],
@@ -66,7 +66,7 @@ class UpdateVehicleRequest extends FormRequest
             'year.min' => 'Tahun minimal 1900',
             'year.max' => 'Tahun tidak valid',
             'vin.unique' => 'VIN sudah terdaftar untuk kendaraan lain',
-            'odometer.integer' => 'Odometer harus berupa angka',
+            'odometer.numeric' => 'Odometer harus berupa angka',
             'odometer.min'                    => 'Odometer tidak boleh negatif',
             'photo.image'                     => 'File harus berupa gambar',
             'photo.mimes'                     => 'Format gambar harus jpeg, jpg, png, atau webp',

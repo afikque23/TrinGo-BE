@@ -162,7 +162,7 @@
                 </div>
             </div>
             <div>
-                <label class="block text-xs text-[#6A7282] mb-1 tracking-wider uppercase" style="font-family: Arial, sans-serif;">Reset Interval</label>
+                <label class="block text-xs text-[#6A7282] mb-1 tracking-wider uppercase" style="font-family: Arial, sans-serif;">Interval Servis (Hari)</label>
                 <div class="flex items-center gap-2">
                     <input type="number" min="0" class="w-full h-[38px] bg-[#0A0A0A] border border-[#1E2939] rounded-[10px] px-3 text-sm text-white"
                            x-model.number="resetIntervalDays" @input="applyResetInterval()" />
@@ -195,7 +195,7 @@
                 </template>
             </div>
 
-            <div class="mt-4 text-xs text-[#364153]" style="font-family: Arial, sans-serif;">Contoh: Ban cukup pakai Jarak + Kecepatan. Oli pakai Jarak + Durasi + Intensitas.</div>
+            <div class="mt-4 text-xs text-[#364153]" style="font-family: Arial, sans-serif;">Contoh: Oli pakai Jarak + Durasi + Intensitas.</div>
         </div>
     </div>
 
@@ -442,14 +442,12 @@
             inputVars: [
                 { key: 'distance_since_service_km', short: 'Jarak Sejak Servis', label: 'Jarak Sejak Servis (km)', unit: 'km' },
                 { key: 'duration_since_service_days', short: 'Durasi Sejak Servis', label: 'Durasi Sejak Servis (hari)', unit: 'hari' },
-                { key: 'avg_speed_kph', short: 'Kecepatan Rata-rata', label: 'Kecepatan Rata-rata (km/jam)', unit: 'km/jam' },
                 { key: 'intensity_km_per_day', short: 'Intensitas Pakai', label: 'Intensitas Pakai (km/hari)', unit: 'km/hari' },
             ],
 
             testInputs: {
                 distance_since_service_km: 1200,
                 duration_since_service_days: 50,
-                avg_speed_kph: 45,
                 intensity_km_per_day: 20,
             },
 

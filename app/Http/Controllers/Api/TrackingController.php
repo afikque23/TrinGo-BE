@@ -146,6 +146,11 @@ class TrackingController extends Controller
         $sumSpeed = 0;
         $countSpeed = 0;
 
+        $maxTempC = null;
+        $minTempC = null;
+        $sumTempC = 0;
+        $countTemp = 0;
+
         $lastPoint = null;
         foreach ($points as $point) {
             if ($lastPoint) {
@@ -163,6 +168,16 @@ class TrackingController extends Controller
                 $countSpeed++;
                 if ($point->speed_kph > $maxSpeedKph) {
                     $maxSpeedKph = $point->speed_kph;
+                }
+            }
+            if ($point->engine_temp_c !== null) {
+                $sumTempC += $point->engine_temp_c;
+                $countTemp++;
+                if ($maxTempC === null || $point->engine_temp_c > $maxTempC) {
+                    $maxTempC = (float) $point->engine_temp_c;
+                }
+                if ($minTempC === null || $point->engine_temp_c < $minTempC) {
+                    $minTempC = (float) $point->engine_temp_c;
                 }
             }
             $lastPoint = $point;
@@ -204,6 +219,11 @@ class TrackingController extends Controller
             $maxSpeedKph = round($clientMaxSpeedKph, 2);
         }
 
+        // Sanity check: Max speed logikanya tidak mungkin lebih rendah dari Average speed
+        if ($maxSpeedKph !== null && $avgSpeedKph !== null && $maxSpeedKph < $avgSpeedKph) {
+            $maxSpeedKph = $avgSpeedKph;
+        }
+
         // Hitung elevation_gain dari baro_rel_alt_m (BMP280) — total kenaikan elevasi
         $elevationGainM = 0;
         $lastAlt = null;
@@ -225,6 +245,8 @@ class TrackingController extends Controller
         $distanceKm = round($totalDistanceMeters / 1000, 2);
         $endOdometer = (int) ($startOdometer + $distanceKm);
 
+        $avgTempC = $countTemp > 0 ? round($sumTempC / $countTemp, 2) : $vehicle->last_engine_temp_c;
+
         $trip->update([
             'status' => 'completed',
             'end_at' => $endAt,
@@ -235,6 +257,9 @@ class TrackingController extends Controller
             'avg_speed_kph' => $avgSpeedKph,
             'max_speed_kph' => $maxSpeedKph,
             'elevation_gain' => $elevationGainM,
+            'avg_temperature_c' => $avgTempC,
+            'max_temperature_c' => $maxTempC ?? $avgTempC,
+            'min_temperature_c' => $minTempC ?? $avgTempC,
         ]);
 
         // Update vehicle odometer
@@ -296,23 +321,29 @@ class TrackingController extends Controller
         };
 
         return response()->json([
-            'latitude'        => $hasCoordinates ? (float) $lat : null,
-            'longitude'       => $hasCoordinates ? (float) $lng : null,
-            'speed_kph'       => $vehicle->last_speed_kph,
-            'heading_deg'     => $vehicle->last_heading_deg,
-            'altitude'        => $vehicle->last_altitude,
-            'accuracy_meters' => $vehicle->last_accuracy_meters,
-            'satellites'      => $satellites,
-            'hdop'            => $hdop,
-            'baro_rel_alt_m'  => $vehicle->last_baro_rel_alt_m,
-            'grade_pct'       => $vehicle->last_grade_pct,
-            'gps_ready'       => $gpsReady,
-            'telemetry_at'    => $vehicle->last_telemetry_at
+            'latitude'         => $hasCoordinates ? (float) $lat : null,
+            'longitude'        => $hasCoordinates ? (float) $lng : null,
+            'speed_kph'        => $vehicle->last_speed_kph,
+            'heading_deg'      => $vehicle->last_heading_deg,
+            'altitude'         => $vehicle->last_altitude,
+            'accuracy_meters'  => $vehicle->last_accuracy_meters,
+            'satellites'       => $satellites,
+            'hdop'             => $hdop,
+            'baro_rel_alt_m'   => $vehicle->last_baro_rel_alt_m,
+            'grade_pct'        => $vehicle->last_grade_pct,
+            'gps_ready'        => $gpsReady,
+            'telemetry_at'     => $vehicle->last_telemetry_at
                                     ? $vehicle->last_telemetry_at->toISOString()
                                     : null,
-            'received_at'     => $lastReceived ? $lastReceived->toISOString() : null,
-            'iot_status'      => $iotStatus,
-            'seconds_ago'     => $secondsAgo,
+            'received_at'      => $lastReceived ? $lastReceived->toISOString() : null,
+            'iot_status'       => $iotStatus,
+            'seconds_ago'      => $secondsAgo,
+            // Suhu mesin DS18B20 — untuk monitoring real-time di Flutter
+            'engine_temp_c'    => $vehicle->last_engine_temp_c,
+            'engine_overheat'  => $vehicle->last_engine_overheat ?? false,
+            'engine_temp_at'   => $vehicle->last_engine_temp_at
+                                    ? $vehicle->last_engine_temp_at->toISOString()
+                                    : null,
         ], 200);
     }
 
