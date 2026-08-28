@@ -25,6 +25,7 @@ class TripPointResource extends JsonResource
             'grade_pct' => $this->grade_pct,
             'speed_kph' => $this->speed_kph,
             'accuracy_meters' => $this->accuracy_meters,
+            'engine_temp_c' => $this->engine_temp_c,
             'recorded_at' => $this->recorded_at?->toIso8601String(),
         ];
     }

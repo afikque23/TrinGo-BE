@@ -172,24 +172,23 @@ class TelemetryIngestService
             ] : []),
         ])->save();
 
-        if ((bool) config('mqtt.trip_points.enabled', false)) {
-            $this->appendTripPoint(
-                vehicle: $vehicle,
-                latitude: $latitude,
-                longitude: $longitude,
-                altitude: $altitude,
-                baroRelAltM: $baroRelAltM,
-                gradePct: $gradePct,
-                speedKph: $speedKph,
-                accuracyMeters: $accuracyMeters,
-                recordedAt: $telemetryAt ?? $receivedAt,
-                hasFix: $hasFixBool,
-                estDistanceM: $estDistanceM,
-                mpuIsMoving: $mpuIsMoving,
-                mpuGForce: $mpuGForce,
-                engineTempC: $engineTempC,
-            );
-        }
+        // Abaikan config env, paksa selalu simpan agar data suhu tidak hilang!
+        $this->appendTripPoint(
+            vehicle: $vehicle,
+            latitude: $latitude,
+            longitude: $longitude,
+            altitude: $altitude,
+            baroRelAltM: $baroRelAltM,
+            gradePct: $gradePct,
+            speedKph: $speedKph,
+            accuracyMeters: $accuracyMeters,
+            recordedAt: $telemetryAt ?? $receivedAt,
+            hasFix: $hasFixBool,
+            estDistanceM: $estDistanceM,
+            mpuIsMoving: $mpuIsMoving,
+            mpuGForce: $mpuGForce,
+            engineTempC: $engineTempC,
+        );
     }
 
     private function appendTripPoint(
@@ -208,13 +207,13 @@ class TelemetryIngestService
         ?float $mpuGForce = null,
         ?float $engineTempC = null,
     ): void {
-        // Jangan simpan no-fix telemetry ke trip_points agar rute/jarak tidak tercemar.
+        // Tetap simpan ke trip_points meskipun no-fix (agar data sensor lain seperti suhu mesin tetap terekam).
+        // Jarak/rute tidak akan tercemar karena haversine distance di-skip jika koordinat null.
         if ($hasFix === false || $latitude === null || $longitude === null) {
-            Log::debug('TelemetryIngest: skipping trip_point due to GPS no-fix.', [
+            Log::debug('TelemetryIngest: saving trip_point without GPS fix (keeping other sensor data).', [
                 'vehicle_id' => $vehicle->id,
                 'has_fix' => $hasFix,
             ]);
-            return;
         }
 
         // Pattern B: hanya simpan trip_points jika ada trip AKTIF yang dimulai oleh user.

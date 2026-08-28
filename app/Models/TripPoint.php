@@ -26,6 +26,7 @@ class TripPoint extends Model
         'mpu_is_moving',
         'mpu_g_force',
         'accuracy_meters',
+        'engine_temp_c',
         'recorded_at',
     ];
 
@@ -41,6 +42,7 @@ class TripPoint extends Model
         'mpu_is_moving' => 'boolean',
         'mpu_g_force' => 'float',
         'accuracy_meters' => 'float',
+        'engine_temp_c' => 'float',
         'recorded_at' => 'datetime',
         'created_at' => 'datetime',
     ];
