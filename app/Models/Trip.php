@@ -40,6 +40,9 @@ class Trip extends Model
         'rough_road_count',
         'hard_acceleration_count',
         'hard_braking_count',
+        'avg_temperature_c',
+        'max_temperature_c',
+        'min_temperature_c',
         // Kalibrasi & scoring
         'is_calibrated',
         'service_score_factor',

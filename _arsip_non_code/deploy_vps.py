@@ -69,6 +69,9 @@ files_to_upload = [
     "app/Models/Vehicle.php",
     "database/migrations/2026_08_07_000001_add_engine_temp_to_vehicles_table.php",
     "app/Http/Resources/TripResource.php",
+    "app/Http/Resources/TripPointResource.php",
+    "app/Models/TripPoint.php",
+    "database/migrations/2026_08_10_102339_add_temperature_fields_to_trips_and_points_table.php",
 ]
 
 local_base = "c:/laragon/www/motorcycle_management"
